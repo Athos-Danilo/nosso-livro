@@ -51,7 +51,23 @@ Estudantes, professores e colaboradores de uma instituição que compartilham ac
 O sistema será desenvolvido utilizando uma **Arquitetura de Microsserviços** poliglota e descentralizada.
 
 ### 🌐 Arquitetura Geral e Integração
-* **Estrutura do Projeto (Monorepo):** O código de todos os microsserviços, frontend e API Gateway será armazenado em um único repositório Git. Isso simplifica a orquestração do ambiente de desenvolvimento local com um único arquivo `docker-compose.yml` e facilita o gerenciamento de dependências locais.
+* **Estrutura do Projeto (Monorepo):** O código de todos os microsserviços, frontend e API Gateway será armazenado em um único repositório Git. Para manter a organização do código limpa e os builds de desenvolvimento eficientes, adotaremos a seguinte estrutura física de diretórios na raiz do repositório:
+  ```text
+  nosso-livro/ (Raiz do Monorepo)
+  ├── frontend/                           # Aplicação cliente React (Vite/TS)
+  ├── backend/                            # Diretório agregador de APIs e Serviços
+  │   ├── api-gateway/                    # API Gateway centralizado (Go)
+  │   ├── user-auth-service/              # Serviço de Usuários e Autenticação (Go)
+  │   ├── loan-service/                   # Serviço de Empréstimos e Devoluções (Go)
+  │   ├── catalog-service/                # Serviço de Catálogo e Bibliotecas (Python/FastAPI)
+  │   ├── recommendation-service/         # Serviço de Recomendação Inteligente (Python/FastAPI)
+  │   ├── reservation-service/            # Serviço de Reservas e Filas (Node.js/TS)
+  │   └── notification-service/           # Serviço de Notificações (Node.js/TS)
+  ├── docker-compose.yml                  # Orquestrador local de infraestrutura e serviços
+  ├── README.md                           # Instruções globais de inicialização do projeto
+  └── ESPECIFICAÇÕES.md                   # Fonte única de verdade do projeto
+  ```
+  Essa organização mantém a raiz do repositório limpa e simplifica a escrita do arquivo centralizado `docker-compose.yml`, que fará o mapeamento e subida automática de todos os microsserviços e seus respectivos bancos locais apontando para os subdiretórios corretos dentro de `./backend/`.
 * **Comunicação Síncrona (HTTP/REST):** 
   - Comunicação externa entre o Frontend, o API Gateway e os serviços de destino.
   - **Integração de Integridade:** Validações de integridade entre serviços serão feitas de forma síncrona e direta via chamadas HTTP internas de serviço para serviço. Por exemplo: antes de salvar um empréstimo, o `Loan Service` realiza chamadas HTTP síncronas para validar se o usuário existe no `User & Auth Service` e se o livro existe no `Catalog & Library Service`.
