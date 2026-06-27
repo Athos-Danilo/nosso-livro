@@ -12,7 +12,7 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 
 - [x] **Fase 1: Configuração do Módulo e Banco de Dados (Go + PostgreSQL)**
 - [x] **Fase 2: Camada de Domínio e Repositórios (Domínio & Repositório)**
-- [ ] **Fase 3: Lógica de Autenticação, Criptografia e JWT (Serviços)**
+- [x] **Fase 3: Lógica de Autenticação, Criptografia e JWT (Serviços)**
 - [ ] **Fase 4: Handlers HTTP, Rotas e Middlewares (Controladores)**
 - [ ] **Fase 5: Segurança, Limitador de Taxa e Validações**
 - [ ] **Fase 6: Testes Automatizados e Cobertura**
@@ -69,19 +69,19 @@ Modelagem das entidades e escrita das queries de banco em português.
 ## 🔒 Fase 3: Lógica de Autenticação, Criptografia e JWT (Serviços)
 Regras de segurança de acesso e criptografia de credenciais.
 
-- [ ] **M3.1: Hashing de Senhas**
-  - [ ] Usar `golang.org/x/crypto/bcrypt` para hash da senha.
-  - [ ] Criar funções `GerarHashSenha` e `CompararSenhaHash`.
-- [ ] **M3.2: Geração e Validação de Tokens JWT**
-  - [ ] Utilizar o pacote `github.com/golang-jwt/jwt/v5`.
-  - [ ] Definir a chave secreta a ser lida de variável de ambiente (`CHAVE_SECRETA_JWT`).
-  - [ ] Criar claims contendo:
+- [x] **M3.1: Hashing de Senhas**
+  - [x] Usar `golang.org/x/crypto/bcrypt` para hash da senha.
+  - [x] Criar funções `GerarHashSenha` e `CompararSenhaHash`.
+- [x] **M3.2: Geração e Validação de Tokens JWT**
+  - [x] Utilizar o pacote `github.com/golang-jwt/jwt/v5`.
+  - [x] Definir a chave secreta a ser lida de variável de ambiente (`CHAVE_SECRETA_JWT`).
+  - [x] Criar claims contendo:
     - ID do Usuário (`sub`)
     - Permissão / Cargo (`permissao`)
     - Telefone WhatsApp (`whatsapp`)
     - Data de expiração (`exp` - padrão de 24 horas)
-  - [ ] Função para gerar e assinar o token (`GerarTokenAutenticacao`).
-  - [ ] Função para decodificar e validar o token (`ValidarTokenAutenticacao`).
+  - [x] Função para gerar e assinar o token (`GerarTokenAutenticacao`).
+  - [x] Função para decodificar e validar o token (`ValidarTokenAutenticacao`).
 
 ---
 

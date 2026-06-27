@@ -8,10 +8,21 @@ import (
 
 	"nosso-livro/servico-autenticacao-usuario/internal/dominio"
 	"nosso-livro/servico-autenticacao-usuario/internal/repositorio"
+	"nosso-livro/servico-autenticacao-usuario/internal/servico"
 )
 
 func main() {
 	log.Println("[API] Iniciando o Serviço de Autenticação e Usuário...")
+
+	// Teste rápido de integridade dos serviços de criptografia Bcrypt
+	hashTeste, err := servico.GerarHashSenha("senha_segura_de_teste")
+	if err != nil {
+		log.Fatalf("[Erro] Falha no teste de inicialização do Bcrypt: %v\n", err)
+	}
+	if err := servico.CompararSenhaHash("senha_segura_de_teste", hashTeste); err != nil {
+		log.Fatalf("[Erro] Comparação do teste de Bcrypt falhou: %v\n", err)
+	}
+	log.Println("[API] Lógica de criptografia Bcrypt testada com sucesso no startup.")
 
 	// 1. Conexão com o Banco de Dados
 	urlBanco := os.Getenv("URL_BANCO_DADOS")
