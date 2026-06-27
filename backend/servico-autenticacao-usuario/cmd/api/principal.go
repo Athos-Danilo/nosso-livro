@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"nosso-livro/servico-autenticacao-usuario/internal/dominio"
 	"nosso-livro/servico-autenticacao-usuario/internal/repositorio"
 )
 
@@ -22,6 +23,11 @@ func main() {
 			log.Fatalf("[Erro] Falha catastrófica ao conectar no banco de dados: %v\n", err)
 		}
 		defer poolBanco.Close()
+
+		// Validação estática de tipo em tempo de compilação para garantir que o repositório implementa a interface
+		repoUsuario := repositorio.NovoRepositorioUsuarioPostgres(poolBanco)
+		var _ dominio.RepositorioUsuario = repoUsuario
+		log.Println("[API] Repositório de usuários carregado e validado estaticamente.")
 	}
 
 	// Endpoint básico de verificação de saúde para testar a inicialização do servidor

@@ -10,8 +10,8 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 
 ## 🗺️ Mapa de Progresso Geral
 
-- [ ] **Fase 1: Configuração do Módulo e Banco de Dados (Go + PostgreSQL)**
-- [ ] **Fase 2: Camada de Domínio e Repositórios (Domínio & Repositório)**
+- [x] **Fase 1: Configuração do Módulo e Banco de Dados (Go + PostgreSQL)**
+- [x] **Fase 2: Camada de Domínio e Repositórios (Domínio & Repositório)**
 - [ ] **Fase 3: Lógica de Autenticação, Criptografia e JWT (Serviços)**
 - [ ] **Fase 4: Handlers HTTP, Rotas e Middlewares (Controladores)**
 - [ ] **Fase 5: Segurança, Limitador de Taxa e Validações**
@@ -23,18 +23,18 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 ## 🗄️ Fase 1: Configuração do Módulo e Banco de Dados
 Configuração inicial do projeto Go e da estrutura de migração com PostgreSQL.
 
-- [ ] **M1.1: Inicialização do Projeto Go**
-  - [ ] Executar `go mod init nosso-livro/servico-autenticacao-usuario` dentro da pasta `./backend/servico-autenticacao-usuario/`
-  - [ ] Organizar a estrutura de diretórios em português:
+- [x] **M1.1: Inicialização do Projeto Go**
+  - [x] Executar `go mod init nosso-livro/servico-autenticacao-usuario` dentro da pasta `./backend/servico-autenticacao-usuario/`
+  - [x] Organizar a estrutura de diretórios em português:
     - `/cmd/api/principal.go` (Ponto de entrada da aplicação)
     - `/internal/dominio` (Entidades e contratos de interfaces)
     - `/internal/repositorio` (Persistência em banco de dados)
     - `/internal/servico` (Lógica de negócios e regras de autenticação)
     - `/internal/controlador` (Controladores HTTP e adaptadores de entrada)
     - `/migrations` (Scripts de alteração de banco de dados SQL em português)
-- [ ] **M1.2: Configuração de Migrações com `golang-migrate`**
-  - [ ] Configurar a ferramenta para gerenciar o banco `banco_autenticacao`.
-  - [ ] Criar a primeira migração (`000001_cria_tabela_usuarios.up.sql`):
+- [x] **M1.2: Configuração de Migrações com `golang-migrate`**
+  - [x] Configurar a ferramenta para gerenciar o banco `banco_autenticacao`.
+  - [x] Criar a primeira migração (`000001_cria_tabela_usuarios.up.sql`):
     - `id` do usuário como UUID (gerado automaticamente no banco).
     - Campo `whatsapp` como string (identificador único, indexado).
     - Campo `email` como string (único, indexado).
@@ -43,26 +43,26 @@ Configuração inicial do projeto Go e da estrutura de migração com PostgreSQL
     - Campo `permissao` como string (ex: `'administrador'`, `'membro'`).
     - Campo `ativo` como booleano (default `true`).
     - Campos de controle temporal `criado_em` e `atualizado_em`.
-- [ ] **M1.3: Conexão e Pool de Banco de Dados**
-  - [ ] Configurar conexão com o banco serverless PostgreSQL Neon via variável de ambiente (`URL_BANCO_DADOS`).
-  - [ ] Utilizar pool de conexões otimizado (`pgx/v5` ou `sqlx`) com retry automático contra cold start.
+- [x] **M1.3: Conexão e Pool de Banco de Dados**
+  - [x] Configurar conexão com o banco serverless PostgreSQL Neon via variável de ambiente (`URL_BANCO_DADOS`).
+  - [x] Utilizar pool de conexões otimizado (`pgx/v5` ou `sqlx`) com retry automático contra cold start.
 
 ---
 
 ## 💾 Fase 2: Camada de Domínio e Repositórios
 Modelagem das entidades e escrita das queries de banco em português.
 
-- [ ] **M2.1: Estruturas de Domínio (`dominio`)**
-  - [ ] Definir a struct `Usuario` mapeando os campos do banco de dados com tags JSON em português.
-  - [ ] Criar a interface `RepositorioUsuario` com os contratos de persistência.
-  - [ ] Definir as estruturas de DTOs para entrada (`RequisicaoCadastro`, `RequisicaoLogin`) e saída (`RespostaUsuario`).
-- [ ] **M2.2: Implementação do Repositório (`repositorio`)**
-  - [ ] Desenvolver a persistência concreta do repositório utilizando comandos SQL parametrizados.
-  - [ ] Método `Criar(ctx, usuario)` para cadastrar novos usuários.
-  - [ ] Método `BuscarPorID(ctx, id)` para obter dados de usuário.
-  - [ ] Método `BuscarPorWhatsApp(ctx, whatsapp)` para encontrar usuários pelo telefone.
-  - [ ] Método `BuscarPorEmail(ctx, email)` para encontrar usuários pelo email.
-  - [ ] Tratar erros de chave duplicada retornando mensagens de erro limpas e informativas (ex: "WhatsApp já cadastrado").
+- [x] **M2.1: Estruturas de Domínio (`dominio`)**
+  - [x] Definir a struct `Usuario` mapeando os campos do banco de dados com tags JSON em português.
+  - [x] Criar a interface `RepositorioUsuario` com os contratos de persistência.
+  - [x] Definir as estruturas de DTOs para entrada (`RequisicaoCadastro`, `RequisicaoLogin`) e saída (`RespostaUsuario`).
+- [x] **M2.2: Implementação do Repositório (`repositorio`)**
+  - [x] Desenvolver a persistência concreta do repositório utilizando comandos SQL parametrizados.
+  - [x] Método `Criar(ctx, usuario)` para cadastrar novos usuários.
+  - [x] Método `BuscarPorID(ctx, id)` para obter dados de usuário.
+  - [x] Método `BuscarPorWhatsApp(ctx, whatsapp)` para encontrar usuários pelo telefone.
+  - [x] Método `BuscarPorEmail(ctx, email)` para encontrar usuários pelo email.
+  - [x] Tratar erros de chave duplicada retornando mensagens de erro limpas e informativas (ex: "WhatsApp já cadastrado").
 
 ---
 
