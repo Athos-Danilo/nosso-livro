@@ -6,26 +6,29 @@ Este documento serve como fonte única de verdade para todas as decisões técni
 
 ## 👥 Equipe e Responsabilidades
 
-Abaixo estão definidos os integrantes do projeto e a linguagem de programação de backend escolhida por cada um para desenvolver seus respectivos microsserviços (a divisão exata de qual serviço ficará com quem será definida posteriormente):
+Abaixo estão definidos os integrantes do projeto, a linguagem de programação de backend e os microsserviços sob responsabilidade de cada um:
 
 ### 👤 Athos Inácio
 * **Linguagem Backend:** **Go**
 * **Responsabilidades:**
   - Desenvolvimento do **Frontend (React)** (Responsável Principal).
   - Desenvolvimento do **API Gateway** em Go.
-  - Desenvolvimento de 2 microsserviços em Go.
+  - Desenvolvimento do **User & Auth Service** em Go.
+  - Desenvolvimento do **Loan Service** em Go.
   - Orquestração inicial do ambiente de desenvolvimento (Docker Compose).
 
 ### 👤 Cauã Herculano
 * **Linguagem Backend:** **Python (FastAPI)**
 * **Responsabilidades:**
-  - Desenvolvimento de 2 microsserviços em Python.
+  - Desenvolvimento do **Catalog & Library Service** em Python.
+  - Desenvolvimento do **Recommendation Service** em Python.
   - Integração com o banco de dados e mensageria RabbitMQ nos seus serviços.
 
 ### 👤 Marcus Vinícius
 * **Linguagem Backend:** **Node.js (TypeScript)**
 * **Responsabilidades:**
-  - Desenvolvimento de 2 microsserviços em Node.js.
+  - Desenvolvimento do **Reservation & Waiting List Service** in Node.js.
+  - Desenvolvimento do **Notification Service** em Node.js.
   - Integração com o banco de dados e mensageria RabbitMQ nos seus serviços.
 
 ---
@@ -47,32 +50,72 @@ Estudantes, professores e colaboradores de uma instituição que compartilham ac
 
 O sistema será desenvolvido utilizando uma **Arquitetura de Microsserviços** poliglota e descentralizada.
 
-### 🌐 Arquitetura Geral
-* **Comunicação Síncrona:** HTTP/REST entre o Frontend, o API Gateway e os serviços de destino.
-* **Comunicação Assíncrona:** **RabbitMQ** (Message Broker) para eventos (ex: notificações enviadas após devoluções ou novos empréstimos).
-* **API Gateway:** Desenvolvido do zero em **Go** (para roteamento dinâmico e centralização de regras).
-* **Autenticação:** Baseada em tokens JWT. O Gateway valida os tokens e repassa as informações do usuário autenticado no cabeçalho das requisições para os microsserviços.
-* **Containerização:** **Docker & Docker Compose** para gerenciar e rodar a aplicação localmente.
+### 🌐 Arquitetura Geral e Integração
+* **Estrutura do Projeto (Monorepo):** O código de todos os microsserviços, frontend e API Gateway será armazenado em um único repositório Git. Isso simplifica a orquestração do ambiente de desenvolvimento local com um único arquivo `docker-compose.yml` e facilita o gerenciamento de dependências locais.
+* **Comunicação Síncrona (HTTP/REST):** 
+  - Comunicação externa entre o Frontend, o API Gateway e os serviços de destino.
+  - **Integração de Integridade:** Validações de integridade entre serviços serão feitas de forma síncrona e direta via chamadas HTTP internas de serviço para serviço. Por exemplo: antes de salvar um empréstimo, o `Loan Service` realiza chamadas HTTP síncronas para validar se o usuário existe no `User & Auth Service` e se o livro existe no `Catalog & Library Service`.
+* **Comunicação Assíncrona (RabbitMQ):** Uso de mensageria assíncrona orientada a eventos para notificar ações reativas do sistema que não bloqueiam a experiência do usuário principal (detalhado na seção de eventos abaixo).
+* **API Gateway:** Desenvolvido do zero em **Go** para centralizar o roteamento de borda, CORS, e redirecionamento.
+* **Autenticação:** Centralizada em tokens JWT. O Gateway valida a assinatura e expiração dos tokens e repassa o cabeçalho com os dados do usuário autenticado para os microsserviços internos.
+* **Containerização:** **Docker & Docker Compose** local para gerenciar todos os bancos de dados, broker e microsserviços sob uma mesma rede local virtual.
 * **Plataforma de Hospedagem (Produção):**
   - **Frontend:** **Vercel**
   - **API Gateway & Microsserviços:** **Render**
   - **Banco de Dados PostgreSQL:** **Neon** (PostgreSQL Serverless)
-  - **Message Broker (RabbitMQ):** CloudAMQP (ou outro provedor de RabbitMQ em nuvem)
+  - **Message Broker (RabbitMQ):** CloudAMQP
 
 ### ⚙️ Microsserviços e Divisão de Escopo
-1. **User & Auth Service (Serviço de Usuários):** Cadastro de usuários (RF01), autenticação (login/registro) e geração de tokens JWT.
-2. **Catalog & Library Service (Serviço de Catálogo):** Cadastro e busca de livros (RF02), além de gestão de múltiplas bibliotecas físicas (RF09).
-3. **Loan Service (Serviço de Empréstimos):** Registro de empréstimos (RF03) e devoluções (RF04).
-4. **Reservation & Waiting List Service (Serviço de Reservas):** Reservas online (RF07) e gerenciamento automático da fila de espera de livros (RF05).
-5. **Notification Service (Serviço de Notificações):** Envio de notificações automáticas (RF06) consumindo eventos do RabbitMQ.
-6. **Recommendation Service (Serviço de Recomendação):** Geração de histórico de utilização (RF08) e stub para futura recomendação inteligente (RF10).
+
+O sistema é dividido em 6 microsserviços, distribuídos de forma equilibrada entre as três tecnologias backend escolhidas com base em afinidade técnica e performance:
+
+#### 🐹 Microsserviços em Go (Desenvolvido por Athos)
+*   **User & Auth Service (Serviço de Usuários):** Cadastro de usuários (RF01), autenticação (login/registro) e geração de tokens JWT.
+    *   *Justificativa Técnica:* A autenticação e geração de JWT necessitam de baixo tempo de resposta e alta segurança. Desenvolver em Go permite latências mínimas em rotas públicas críticas e facilita a integração nativa com o **API Gateway** (também em Go) compartilhando lógicas e chaves de validação.
+*   **Loan Service (Serviço de Empréstimos):** Registro de empréstimos (RF03) e devoluções (RF04).
+    *   *Justificativa Técnica:* Representa o núcleo transacional de negócio e requer consistência robusta. A tipagem estática do Go, combinada à facilidade de controle de concorrência nativa (goroutines e mutexes), garante um serviço livre de condições de corrida em reservas/empréstimos simultâneos do mesmo livro físico.
+
+#### 🐍 Microsserviços em Python (FastAPI) (Desenvolvido por Cauã)
+*   **Catalog & Library Service (Serviço de Catálogo):** Cadastro e busca de livros (RF02) e gestão de múltiplas bibliotecas físicas (RF09).
+    *   *Justificativa Técnica:* O FastAPI oferece alta performance assíncrona, além de gerar automaticamente a documentação interativa OpenAPI (Swagger), acelerando a integração com o frontend. É ideal também para futuras conexões com APIs externas de busca de livros.
+*   **Recommendation Service (Serviço de Recomendação):** Geração de histórico de utilização (RF08) e stub para futura recomendação inteligente (RF10).
+    *   *Justificativa Técnica:* Python é o padrão da indústria para tratamento de dados e Inteligência Artificial. Utilizar Python e FastAPI aqui prepara o serviço de forma nativa para integrar algoritmos e modelos de Machine Learning no futuro.
+
+#### 🟢 Microsserviços em Node.js (TypeScript) (Desenvolvido por Marcus)
+*   **Reservation & Waiting List Service (Serviço de Reservas):** Reservas online (RF07) e gerenciamento automático da fila de espera de livros (RF05).
+    *   *Justificativa Técnica:* O fluxo de reservas e ordenação reativa das filas de espera depende fortemente de processamento de mensagens assíncronas do RabbitMQ. O modelo assíncrono não-bloqueante do Node.js é ideal para este fluxo orientado a eventos. O uso do TypeScript facilita o compartilhamento e validação de interfaces de dados com o frontend em React.
+*   **Notification Service (Serviço de Notificações):** Envio de notificações automáticas (RF06) consumindo eventos do RabbitMQ.
+    *   *Justificativa Técnica:* Serviço puramente I/O-bound que consome mensagens das filas e despacha alertas (e-mail, push, etc.). Node.js brilha em processamento de I/O de rede assíncrona e conta com um ecossistema gigantesco de bibliotecas de envio (`nodemailer`, SDKs de notificação push, etc.).
 
 ### 🛠️ Tecnologias e Infraestrutura
 * **Frontend:** **React** (Hospedado na **Vercel**)
 * **Backend (Serviços):** **Go**, **Node.js (TypeScript)** e **Python (FastAPI)** (Hospedados no **Render**)
-* **Banco de Dados:** **PostgreSQL** hospedado na **Neon** (bases de dados separadas por microsserviço: `auth_db`, `catalog_db`, `loans_db`, `reservations_db`, `notifications_db`, `recommendations_db`)
+* **Banco de Dados:** **PostgreSQL** hospedado na **Neon** (bases de dados separadas por microsserviço: `auth_db`, `catalog_db`, `loans_db`, `reservations_db`, `notifications_db`, `recommendations_db`).
+  - **Migrations:** Cada microsserviço utilizará o sistema de migração nativo de sua respectiva tecnologia/framework para gerenciar seu próprio banco de dados de maneira isolada (ex: `golang-migrate` para Go, `Alembic` para Python/FastAPI e `Prisma/TypeORM Migrations` para Node.js).
 * **Mensageria:** **RabbitMQ** (Hospedado via CloudAMQP)
 * **Ambiente de Desenvolvimento:** **Docker** e **Docker Compose** local
+
+### ✉️ Catálogo de Eventos (RabbitMQ)
+
+Para a comunicação assíncrona orientada a eventos, as filas do Message Broker serão regidas por 4 eventos principais:
+
+1. **`loan.created` (Empréstimo Realizado):**
+   * *Publicador:* `Loan Service`
+   * *Consumidor:* `Notification Service`
+   * *Ação:* Dispara notificação por e-mail/alerta informando sobre a realização do empréstimo e a data limite de devolução.
+2. **`loan.returned` (Livro Devolvido):**
+   * *Publicador:* `Loan Service`
+   * *Consumidores:* 
+     - `Notification Service`: Notifica a devolução efetuada com sucesso.
+     - `Reservation Service`: Ativa a verificação na fila de espera para esse livro em específico.
+3. **`reservation.created` (Reserva Registrada):**
+   * *Publicador:* `Reservation Service`
+   * *Consumidor:* `Notification Service`
+   * *Ação:* Confirma o ingresso do usuário na fila de espera de determinado título.
+4. **`reservation.assigned` (Livro Liberado para o Próximo da Fila):**
+   * *Publicador:* `Reservation Service` (disparado após processamento e liberação da vaga na fila)
+   * *Consumidor:* `Notification Service`
+   * *Ação:* Alerta o próximo usuário na fila de espera que o livro já está disponível para retirada na biblioteca física de coleta selecionada.
 
 ### 📝 Diretrizes de Desenvolvimento
 * **Idioma do Projeto:** Todo o projeto (interface com o usuário, documentação, commits, mensagens de log, variáveis e comentários do código-fonte) deve ser desenvolvido prioritariamente em **Português do Brasil (PT-BR)**, facilitando a colaboração da equipe e a avaliação acadêmica.
@@ -98,13 +141,3 @@ O sistema será desenvolvido utilizando uma **Arquitetura de Microsserviços** p
 * **[RNF02] Persistência Consistente:** Bancos de dados garantindo a integridade dos dados transacionais de empréstimo.
 * **[RNF03] Segurança e Autenticação:** Autenticação baseada em JWT para comunicação segura entre o cliente e os microsserviços.
 * **[RNF04] Escalabilidade:** Serviços containerizados com Docker facilitando o escalonamento independente de componentes (ex: catálogo sob alta carga).
-
----
-
-## 📅 Planejamento de Entregas (Milestones)
-
-*Divisão sugerida do desenvolvimento em fases:*
-
-* **Milestone 1 - Planejamento e Arquitetura:** Definição do escopo, diagramas e configuração dos repositórios.
-* **Milestone 2 - MVP (Produto Mínimo Viável):** Desenvolvimento das funcionalidades principais.
-* **Milestone 3 - Integração e Ajustes:** Testes, correções de bugs e deploy em ambiente de produção/homologação.
