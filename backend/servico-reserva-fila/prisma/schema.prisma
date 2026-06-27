@@ -1,0 +1,62 @@
+// Schema Prisma — Serviço de Reserva e Fila
+// Banco de dados: banco_reservas (PostgreSQL)
+// Idioma do projeto: PT-BR
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enumerador de estados da reserva ────────────────────────────────────────
+// PENDENTE   → Usuário na fila de espera aguardando disponibilidade do livro.
+// ATRIBUIDO  → Livro disponível para retirada; reserva aguardando confirmação de empréstimo.
+// CONCLUIDO  → Empréstimo realizado com sucesso; reserva encerrada.
+// CANCELADO  → Reserva cancelada pelo usuário ou por expiração do prazo de retirada.
+enum EstadoReserva {
+  PENDENTE
+  ATRIBUIDO
+  CONCLUIDO
+  CANCELADO
+}
+
+// ─── Modelo principal de Reserva ─────────────────────────────────────────────
+model Reserva {
+  // Identificador único gerado automaticamente (UUID v4)
+  id         String       @id @default(uuid())
+
+  // Referência ao usuário que realizou a reserva (validado no Serviço de Usuário)
+  idUsuario  String
+
+  // Referência ao livro reservado (validado no Serviço de Catálogo)
+  idLivro    String
+
+  // Estado atual da reserva no ciclo de vida
+  estado     EstadoReserva @default(PENDENTE)
+
+  // Posição numérica do usuário na fila de espera para o livro específico
+  // Começa em 1 para o primeiro da fila. Zerado quando o livro é atribuído.
+  posicao    Int
+
+  // Prazo limite para retirada do livro quando o estado é ATRIBUIDO (48h após atribuição)
+  prazoRetirada DateTime?
+
+  // Controles automáticos de data
+  criadoEm    DateTime  @default(now())
+  atualizadoEm DateTime  @updatedAt
+
+  // ─── Índices de busca ──────────────────────────────────────────────
+  // Acelera buscas por livro (listagem de fila, atribuição após devolução)
+  @@index([idLivro])
+  // Acelera buscas por usuário (listagem das reservas do usuário logado)
+  @@index([idUsuario])
+  // Acelera filtros por estado (busca de PENDENTES para atribuição)
+  @@index([estado])
+  // Índice composto: busca eficiente de reservas de um livro por estado
+  @@index([idLivro, estado])
+
+  // Nome da tabela no banco de dados
+  @@map("reservas")
+}
