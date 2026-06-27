@@ -10,9 +10,9 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 
 ## 🗺️ Mapa de Progresso Geral
 
-- [ ] **Fase 1: Configuração do Ambiente e Banco de Dados (Python + Alembic)**
-- [ ] **Fase 2: Schemas Pydantic e Lógica ORM (SQLAlchemy)**
-- [ ] **Fase 3: Desenvolvimento de APIs REST e Endpoints (FastAPI)**
+- [X] **Fase 1: Configuração do Ambiente e Banco de Dados (Python + Alembic)**
+- [X] **Fase 2: Schemas Pydantic e Lógica ORM (SQLAlchemy)**
+- [X] **Fase 3: Desenvolvimento de APIs REST e Endpoints (FastAPI)**
 - [ ] **Fase 4: Segurança, Autorização baseada em Permissões e Performance**
 - [ ] **Fase 5: Testes Automatizados (pytest)**
 - [ ] **Fase 6: Dockerização, Observabilidade e Práticas de Produção**
@@ -22,10 +22,10 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 ## 🗄️ Fase 1: Configuração do Ambiente e Banco de Dados
 Configuração do ecossistema Python, estrutura de diretórios e migrations do banco de dados do catálogo.
 
-- [ ] **M1.1: Inicialização do Projeto e Dependências**
-  - [ ] Configurar ambiente virtual (`python -m venv venv`) ou inicializar gerenciador (`poetry init`).
-  - [ ] Instalar pacotes essenciais: `fastapi`, `uvicorn[standard]`, `sqlalchemy`, `alembic`, `psycopg2-binary` (ou `asyncpg` para conexões assíncronas) e `pydantic[email]`.
-  - [ ] Organizar a estrutura de arquivos modular em português:
+- [X] **M1.1: Inicialização do Projeto e Dependências**
+  - [X] Configurar ambiente virtual (`python -m venv venv`) ou inicializar gerenciador (`poetry init`).
+  - [X] Instalar pacotes essenciais: `fastapi`, `uvicorn[standard]`, `sqlalchemy`, `alembic`, `psycopg2-binary` (ou `asyncpg` para conexões assíncronas) e `pydantic[email]`.
+  - [X] Organizar a estrutura de arquivos modular em português:
     - `/app/principal.py` (Ponto de inicialização do FastAPI)
     - `/app/core/configuracoes.py` (Configurações e variáveis de ambiente)
     - `/app/core/banco.py` (Conexão do SQLAlchemy e SessionLocal)
@@ -33,28 +33,28 @@ Configuração do ecossistema Python, estrutura de diretórios e migrations do b
     - `/app/esquemas/` (Estruturas de validação Pydantic)
     - `/app/api/` (Rotas HTTP e controladores)
     - `/app/crud/` (Lógica de leitura/escrita no banco de dados)
-- [ ] **M1.2: Modelagem Física do Banco com SQLAlchemy**
-  - [ ] Criar modelo `Biblioteca` (Biblioteca Física):
+- [X] **M1.2: Modelagem Física do Banco com SQLAlchemy**
+  - [X] Criar modelo `Biblioteca` (Biblioteca Física):
     - Campos: `id` (UUID ou ID serial), `nome` (Ex: "Biblioteca Setor Sul"), `localizacao` (descrição física do local), `ativo` (booleano), `criado_em` e `atualizado_em`.
-  - [ ] Criar modelo `Livro` (Livro Físico):
+  - [X] Criar modelo `Livro` (Livro Físico):
     - Campos: `id` (UUID ou ID serial), `titulo`, `autor`, `isbn`, `categoria` (gênero), `ano_publicacao`, `capa_url`, `quantidade_total`, `quantidade_disponivel`, `id_biblioteca` (ForeignKey referenciando `Biblioteca`), `ativo` (booleano), `criado_em` e `atualizado_em`.
-- [ ] **M1.3: Setup e Migração com Alembic**
-  - [ ] Executar `alembic init alembic` para estruturar as pastas de migração.
-  - [ ] Configurar `env.py` para carregar dinamicamente a string do banco PostgreSQL Neon (`URL_BANCO_DADOS`) e registrar os metadados do SQLAlchemy (`Base.metadata`) para autogeração.
-  - [ ] Gerar e aplicar a primeira migration de criação das tabelas `bibliotecas` e `livros`, configurando chaves estrangeiras e índices em `livros.titulo`, `livros.isbn` e `livros.id_biblioteca`.
+- [X] **M1.3: Setup e Migração com Alembic**
+  - [X] Executar `alembic init alembic` para estruturar as pastas de migração.
+  - [X] Configurar `env.py` para carregar dinamicamente a string do banco PostgreSQL Neon (`URL_BANCO_DADOS`) e registrar os metadados do SQLAlchemy (`Base.metadata`) para autogeração.
+  - [X] Gerar e aplicar a primeira migration de criação das tabelas `bibliotecas` e `livros`, configurando chaves estrangeiras e índices em `livros.titulo`, `livros.isbn` e `livros.id_biblioteca`.
 
 ---
 
 ## 💾 Fase 2: Schemas Pydantic e Lógica ORM (SQLAlchemy)
 Configuração das validações e criação das operações de banco (CRUD) em português.
 
-- [ ] **M2.1: Esquemas de Dados com Pydantic (`esquemas`)**
-  - [ ] Criar esquemas de entrada e saída para Bibliotecas (`CriarBiblioteca`, `RespostaBiblioteca`).
-  - [ ] Criar esquemas de entrada e saída para Livros (`CriarLivro`, `AtualizarLivro`, `RespostaLivro`).
-  - [ ] Garantir validação estrita do formato do código ISBN utilizando regras customizadas do Pydantic.
-- [ ] **M2.2: Operações de CRUD (`app/crud/`)**
-  - [ ] Desenvolver operações para a entidade `Biblioteca` (criar, listar ativas, buscar por ID).
-  - [ ] Desenvolver operações para a entidade `Livro`:
+- [X] **M2.1: Esquemas de Dados com Pydantic (`esquemas`)**
+  - [X] Criar esquemas de entrada e saída para Bibliotecas (`CriarBiblioteca`, `RespostaBiblioteca`).
+  - [X] Criar esquemas de entrada e saída para Livros (`CriarLivro`, `AtualizarLivro`, `RespostaLivro`).
+  - [X] Garantir validação estrita do formato do código ISBN utilizando regras customizadas do Pydantic.
+- [X] **M2.2: Operações de CRUD (`app/crud/`)**
+  - [X] Desenvolver operações para a entidade `Biblioteca` (criar, listar ativas, buscar por ID).
+  - [X] Desenvolver operações para a entidade `Livro`:
     - `criar_livro`: Criar novo título validando se a biblioteca associada existe.
     - `buscar_livro_por_id`: Buscar livro incluindo o relacionamento carregado (JOIN) com a biblioteca de origem.
     - `listar_livros`: Listar livros com paginação (`limite`/`deslocamento`) e suporte a filtros opcionais por título, autor, categoria e ID da biblioteca.
@@ -65,16 +65,16 @@ Configuração das validações e criação das operações de banco (CRUD) em p
 ## 🌐 Fase 3: Desenvolvimento de APIs REST e Endpoints (FastAPI)
 Exposição de endpoints para o frontend e consumo interno de outros serviços.
 
-- [ ] **M3.1: APIs de Gestão de Bibliotecas**
-  - [ ] `POST /api/bibliotecas` (Protegido - Apenas Administrador): Cadastro de bibliotecas.
-  - [ ] `GET /api/bibliotecas` (Público): Listagem de todas as bibliotecas disponíveis no sistema.
-- [ ] **M3.2: APIs de Catálogo de Livros**
-  - [ ] `POST /api/livros` (Protegido - Apenas Administrador): Cadastro de um livro no acervo.
-  - [ ] `GET /api/livros` (Público): Pesquisa de livros com filtros dinâmicos e paginação.
-  - [ ] `GET /api/livros/{id}` (Público/Integração): Detalhes de um livro específico.
+- [X] **M3.1: APIs de Gestão de Bibliotecas**
+  - [X] `POST /api/bibliotecas` (Protegido - Apenas Administrador): Cadastro de bibliotecas.
+  - [X] `GET /api/bibliotecas` (Público): Listagem de todas as bibliotecas disponíveis no sistema.
+- [X] **M3.2: APIs de Catálogo de Livros**
+  - [X] `POST /api/livros` (Protegido - Apenas Administrador): Cadastro de um livro no acervo.
+  - [X] `GET /api/livros` (Público): Pesquisa de livros com filtros dinâmicos e paginação.
+  - [X] `GET /api/livros/{id}` (Público/Integração): Detalhes de um livro específico.
     - **Importante:** Este endpoint será consumido via chamada HTTP interna síncrona pelo `Serviço de Empréstimo`. Deve retornar um payload limpo informando a disponibilidade física do exemplar.
-  - [ ] `PUT /api/livros/{id}` (Protegido - Apenas Administrador): Atualização de metadados do livro.
-  - [ ] `DELETE /api/livros/{id}` (Protegido - Apenas Administrador): Exclusão lógica (desativação do livro).
+  - [X] `PUT /api/livros/{id}` (Protegido - Apenas Administrador): Atualização de metadados do livro.
+  - [X] `DELETE /api/livros/{id}` (Protegido - Apenas Administrador): Exclusão lógica (desativação do livro).
 
 ---
 

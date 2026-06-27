@@ -1,5 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from app.api.bibliotecas import roteador as roteador_bibliotecas
+from app.api.livros import roteador as roteador_livros
 
 app = FastAPI(
     title="Serviço de Catálogo e Biblioteca",
@@ -21,6 +23,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Inclusão dos roteadores da API
+app.include_router(roteador_bibliotecas, prefix="/api/bibliotecas", tags=["Bibliotecas"])
+app.include_router(roteador_livros, prefix="/api/livros", tags=["Livros"])
 
 @app.get("/", tags=["Raiz"])
 async def obter_estado_servico():
