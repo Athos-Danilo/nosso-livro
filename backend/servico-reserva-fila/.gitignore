@@ -7,9 +7,6 @@ dist/
 # Variáveis de ambiente sensíveis (use .env.exemplo como referência)
 .env
 
-# Prisma: cliente gerado automaticamente (não versionar)
-prisma/migrations/
-
 # Logs
 *.log
 npm-debug.log*
