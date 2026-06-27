@@ -13,28 +13,64 @@ import {
 /** Prazo de retirada após atribuição: 48 horas em milissegundos */
 const PRAZO_RETIRADA_MS = 48 * 60 * 60 * 1000;
 
+/** Número máximo de retentativas em caso de conflito de serialização */
+const MAX_TENTATIVAS_TRANSACAO = 3;
+
+// ─── Auxiliar: executa transação com retry em caso de conflito (P2034) ────────
+
+/**
+ * Executa uma função dentro de uma transação Prisma com retentativas
+ * automáticas em caso de erro de serialização do PostgreSQL (código P2034).
+ *
+ * Esse padrão é necessário quando usamos isolationLevel: 'Serializable',
+ * pois o PostgreSQL pode abortar transações concorrentes por conflito de
+ * serialização e espera que a aplicação tente novamente.
+ */
+async function executarComRetry<T>(
+  fn: (tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0]) => Promise<T>
+): Promise<T> {
+  let tentativa = 0;
+  while (true) {
+    try {
+      return await prisma.$transaction(fn, { isolationLevel: 'Serializable' });
+    } catch (erro: unknown) {
+      const codigoErro = (erro as { code?: string })?.code;
+      // P2034: Transaction failed due to a write conflict or a deadlock
+      if (codigoErro === 'P2034' && tentativa < MAX_TENTATIVAS_TRANSACAO - 1) {
+        tentativa++;
+        // Espera exponencial entre tentativas: 50ms, 100ms, 200ms...
+        await new Promise((r) => setTimeout(r, 50 * Math.pow(2, tentativa)));
+        console.warn(`[Transação] Conflito de serialização. Tentativa ${tentativa + 1}/${MAX_TENTATIVAS_TRANSACAO}...`);
+        continue;
+      }
+      throw erro;
+    }
+  }
+}
+
 // ─── Função de Ingressão na Fila (M4.1) ──────────────────────────────────────
 
 /**
  * Insere um usuário na fila de espera para um determinado livro.
+ *
  * Fluxo:
- * 1. Valida a existência do usuário e livro (HTTP síncrono).
- * 2. Transação Prisma (Serializable):
- *    a. Verifica se já existe reserva ativa.
- *    b. Conta quantos usuários já estão na fila para o livro.
+ * 1. Valida a existência do usuário e livro (HTTP síncrono, paralelo).
+ * 2. Transação Serializable com retry:
+ *    a. Verifica se já existe reserva ativa (PENDENTE ou ATRIBUIDO) — evita duplicatas.
+ *    b. Conta quantos usuários já estão na fila (somente PENDENTES).
  *    c. Cria a reserva com posição = contagem + 1.
- * 3. Publica evento 'reserva.criada'.
+ * 3. Publica evento assíncrono 'reserva.criada'.
  */
 export async function ingressarNaFila(idUsuario: string, idLivro: string): Promise<Reserva> {
-  // 1. Validações remotas (lançam erro se não existirem)
+  // 1. Validações remotas simultâneas (lançam erro semântico se não existirem)
   await Promise.all([
     buscarUsuarioPorId(idUsuario),
     buscarLivroPorId(idLivro),
   ]);
 
-  // 2. Transação atômica (com nível Serializable para evitar race conditions no cálculo de posição)
-  const reservaCriada = await prisma.$transaction(async (tx) => {
-    // a. Impedir reservas duplicadas ativas (PENDENTE ou ATRIBUIDO)
+  // 2. Transação atômica com retry em conflito de serialização
+  const reservaCriada = await executarComRetry(async (tx) => {
+    // a. Verificar reservas duplicadas ativas (PENDENTE ou ATRIBUIDO)
     const reservaAtiva = await tx.reserva.findFirst({
       where: {
         idUsuario,
@@ -47,7 +83,7 @@ export async function ingressarNaFila(idUsuario: string, idLivro: string): Promi
       throw new ErroReservaDuplicada(idLivro, idUsuario);
     }
 
-    // b. Calcular a posição (contagem de reservas PENDENTES para o mesmo livro)
+    // b. Calcular posição: quantidade atual de PENDENTES + 1
     const contagemFila = await tx.reserva.count({
       where: {
         idLivro,
@@ -57,7 +93,7 @@ export async function ingressarNaFila(idUsuario: string, idLivro: string): Promi
 
     const novaPosicao = contagemFila + 1;
 
-    // c. Gravar a nova reserva
+    // c. Criar a reserva na posição calculada
     return await tx.reserva.create({
       data: {
         idUsuario,
@@ -66,13 +102,9 @@ export async function ingressarNaFila(idUsuario: string, idLivro: string): Promi
         posicao: novaPosicao,
       },
     });
-  }, {
-    // Usamos um nível de isolamento forte no PostgreSQL para garantir
-    // a consistência do count() em alta concorrência.
-    isolationLevel: 'Serializable',
   });
 
-  // 3. Dispara evento assíncrono informando o ingresso na fila
+  // 3. Dispara evento assíncrono após confirmação da transação
   publicarReservaCriada({
     id_reserva: reservaCriada.id,
     id_usuario: reservaCriada.idUsuario,
@@ -87,14 +119,23 @@ export async function ingressarNaFila(idUsuario: string, idLivro: string): Promi
 // ─── Função de Cancelamento de Reserva (M4.2) ────────────────────────────────
 
 /**
- * Cancela uma reserva existente (manualmente pelo usuário ou por expiração de tempo).
- * Fluxo depende do estado atual:
- * - Se PENDENTE: Cancela e decrementa a posição de todos atrás na fila.
- * - Se ATRIBUIDO: Cancela e reatribui o livro para o próximo da fila.
+ * Cancela uma reserva existente, aplicando a lógica de reordenamento da fila.
+ *
+ * Fluxo depende do estado atual da reserva:
+ * - PENDENTE → Cancela e decrementa a posição de todos atrás na fila.
+ * - ATRIBUIDO → Cancela e reatribui o livro para o próximo PENDENTE (se houver).
+ *
+ * @param idReserva - UUID da reserva a ser cancelada
+ * @param idUsuarioSolicitante - Quando fornecido, verifica se o usuário é dono da reserva.
+ *        Se omitido (cancelamento por expiração interno), pula a verificação de posse.
  */
-export async function cancelarReserva(idReserva: string, idUsuarioSolicitante?: string): Promise<Reserva> {
-  const resultado = await prisma.$transaction(async (tx) => {
-    // Busca a reserva com bloqueio para update
+export async function cancelarReserva(
+  idReserva: string,
+  idUsuarioSolicitante?: string
+): Promise<Reserva> {
+
+  const resultado = await executarComRetry(async (tx) => {
+    // Lê o estado original da reserva (antes de qualquer update)
     const reserva = await tx.reserva.findUnique({
       where: { id: idReserva },
     });
@@ -103,16 +144,21 @@ export async function cancelarReserva(idReserva: string, idUsuarioSolicitante?: 
       throw new ErroReservaNaoEncontrada(idReserva);
     }
 
-    // Se informou usuário solicitante, valida permissão
+    // Verifica permissão apenas para cancelamentos manuais (com usuário informado)
     if (idUsuarioSolicitante && reserva.idUsuario !== idUsuarioSolicitante) {
       throw new ErroAcessoNegadoReserva(idReserva, idUsuarioSolicitante);
     }
 
+    // Não é possível cancelar estados terminais
     if (reserva.estado === EstadoReserva.CANCELADO || reserva.estado === EstadoReserva.CONCLUIDO) {
       throw new ErroEstadoInvalidoParaCancelamento(idReserva, reserva.estado);
     }
 
-    // Efetua o cancelamento
+    // Guarda o estado e posição ANTES do cancelamento para usar nas regras abaixo
+    const estadoOriginal = reserva.estado;
+    const posicaoOriginal = reserva.posicao;
+
+    // Efetua o cancelamento da reserva
     const reservaCancelada = await tx.reserva.update({
       where: { id: idReserva },
       data: { estado: EstadoReserva.CANCELADO, posicao: 0, prazoRetirada: null },
@@ -120,28 +166,30 @@ export async function cancelarReserva(idReserva: string, idUsuarioSolicitante?: 
 
     let proximaReservaAtribuida: Reserva | null = null;
 
-    if (reserva.estado === EstadoReserva.PENDENTE) {
-      // Regra: Reserva no meio da fila. Decrementar posição de quem está atrás.
+    if (estadoOriginal === EstadoReserva.PENDENTE) {
+      // ── Regra: reserva no meio da fila ─────────────────────────────────
+      // Decrementa a posição de todos os PENDENTES que estavam atrás do cancelado.
+      // Como a reserva já foi cancelada (estado = CANCELADO) ela não é afetada.
       await tx.reserva.updateMany({
         where: {
           idLivro: reserva.idLivro,
           estado: EstadoReserva.PENDENTE,
-          posicao: { gt: reserva.posicao }, // Posições maiores que a do cancelado
+          posicao: { gt: posicaoOriginal },
         },
         data: {
           posicao: { decrement: 1 },
         },
       });
-    } else if (reserva.estado === EstadoReserva.ATRIBUIDO) {
-      // Regra: O livro estava guardado para este usuário. Passar para o próximo da fila.
+
+    } else if (estadoOriginal === EstadoReserva.ATRIBUIDO) {
+      // ── Regra: livro estava reservado aguardando retirada ───────────────
+      // Passa o livro para o próximo PENDENTE mais antigo da fila.
       const proximaReserva = await tx.reserva.findFirst({
         where: {
           idLivro: reserva.idLivro,
           estado: EstadoReserva.PENDENTE,
         },
-        orderBy: {
-          criadoEm: 'asc',
-        },
+        orderBy: { criadoEm: 'asc' },
       });
 
       if (proximaReserva) {
@@ -158,11 +206,9 @@ export async function cancelarReserva(idReserva: string, idUsuarioSolicitante?: 
     }
 
     return { reservaCancelada, proximaReservaAtribuida };
-  }, {
-    isolationLevel: 'Serializable',
   });
 
-  // Se o cancelamento resultou em nova atribuição, publica o evento fora da transação
+  // Publica evento de reatribuição FORA da transação (somente após commit confirmado)
   if (resultado.proximaReservaAtribuida) {
     publicarReservaAtribuida({
       id_reserva: resultado.proximaReservaAtribuida.id,
@@ -173,4 +219,39 @@ export async function cancelarReserva(idReserva: string, idUsuarioSolicitante?: 
   }
 
   return resultado.reservaCancelada;
+}
+
+// ─── Função de Expiração Automática de Reservas (M4.2 — expiração por prazo) ─
+
+/**
+ * Cancela automaticamente todas as reservas no estado ATRIBUIDO cujo prazo
+ * de retirada (prazoRetirada) já tenha vencido.
+ *
+ * Deve ser chamado periodicamente por um job agendado (ex: cron ou setTimeout).
+ * Para cada reserva expirada, reutiliza a lógica completa de `cancelarReserva`
+ * (inclusive reatribuição automática para o próximo da fila).
+ */
+export async function cancelarReservasExpiradas(): Promise<void> {
+  // Busca todas as reservas ATRIBUIDAS com prazo vencido
+  const expiradas = await prisma.reserva.findMany({
+    where: {
+      estado: EstadoReserva.ATRIBUIDO,
+      prazoRetirada: { lt: new Date() }, // prazo anterior ao momento atual
+    },
+    select: { id: true },
+  });
+
+  if (expiradas.length === 0) return;
+
+  console.log(`[Expiração] ${expiradas.length} reserva(s) expirada(s) encontrada(s). Cancelando...`);
+
+  // Cancela cada uma sequencialmente (sem idUsuarioSolicitante = cancelamento interno)
+  for (const { id } of expiradas) {
+    try {
+      await cancelarReserva(id);
+      console.log(`[Expiração] Reserva ${id} cancelada por prazo vencido.`);
+    } catch (erro) {
+      console.error(`[Expiração] Erro ao cancelar reserva ${id}:`, erro);
+    }
+  }
 }
