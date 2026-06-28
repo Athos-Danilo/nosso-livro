@@ -13,9 +13,9 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 - [X] **Fase 1: Configuração do Ambiente e Banco de Dados (Python + Alembic)**
 - [X] **Fase 2: Schemas Pydantic e Lógica ORM (SQLAlchemy)**
 - [X] **Fase 3: Desenvolvimento de APIs REST e Endpoints (FastAPI)**
-- [ ] **Fase 4: Segurança, Autorização baseada em Permissões e Performance**
-- [ ] **Fase 5: Testes Automatizados (pytest)**
-- [ ] **Fase 6: Dockerização, Observabilidade e Práticas de Produção**
+- [X] **Fase 4: Segurança, Autorização baseada em Permissões e Performance**
+- [X] **Fase 5: Testes Automatizados (pytest)**
+- [X] **Fase 6: Dockerização, Observabilidade e Práticas de Produção**
 
 ---
 
@@ -81,35 +81,35 @@ Exposição de endpoints para o frontend e consumo interno de outros serviços.
 ## 🛡️ Fase 4: Segurança, Autorização e Otimização de Performance
 Controle de segurança baseado em papéis (permissões) e aceleração de buscas.
 
-- [ ] **M4.1: Validação de Autenticação JWT**
-  - [ ] Criar dependência FastAPI (`Depends`) para ler o JWT repassado pelo Gateway de API através do header `Authorization`.
-  - [ ] Decodificar o payload e verificar a permissão do usuário (`permissao`). Restringir rotas administrativas de cadastro/edição de livros, bloqueando acessos não-autorizados (`403 Forbidden`).
-- [ ] **M4.2: Otimização de Performance com Cache**
-  - [ ] Implementar cache em memória (ex: `fastapi-cache` ou Redis) na rota de listagem de livros (`GET /api/livros`), diminuindo acessos ao PostgreSQL Neon.
-- [ ] **M4.3: Documentação de APIs**
-  - [ ] Customizar as respostas padrão e tags descritivas para gerar o Swagger em português.
+- [X] **M4.1: Validação de Autenticação JWT**
+  - [X] Criar dependência FastAPI (`Depends`) para ler o JWT repassado pelo Gateway de API através do header `Authorization`.
+  - [X] Decodificar o payload e verificar a permissão do usuário (`permissao`). Restringir rotas administrativas de cadastro/edição de livros, bloqueando acessos não-autorizados (`403 Forbidden`).
+- [X] **M4.2: Otimização de Performance com Cache**
+  - [X] Implementar cache em memória (ex: `fastapi-cache` ou Redis) na rota de listagem de livros (`GET /api/livros`), diminuindo acessos ao PostgreSQL Neon.
+- [X] **M4.3: Documentação de APIs**
+  - [X] Customizar as respostas padrão e tags descritivas para gerar o Swagger em português.
 
 ---
 
 ## 🧪 Fase 5: Testes Automatizados (pytest)
 Testes unitários e de integração para garantir a estabilidade do catálogo.
 
-- [ ] **M5.1: Setup do Pytest**
-  - [ ] Configurar `conftest.py` contendo fixtures para inicialização do banco de dados temporário de testes (usando SQLite em memória ou PostgreSQL local).
-- [ ] **M5.2: Testes de Integração e Rotas**
-  - [ ] Testar criação e listagem de bibliotecas.
-  - [ ] Testar regras de validação do Pydantic para ISBN incorreto ou quantidade negativa.
-  - [ ] Testar segurança das rotas (garantir que usuários comuns recebam `403` ao tentar cadastrar livros).
+- [X] **M5.1: Setup do Pytest**
+  - [X] Configurar `conftest.py` contendo fixtures para inicialização do banco de dados temporário de testes (usando SQLite em memória ou PostgreSQL local).
+- [X] **M5.2: Testes de Integração e Rotas**
+  - [X] Testar criação e listagem de bibliotecas.
+  - [X] Testar regras de validação do Pydantic para ISBN incorreto ou quantidade negativa.
+  - [X] Testar segurança das rotas (garantir que usuários comuns recebam `403` ao tentar cadastrar livros).
 
 ---
 
 ## 🚀 Fase 6: Dockerização, Observabilidade e Produção
 Deploy e padrões operacionais profissionais.
 
-- [ ] **M6.1: Dockerfile Otimizado**
-  - [ ] Criar `Dockerfile` usando imagem `python:3.11-slim` executando o servidor de produção Uvicorn de forma segura como usuário não-root.
-- [ ] **M6.2: Graceful Shutdown**
-  - [ ] Configurar eventos de encerramento (`shutdown`) no FastAPI para gerenciar a desconexão limpa do pool de conexões do SQLAlchemy.
-- [ ] **M6.3: Health Check e Logs**
-  - [ ] Criar rotas `/saude` e `/pronto` verificando integridade do PostgreSQL.
-  - [ ] Configurar logging para gerar logs estruturados em formato JSON em português.
+- [X] **M6.1: Dockerfile Otimizado**
+  - [X] Criar `Dockerfile` usando imagem `python:3.11-slim` executando o servidor de produção Uvicorn de forma segura como usuário não-root.
+- [X] **M6.2: Graceful Shutdown**
+  - [X] Configurar eventos de encerramento (`shutdown`) no FastAPI para gerenciar a desconexão limpa do pool de conexões do SQLAlchemy.
+- [X] **M6.3: Health Check e Logs**
+  - [X] Criar rotas `/saude` e `/pronto` verificando integridade do PostgreSQL.
+  - [X] Configurar logging para gerar logs estruturados em formato JSON em português.

@@ -28,8 +28,7 @@ async def criar_livro(db: AsyncSession, dados: CriarLivro) -> Livro:
     )
     db.add(novo_livro)
     await db.commit()
-    await db.refresh(novo_livro)
-    return novo_livro
+    return await buscar_livro_por_id(db, novo_livro.id)
 
 async def buscar_livro_por_id(db: AsyncSession, id_livro: int) -> Livro | None:
     """Busca um livro por ID, carregando os dados da biblioteca vinculada via JOIN."""

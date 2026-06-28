@@ -3,11 +3,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.banco import obter_banco
 from app.esquemas.biblioteca import CriarBiblioteca, RespostaBiblioteca
 from app.crud import biblioteca as crud_biblioteca
+from app.core.seguranca import exigir_administrador
 
 roteador = APIRouter()
 
 @roteador.post("/", response_model=RespostaBiblioteca, status_code=status.HTTP_201_CREATED)
-async def cadastrar_biblioteca(dados: CriarBiblioteca, db: AsyncSession = Depends(obter_banco)):
+async def cadastrar_biblioteca(
+    dados: CriarBiblioteca,
+    db: AsyncSession = Depends(obter_banco),
+    usuario: dict = Depends(exigir_administrador)
+):
     """Cadastra uma nova biblioteca física no sistema."""
     return await crud_biblioteca.criar_biblioteca(db=db, dados=dados)
 

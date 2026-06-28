@@ -8,6 +8,7 @@ caminho_env = os.path.join(diretorio_atual, "..", "..", ".env")
 class Configuracoes(BaseSettings):
     """Classe responsável por gerenciar as configurações da aplicação."""
     URL_BANCO_DADOS: str
+    CHAVE_SECRETA_JWT: str = "chave_secreta_padrao_desenvolvimento_nosso_livro"
 
     model_config = SettingsConfigDict(
         env_file=caminho_env,

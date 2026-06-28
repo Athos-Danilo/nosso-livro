@@ -4,14 +4,24 @@ from app.core.banco import obter_banco
 from app.esquemas.livro import CriarLivro, AtualizarLivro, RespostaLivro
 from app.crud import livro as crud_livro
 from app.modelos.livro import Livro
+from app.core.seguranca import exigir_administrador
 
 roteador = APIRouter()
 
+# Dicionário global para cache de busca de livros em memória
+CACHE_LIVROS = {}
+
 @roteador.post("/", response_model=RespostaLivro, status_code=status.HTTP_201_CREATED)
-async def cadastrar_livro(dados: CriarLivro, db: AsyncSession = Depends(obter_banco)):
+async def cadastrar_livro(
+    dados: CriarLivro,
+    db: AsyncSession = Depends(obter_banco),
+    usuario: dict = Depends(exigir_administrador)
+):
     """Cadastra um novo livro físico no acervo de uma biblioteca."""
     try:
-        return await crud_livro.criar_livro(db=db, dados=dados)
+        novo_livro = await crud_livro.criar_livro(db=db, dados=dados)
+        CACHE_LIVROS.clear() # Invalida o cache
+        return novo_livro
     except ValueError as erro:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(erro))
 
@@ -26,7 +36,13 @@ async def pesquisar_livros(
     db: AsyncSession = Depends(obter_banco)
 ):
     """Pesquisa livros ativos com paginação e filtros dinâmicos."""
-    return await crud_livro.listar_livros(
+    # Chave do cache baseada nos filtros
+    chave_cache = (titulo, autor, categoria, id_biblioteca, limite, pulo)
+    
+    if chave_cache in CACHE_LIVROS:
+        return CACHE_LIVROS[chave_cache]
+        
+    resultado = await crud_livro.listar_livros(
         db=db,
         titulo=titulo,
         autor=autor,
@@ -35,6 +51,9 @@ async def pesquisar_livros(
         limite=limite,
         pulo=pulo
     )
+    
+    CACHE_LIVROS[chave_cache] = resultado
+    return resultado
 
 @roteador.get("/{id_livro}", response_model=RespostaLivro)
 async def obter_detalhes_livro(id_livro: int, db: AsyncSession = Depends(obter_banco)):
@@ -55,7 +74,8 @@ async def obter_detalhes_livro(id_livro: int, db: AsyncSession = Depends(obter_b
 async def atualizar_metadados_livro(
     id_livro: int,
     dados: AtualizarLivro,
-    db: AsyncSession = Depends(obter_banco)
+    db: AsyncSession = Depends(obter_banco),
+    usuario: dict = Depends(exigir_administrador)
 ):
     """Atualiza as informações de metadados de um livro cadastrado."""
     livro = await db.get(Livro, id_livro)
@@ -68,11 +88,15 @@ async def atualizar_metadados_livro(
         setattr(livro, chave, valor)
         
     await db.commit()
-    await db.refresh(livro)
-    return livro
+    CACHE_LIVROS.clear() # Invalida o cache
+    return await crud_livro.buscar_livro_por_id(db, id_livro)
 
 @roteador.delete("/{id_livro}", status_code=status.HTTP_204_NO_CONTENT)
-async def desativar_livro(id_livro: int, db: AsyncSession = Depends(obter_banco)):
+async def desativar_livro(
+    id_livro: int,
+    db: AsyncSession = Depends(obter_banco),
+    usuario: dict = Depends(exigir_administrador)
+):
     """Realiza a exclusão lógica do livro do catálogo (alterando o campo ativo para falso)."""
     livro = await db.get(Livro, id_livro)
     if not livro:
@@ -80,4 +104,5 @@ async def desativar_livro(id_livro: int, db: AsyncSession = Depends(obter_banco)
         
     livro.ativo = False
     await db.commit()
+    CACHE_LIVROS.clear() # Invalida o cache
     return
