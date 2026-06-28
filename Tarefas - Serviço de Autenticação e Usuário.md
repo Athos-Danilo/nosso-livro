@@ -13,7 +13,7 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 - [x] **Fase 1: Configuração do Módulo e Banco de Dados (Go + PostgreSQL)**
 - [x] **Fase 2: Camada de Domínio e Repositórios (Domínio & Repositório)**
 - [x] **Fase 3: Lógica de Autenticação, Criptografia e JWT (Serviços)**
-- [ ] **Fase 4: Handlers HTTP, Rotas e Middlewares (Controladores)**
+- [x] **Fase 4: Handlers HTTP, Rotas e Middlewares (Controladores)**
 - [ ] **Fase 5: Segurança, Limitador de Taxa e Validações**
 - [ ] **Fase 6: Testes Automatizados e Cobertura**
 - [ ] **Fase 7: Dockerização, Observabilidade e Práticas de Produção**
@@ -88,23 +88,23 @@ Regras de segurança de acesso e criptografia de credenciais.
 ## 🌐 Fase 4: Handlers HTTP, Rotas e Middlewares (Controladores)
 Criação dos endpoints REST e roteamento em português.
 
-- [ ] **M4.1: Endpoints de Registro e Login**
-  - [ ] `POST /api/autenticacao/cadastro` (Público):
+- [x] **M4.1: Endpoints de Registro e Login**
+  - [x] `POST /api/autenticacao/cadastro` (Público):
     - Recebe dados em português (`nome`, `whatsapp`, `email`, `senha`).
     - Valida dados de entrada e cria o usuário no banco de dados.
-  - [ ] `POST /api/autenticacao/login` (Público):
+  - [x] `POST /api/autenticacao/login` (Público):
     - Recebe credenciais (`whatsapp` ou `email`, e `senha`).
     - Valida as credenciais e retorna o token JWT e dados do usuário.
-- [ ] **M4.2: Endpoints de Informação de Perfil e Integração**
-  - [ ] `GET /api/usuarios/me` (Protegido):
+- [x] **M4.2: Endpoints de Informação de Perfil e Integração**
+  - [x] `GET /api/usuarios/me` (Protegido):
     - Retorna o perfil completo do usuário logado baseado no token fornecido no cabeçalho `Authorization: Bearer <token>`.
-  - [ ] `GET /api/usuarios/{id}` (Protegido/Interno):
+  - [x] `GET /api/usuarios/{id}` (Protegido/Interno):
     - Retorna dados públicos do usuário por ID (endpoint síncrono que será consultado pelo `Serviço de Empréstimo` para verificar se o usuário existe).
-- [ ] **M4.3: Middlewares**
-  - [ ] Middleware CORS.
-  - [ ] Middleware de logs estruturados das requisições.
-  - [ ] Middleware de recuperação de pânicos (Panic Recovery) retornando JSON com erro 500 controlado.
-  - [ ] Middleware de autenticação JWT para rotas protegidas (extrai o token, valida e injeta o usuário no contexto).
+- [x] **M4.3: Middlewares**
+  - [x] Middleware CORS.
+  - [x] Middleware de logs estruturados das requisições.
+  - [x] Middleware de recuperação de pânicos (Panic Recovery) retornando JSON com erro 500 controlado.
+  - [x] Middleware de autenticação JWT para rotas protegidas (extrai o token, valida e injeta o usuário no contexto).
 
 ---
 
