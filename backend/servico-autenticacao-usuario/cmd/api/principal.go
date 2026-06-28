@@ -56,9 +56,13 @@ func main() {
 		chaveSecretaJWT = "chave_secreta_padrao_desenvolvimento_nosso_livro"
 	}
 
-	// 3. Inicialização dos Controladores
+	// 3. Inicialização dos Controladores e Limitadores de Segurança
 	controladorAuth := controlador.NovoControladorAutenticacao(repoUsuario, chaveSecretaJWT)
 	controladorUser := controlador.NovoControladorUsuario(repoUsuario)
+
+	// Inicializa o limitador de IP para rotas públicas (cadastro/login) limitando a 5 requisições por minuto (5/60 req/s) com rajada (burst) de 5
+	limitadorAutenticacao := controlador.NovoLimitadorIP(5.0/60.0, 5)
+	middlewareRateLimit := controlador.MiddlewareLimitadorTaxa(limitadorAutenticacao)
 
 	// 4. Configuração do Roteador HTTP (Utilizando o ServeMux nativo do Go 1.22+ com suporte a métodos e caminhos)
 	mux := http.NewServeMux()
@@ -70,9 +74,9 @@ func main() {
 		fmt.Fprint(w, `{"status": "ativo", "mensagem": "Serviço de Autenticação e Usuário está funcionando corretamente"}`)
 	})
 
-	// Endpoints públicos de Autenticação
-	mux.HandleFunc("POST /api/autenticacao/cadastro", controladorAuth.Cadastrar)
-	mux.HandleFunc("POST /api/autenticacao/login", controladorAuth.Login)
+	// Endpoints públicos de Autenticação (Protegidos por limitador de taxa para evitar força bruta)
+	mux.Handle("POST /api/autenticacao/cadastro", middlewareRateLimit(http.HandlerFunc(controladorAuth.Cadastrar)))
+	mux.Handle("POST /api/autenticacao/login", middlewareRateLimit(http.HandlerFunc(controladorAuth.Login)))
 
 	// Middleware de proteção JWT para endpoints de usuário
 	middlewareAutenticacao := controlador.MiddlewareAutenticacaoJWT(chaveSecretaJWT)

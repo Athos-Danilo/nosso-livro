@@ -14,7 +14,7 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 - [x] **Fase 2: Camada de Domínio e Repositórios (Domínio & Repositório)**
 - [x] **Fase 3: Lógica de Autenticação, Criptografia e JWT (Serviços)**
 - [x] **Fase 4: Handlers HTTP, Rotas e Middlewares (Controladores)**
-- [ ] **Fase 5: Segurança, Limitador de Taxa e Validações**
+- [x] **Fase 5: Segurança, Limitador de Taxa e Validações**
 - [ ] **Fase 6: Testes Automatizados e Cobertura**
 - [ ] **Fase 7: Dockerização, Observabilidade e Práticas de Produção**
 
@@ -108,13 +108,13 @@ Criação dos endpoints REST e roteamento em português.
 
 ---
 
-## 🛡️ Fase 5: Segurança, Limitador de Taxa e Validações
+- [x] **Fase 5: Segurança, Limitador de Taxa e Validações**
 Controles contra abusos e validação estrutural.
 
-- [ ] **M5.1: Limitador de Taxa (Rate Limiting)**
-  - [ ] Implementar limitador de requisições nas rotas de `/login` e `/cadastro` (usando `golang.org/x/time/rate` ou similar) para evitar força bruta.
-- [ ] **M5.2: Validação de Dados**
-  - [ ] Validar formato de e-mail e formato de telefone WhatsApp antes do processamento no banco.
+- [x] **M5.1: Limitador de Taxa (Rate Limiting)**
+  - [x] Implementar limitador de requisições nas rotas de `/login` e `/cadastro` (usando `golang.org/x/time/rate` ou similar) para evitar força bruta.
+- [x] **M5.2: Validação de Dados**
+  - [x] Validar formato de e-mail e formato de telefone WhatsApp antes do processamento no banco.
 
 ---
 

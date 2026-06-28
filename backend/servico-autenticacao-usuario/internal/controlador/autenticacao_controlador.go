@@ -54,6 +54,19 @@ func (ca *ControladorAutenticacao) Cadastrar(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
+	// Sanitização e Validação estrutural de dados
+	req.WhatsApp = servico.SanitizarWhatsApp(req.WhatsApp)
+
+	if err := servico.ValidarEmail(req.Email); err != nil {
+		responderComErro(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
+	if err := servico.ValidarWhatsApp(req.WhatsApp); err != nil {
+		responderComErro(w, http.StatusBadRequest, err.Error())
+		return
+	}
+
 	// Criptografa a senha fornecida pelo usuário
 	senhaHash, err := servico.GerarHashSenha(req.Senha)
 	if err != nil {
@@ -127,6 +140,7 @@ func (ca *ControladorAutenticacao) Login(w http.ResponseWriter, r *http.Request)
 
 	// Busca usuário por WhatsApp ou por E-mail conforme fornecido
 	if req.WhatsApp != "" {
+		req.WhatsApp = servico.SanitizarWhatsApp(req.WhatsApp)
 		usuario, err = ca.repoUsuario.BuscarPorWhatsApp(r.Context(), req.WhatsApp)
 	} else {
 		usuario, err = ca.repoUsuario.BuscarPorEmail(r.Context(), req.Email)
