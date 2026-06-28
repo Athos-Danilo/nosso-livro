@@ -11,7 +11,7 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 ## 🗺️ Mapa de Progresso Geral
 
 - [X] **Fase 1: Configuração do Ambiente e Banco de Dados (Python + Alembic)**
-- [ ] **Fase 2: Consumidor RabbitMQ (Mensageria Assíncrona com `aio-pika`)**
+- [X] **Fase 2: Consumidor RabbitMQ (Mensageria Assíncrona com `aio-pika`)**
 - [ ] **Fase 3: Motor de Recomendação (Lógica de Negócio e Stubs - RF10)**
 - [ ] **Fase 4: APIs REST e Endpoints de Consulta (FastAPI)**
 - [ ] **Fase 5: Testes Automatizados e Cobertura (pytest)**
@@ -47,17 +47,17 @@ Configuração da stack Python e modelagem física dos dados do histórico e est
 ## ✉️ Fase 2: Consumidor RabbitMQ (Mensageria Assíncrona com `aio-pika`)
 Captação de eventos de empréstimos e devoluções para retroalimentar o histórico sem acoplamento síncrono.
 
-- [ ] **M2.1: Desenvolvimento do Consumidor**
-  - [ ] Criar o worker em `/app/trabalhadores/consumidor_eventos.py` usando `aio-pika`.
-  - [ ] Implementar a escuta de eventos na exchange do RabbitMQ associada ao `Serviço de Empréstimo`.
-  - [ ] Configurar fila própria (`fila_recomendacoes`) vinculada às chaves de roteamento dos eventos:
+- [X] **M2.1: Desenvolvimento do Consumidor**
+  - [X] Criar o worker em `/app/trabalhadores/consumidor_eventos.py` usando `aio-pika`.
+  - [X] Implementar a escuta de eventos na exchange do RabbitMQ associada ao `Serviço de Empréstimo`.
+  - [X] Configurar fila própria (`fila_recomendacoes`) vinculada às chaves de roteamento dos eventos:
     - **`emprestimo.criado`**:
       - Ação: Criar registro em `HistoricoLeitura` com estado `'LENDO'` e incrementar o contador correspondente do livro na tabela `PopularidadeLivro`.
     - **`emprestimo.devolvido`**:
       - Ação: Localizar registro ativo em `HistoricoLeitura` para a respectiva combinação de usuário/livro e alterar o estado para `'CONCLUIDO'`, gravando a data final.
-- [ ] **M2.2: Inicialização e Resiliência**
-  - [ ] Configurar a tarefa do consumidor para iniciar em segundo plano na inicialização (`startup`) do FastAPI.
-  - [ ] Implementar política de reconexão automática caso o broker caia.
+- [X] **M2.2: Inicialização e Resiliência**
+  - [X] Configurar a tarefa do consumidor para iniciar em segundo plano na inicialização (`startup`) do FastAPI.
+  - [X] Implementar política de reconexão automática caso o broker caia.
 
 ---
 

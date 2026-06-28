@@ -8,6 +8,7 @@ caminho_env = os.path.join(diretorio_atual, "..", "..", ".env")
 class Configuracoes(BaseSettings):
     """Classe responsável por gerenciar as configurações da aplicação de recomendação."""
     URL_BANCO_RECOMENDACOES: str
+    URL_RABBITMQ: str
 
     model_config = SettingsConfigDict(
         env_file=caminho_env,
