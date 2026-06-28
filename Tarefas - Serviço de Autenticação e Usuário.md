@@ -15,7 +15,7 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 - [x] **Fase 3: Lógica de Autenticação, Criptografia e JWT (Serviços)**
 - [x] **Fase 4: Handlers HTTP, Rotas e Middlewares (Controladores)**
 - [x] **Fase 5: Segurança, Limitador de Taxa e Validações**
-- [ ] **Fase 6: Testes Automatizados e Cobertura**
+- [x] **Fase 6: Testes Automatizados e Cobertura**
 - [ ] **Fase 7: Dockerização, Observabilidade e Práticas de Produção**
 
 ---
@@ -121,12 +121,12 @@ Controles contra abusos e validação estrutural.
 ## 🧪 Fase 6: Testes Automatizados e Cobertura
 Garantia de qualidade por meio de testes locais.
 
-- [ ] **M6.1: Testes Unitários**
-  - [ ] Testar hash de senhas e geração/validação de tokens JWT.
-- [ ] **M6.2: Testes de Integração com Banco Mockado**
-  - [ ] Criar testes para o repositório utilizando banco PostgreSQL de testes ou `go-sqlmock`.
-  - [ ] Testar cenários de concorrência massiva de cadastros simultâneos com o mesmo WhatsApp, assegurando que o sistema rejeite a duplicidade sem quebras.
-  - [ ] Executar toda a suíte de testes com a flag `-race` do Go ativa.
+- [x] **M6.1: Testes Unitários**
+  - [x] Testar hash de senhas e geração/validação de tokens JWT.
+- [x] **M6.2: Testes de Integração com Banco Mockado**
+  - [x] Criar testes para o repositório utilizando banco PostgreSQL de testes ou `go-sqlmock`.
+  - [x] Testar cenários de concorrência massiva de cadastros simultâneos com o mesmo WhatsApp, assegurando que o sistema rejeite a duplicidade sem quebras.
+  - [x] Executar toda a suíte de testes com a flag `-race` do Go ativa.
 
 ---
 
