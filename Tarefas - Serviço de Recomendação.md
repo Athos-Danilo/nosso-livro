@@ -10,7 +10,7 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 
 ## 🗺️ Mapa de Progresso Geral
 
-- [ ] **Fase 1: Configuração do Ambiente e Banco de Dados (Python + Alembic)**
+- [X] **Fase 1: Configuração do Ambiente e Banco de Dados (Python + Alembic)**
 - [ ] **Fase 2: Consumidor RabbitMQ (Mensageria Assíncrona com `aio-pika`)**
 - [ ] **Fase 3: Motor de Recomendação (Lógica de Negócio e Stubs - RF10)**
 - [ ] **Fase 4: APIs REST e Endpoints de Consulta (FastAPI)**
@@ -22,9 +22,9 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 ## 🗄️ Fase 1: Configuração do Ambiente e Banco de Dados
 Configuração da stack Python e modelagem física dos dados do histórico e estatísticas de uso.
 
-- [ ] **M1.1: Inicialização do Projeto e Pacotes**
-  - [ ] Criar ambiente virtual Python e instalar dependências core: `fastapi`, `uvicorn[standard]`, `sqlalchemy`, `alembic`, `psycopg2-binary` (ou `asyncpg`), `pydantic` e `aio-pika` (RabbitMQ).
-  - [ ] Organizar diretórios em português:
+- [X] **M1.1: Inicialização do Projeto e Pacotes**
+  - [X] Criar ambiente virtual Python e instalar dependências core: `fastapi`, `uvicorn[standard]`, `sqlalchemy`, `alembic`, `psycopg2-binary` (ou `asyncpg`), `pydantic` e `aio-pika` (RabbitMQ).
+  - [X] Organizar diretórios em português:
     - `/app/principal.py` (Ponto de inicialização do FastAPI)
     - `/app/core/configuracoes.py` (Variáveis de ambiente)
     - `/app/core/banco.py` (PostgreSQL Neon)
@@ -33,14 +33,14 @@ Configuração da stack Python e modelagem física dos dados do histórico e est
     - `/app/api/` (Roteadores de endpoints)
     - `/app/servicos/` (Lógica do motor de recomendações)
     - `/app/trabalhadores/` (Trabalhadores em segundo plano para consumo do RabbitMQ)
-- [ ] **M1.2: Modelagem Física do Banco (`banco_recomendacoes`)**
-  - [ ] Criar modelo `HistoricoLeitura` (Histórico de Leitura):
+- [X] **M1.2: Modelagem Física do Banco (`banco_recomendacoes`)**
+  - [X] Criar modelo `HistoricoLeitura` (Histórico de Leitura):
     - Campos: `id` (UUID ou Serial), `id_usuario` (UUID), `id_livro` (UUID), `categoria` (string - útil para classificar preferências), `data_inicio` (timestamp), `data_fim` (timestamp, nullable) e `estado` (Ex: `'LENDO'`, `'CONCLUIDO'`).
-  - [ ] Criar modelo `PopularidadeLivro` (Popularidade de Livros):
+  - [X] Criar modelo `PopularidadeLivro` (Popularidade de Livros):
     - Campos: `id_livro` (UUID, chave primária), `titulo` (string), `categoria` (string) e `total_emprestimos` (contador inteiro).
-- [ ] **M1.3: Migrations com Alembic**
-  - [ ] Configurar conexão com o Neon no `env.py` do Alembic.
-  - [ ] Criar migração de tabelas incluindo indexações otimizadas para agregação de histórico: `historico_leitura.id_usuario` e `popularidade_livro.total_emprestimos`.
+- [X] **M1.3: Migrations com Alembic**
+  - [X] Configurar conexão com o Neon no `env.py` do Alembic.
+  - [X] Criar migração de tabelas incluindo indexações otimizadas para agregação de histórico: `historico_leitura.id_usuario` e `popularidade_livro.total_emprestimos`.
 
 ---
 
