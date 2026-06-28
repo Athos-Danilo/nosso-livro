@@ -16,7 +16,7 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 - [x] **Fase 4: Handlers HTTP, Rotas e Middlewares (Controladores)**
 - [x] **Fase 5: Segurança, Limitador de Taxa e Validações**
 - [x] **Fase 6: Testes Automatizados e Cobertura**
-- [ ] **Fase 7: Dockerização, Observabilidade e Práticas de Produção**
+- [x] **Fase 7: Dockerização, Observabilidade e Práticas de Produção**
 
 ---
 
@@ -133,10 +133,10 @@ Garantia de qualidade por meio de testes locais.
 ## 🚀 Fase 7: Dockerização, Observabilidade e Práticas de Produção
 Deploy e suporte de produção.
 
-- [ ] **M7.1: Dockerfile Otimizado**
-  - [ ] Criar `Dockerfile` multi-stage gerando imagem estática enxuta baseada em `scratch` ou `alpine` mínimo.
-- [ ] **M7.2: Desligamento Gracioso (Graceful Shutdown)**
-  - [ ] Interceptação de sinais `SIGINT` e `SIGTERM` para fechar o servidor, conexões pendentes e pool do PostgreSQL de forma ordenada.
-- [ ] **M7.3: Health Check e Logs**
-  - [ ] Endpoints de saúde `/saude` e `/pronto`.
-  - [ ] Logs estruturados em formato JSON utilizando a biblioteca nativa `slog` em português.
+- [x] **M7.1: Dockerfile Otimizado**
+  - [x] Criar `Dockerfile` multi-stage gerando imagem estática enxuta baseada em `scratch` ou `alpine` mínimo.
+- [x] **M7.2: Desligamento Gracioso (Graceful Shutdown)**
+  - [x] Interceptação de sinais `SIGINT` e `SIGTERM` para fechar o servidor, conexões pendentes e pool do PostgreSQL de forma ordenada.
+- [x] **M7.3: Health Check e Logs**
+  - [x] Endpoints de saúde `/saude` e `/pronto`.
+  - [x] Logs estruturados em formato JSON utilizando a biblioteca nativa `slog` em português.
