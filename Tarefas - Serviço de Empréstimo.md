@@ -13,7 +13,7 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 - [x] **Fase 1: Configuração do Módulo e Banco de Dados (Go + PostgreSQL)**
 - [x] **Fase 2: Clientes HTTP Resilientes (Integração Síncrona Inter-serviços)**
 - [x] **Fase 3: Conexão e Publicação com RabbitMQ (Mensageria)**
-- [ ] **Fase 4: Camada de Serviços e Lógica de Negócios (Transações e Concorrência)**
+- [x] **Fase 4: Camada de Serviços e Lógica de Negócios (Transações e Concorrência)**
 - [ ] **Fase 5: Rotas HTTP, Middlewares e Handlers (Controladores)**
 - [ ] **Fase 6: Testes Automatizados e Concorrência (Prevenção de Condição de Corrida)**
 - [ ] **Fase 7: Dockerização, Desligamento Gracioso e Monitoramento**
@@ -76,16 +76,16 @@ Disparo confiável de eventos assíncronos para o Message Broker.
 ## 💼 Fase 4: Camada de Serviços e Lógica de Negócios (Transações)
 Lógica de empréstimos e devoluções com controle concorrente estrito.
 
-- [ ] **M4.1: Fluxo de Criação de Empréstimos**
-  - [ ] Validar a existência do usuário e livro síncronamente via clientes HTTP.
-  - [ ] Checar no banco local se o usuário já possui pendências de livros em atraso (impedindo novos empréstimos).
-  - [ ] Gravar o registro do empréstimo definindo a data de devolução prevista (ex: data atual + 14 dias).
-  - [ ] **Controle de Concorrência Rígido:** Utilizar transações com isolamento adequado no PostgreSQL ou Locks pessimistas baseados no ID do livro para garantir que um exemplar disponível não seja associado a dois empréstimos concorrentes executados simultaneamente.
-  - [ ] Disparar o evento assíncrono `emprestimo.criado` via RabbitMQ.
-- [ ] **M4.2: Fluxo de Devolução de Empréstimo**
-  - [ ] Buscar o registro do empréstimo ativo no banco pelo ID.
-  - [ ] Atualizar o campo `data_devolucao_real` com a data/hora atual e mudar o estado para `'DEVOLVIDO'`.
-  - [ ] Disparar o evento assíncrono `emprestimo.devolvido` via RabbitMQ.
+- [x] **M4.1: Fluxo de Criação de Empréstimos**
+  - [x] Validar a existência do usuário e livro síncronamente via clientes HTTP.
+  - [x] Checar no banco local se o usuário já possui pendências de livros em atraso (impedindo novos empréstimos).
+  - [x] Gravar o registro do empréstimo definindo a data de devolução prevista (ex: data atual + 14 dias).
+  - [x] **Controle de Concorrência Rígido:** Utilizar transações com isolamento adequado no PostgreSQL ou Locks pessimistas baseados no ID do livro para garantir que um exemplar disponível não seja associado a dois empréstimos concorrentes executados simultaneamente.
+  - [x] Disparar o evento assíncrono `emprestimo.criado` via RabbitMQ.
+- [x] **M4.2: Fluxo de Devolução de Empréstimo**
+  - [x] Buscar o registro do empréstimo ativo no banco pelo ID.
+  - [x] Atualizar o campo `data_devolucao_real` com a data/hora atual e mudar o estado para `'DEVOLVIDO'`.
+  - [x] Disparar o evento assíncrono `emprestimo.devolvido` via RabbitMQ.
 
 ---
 
