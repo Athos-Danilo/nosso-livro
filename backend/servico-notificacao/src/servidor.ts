@@ -17,6 +17,12 @@ dotenv.config();
 import app from './app';
 import logger from './logger';
 import prisma from './banco/prisma';
+import {
+  iniciarConexaoRabbitMQ,
+  fecharConexaoRabbitMQ,
+  aoReconectar,
+  iniciarConsumidor,
+} from './fila';
 
 // ─── Configurações ────────────────────────────────────────────────────────────
 const porta = Number(process.env.PORTA) || 3002;
@@ -40,8 +46,18 @@ async function iniciar(): Promise<void> {
     });
   });
 
-  // 2. (Fases 3+) Conexão com RabbitMQ e registro de consumidores serão
-  //    inicializados aqui nas fases subsequentes.
+  // 2. Conecta ao broker RabbitMQ e declara filas/bindings
+  await iniciarConexaoRabbitMQ();
+
+  // 3. Registra os consumidores de eventos na fila
+  await iniciarConsumidor();
+
+  // 4. Configura re-registro automático de consumidores em caso de reconexão
+  aoReconectar(async () => {
+    logger.info('Reconexão detectada. Re-registrando consumidores...');
+    await iniciarConsumidor();
+  });
+
   logger.info('Serviço de Notificação inicializado e pronto para receber eventos.');
 }
 
@@ -69,7 +85,9 @@ const desligar = async (sinal: string): Promise<void> => {
     await prisma.$disconnect();
     logger.info('Conexão com o banco de dados encerrada.');
 
-    // 3. (Fase 3+) Fechar conexão RabbitMQ será adicionado aqui.
+    // 3. Encerra conexão com o broker RabbitMQ
+    await fecharConexaoRabbitMQ();
+    logger.info('Conexão com o broker RabbitMQ encerrada.');
 
     logger.info('Desligamento gracioso concluído.');
     process.exit(0);
