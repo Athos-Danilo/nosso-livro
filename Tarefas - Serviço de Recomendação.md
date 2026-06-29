@@ -12,7 +12,7 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 
 - [X] **Fase 1: Configuração do Ambiente e Banco de Dados (Python + Alembic)**
 - [X] **Fase 2: Consumidor RabbitMQ (Mensageria Assíncrona com `aio-pika`)**
-- [ ] **Fase 3: Motor de Recomendação (Lógica de Negócio e Stubs - RF10)**
+- [X] **Fase 3: Motor de Recomendação (Lógica de Negócio e Stubs - RF10)**
 - [ ] **Fase 4: APIs REST e Endpoints de Consulta (FastAPI)**
 - [ ] **Fase 5: Testes Automatizados e Cobertura (pytest)**
 - [ ] **Fase 6: Dockerização, Observabilidade e Práticas de Produção**
@@ -64,14 +64,14 @@ Captação de eventos de empréstimos e devoluções para retroalimentar o hist�
 ## 🤖 Fase 3: Motor de Recomendação (Lógica de Negócio e Stubs - RF10)
 Estruturação da inteligência do sistema em formato modular de fácil substituição.
 
-- [ ] **M3.1: Implementação da Lógica do Stub de Recomendação**
-  - [ ] Desenvolver classe `ServicoRecomendacao` em `/app/servicos/recomendador.py`.
-  - [ ] Criar lógica heurística inicial baseada em dados:
+- [X] **M3.1: Implementação da Lógica do Stub de Recomendação**
+  - [X] Desenvolver classe `ServicoRecomendacao` em `/app/servicos/recomendador.py`.
+  - [X] Criar lógica heurística inicial baseada em dados:
     - Buscar categorias que o usuário mais leu na tabela `HistoricoLeitura`.
     - Buscar livros mais populares pertencentes a essas mesmas categorias da tabela `PopularidadeLivro` (excluindo os livros que o usuário já leu).
     - Caso o usuário não tenha histórico, retornar uma lista padrão baseada nos mais emprestados globalmente (fallback).
-- [ ] **M3.2: Modularidade para Machine Learning**
-  - [ ] Desenvolver a assinatura do método de recomendação de forma abstrata. Isso garante que a substituição futura por modelos de Machine Learning (como IA baseada em embeddings) exija apenas a mudança interna na lógica do serviço, mantendo intactas as rotas da API.
+- [X] **M3.2: Modularidade para Machine Learning**
+  - [X] Desenvolver a assinatura do método de recomendação de forma abstrata. Isso garante que a substituição futura por modelos de Machine Learning (como IA baseada em embeddings) exija apenas a mudança interna na lógica do serviço, mantendo intactas as rotas da API.
 
 ---
 
