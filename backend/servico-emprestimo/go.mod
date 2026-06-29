@@ -2,7 +2,10 @@ module nosso-livro/servico-emprestimo
 
 go 1.26.3
 
-require github.com/jackc/pgx/v5 v5.10.0
+require (
+	github.com/jackc/pgx/v5 v5.10.0
+	github.com/rabbitmq/amqp091-go v1.12.0
+)
 
 require (
 	github.com/jackc/pgpassfile v1.0.0 // indirect

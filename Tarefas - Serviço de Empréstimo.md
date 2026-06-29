@@ -12,7 +12,7 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 
 - [x] **Fase 1: Configuração do Módulo e Banco de Dados (Go + PostgreSQL)**
 - [x] **Fase 2: Clientes HTTP Resilientes (Integração Síncrona Inter-serviços)**
-- [ ] **Fase 3: Conexão e Publicação com RabbitMQ (Mensageria)**
+- [x] **Fase 3: Conexão e Publicação com RabbitMQ (Mensageria)**
 - [ ] **Fase 4: Camada de Serviços e Lógica de Negócios (Transações e Concorrência)**
 - [ ] **Fase 5: Rotas HTTP, Middlewares e Handlers (Controladores)**
 - [ ] **Fase 6: Testes Automatizados e Concorrência (Prevenção de Condição de Corrida)**
@@ -62,14 +62,14 @@ Consumo seguro das APIs externas para validação de dados de usuários e livros
 ## ✉️ Fase 3: Conexão e Publicação com RabbitMQ (Mensageria)
 Disparo confiável de eventos assíncronos para o Message Broker.
 
-- [ ] **M3.1: Configuração do Driver do RabbitMQ**
-  - [ ] Instalar o pacote oficial `github.com/rabbitmq/amqp091-go`.
-  - [ ] Criar lógica de conexão e reconexão automática resiliente ao broker.
-- [ ] **M3.2: Implementação do Publicador de Eventos**
-  - [ ] Criar o componente de disparo de eventos em `/internal/evento`.
-  - [ ] Desenvolver função de publicação para o evento **`emprestimo.criado`** contendo o ID do empréstimo, ID do usuário, ID do livro, ID da biblioteca e data limite de devolução.
-  - [ ] Desenvolver função de publicação para o evento **`emprestimo.devolvido`** contendo o ID do empréstimo, ID do usuário, ID do livro e a data real da devolução.
-  - [ ] Garantir resiliência na publicação ativando o mecanismo de **Publisher Confirms** do RabbitMQ.
+- [x] **M3.1: Configuração do Driver do RabbitMQ**
+  - [x] Instalar o pacote oficial `github.com/rabbitmq/amqp091-go`.
+  - [x] Criar lógica de conexão e reconexão automática resiliente ao broker.
+- [x] **M3.2: Implementação do Publicador de Eventos**
+  - [x] Criar o componente de disparo de eventos em `/internal/evento`.
+  - [x] Desenvolver função de publicação para o evento **`emprestimo.criado`** contendo o ID do empréstimo, ID do usuário, ID do livro, ID da biblioteca e data limite de devolução.
+  - [x] Desenvolver função de publicação para o evento **`emprestimo.devolvido`** contendo o ID do empréstimo, ID do usuário, ID do livro e a data real da devolução.
+  - [x] Garantir resiliência na publicação ativando o mecanismo de **Publisher Confirms** do RabbitMQ.
 
 ---
 
