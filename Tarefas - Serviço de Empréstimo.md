@@ -11,7 +11,7 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 ## 🗺️ Mapa de Progresso Geral
 
 - [x] **Fase 1: Configuração do Módulo e Banco de Dados (Go + PostgreSQL)**
-- [ ] **Fase 2: Clientes HTTP Resilientes (Integração Síncrona Inter-serviços)**
+- [x] **Fase 2: Clientes HTTP Resilientes (Integração Síncrona Inter-serviços)**
 - [ ] **Fase 3: Conexão e Publicação com RabbitMQ (Mensageria)**
 - [ ] **Fase 4: Camada de Serviços e Lógica de Negócios (Transações e Concorrência)**
 - [ ] **Fase 5: Rotas HTTP, Middlewares e Handlers (Controladores)**
@@ -47,15 +47,15 @@ Inicialização do ambiente, Clean Architecture e migração do banco transacion
 ## 🔗 Fase 2: Clientes HTTP Resilientes (Integração Síncrona Inter-serviços)
 Consumo seguro das APIs externas para validação de dados de usuários e livros.
 
-- [ ] **M2.1: Desenvolvimento do Cliente de Usuários**
-  - [ ] Criar `ClienteUsuario` em `/internal/cliente` que efetua chamadas para `GET /api/usuarios/{id}` do **Serviço de Autenticação e Usuário**.
-  - [ ] Validar se o usuário existe e se está ativo (`ativo == true`) antes de autorizar qualquer empréstimo.
-- [ ] **M2.2: Desenvolvimento do Cliente de Catálogo**
-  - [ ] Criar `ClienteCatalogo` que efetua chamadas para `GET /api/livros/{id}` do **Serviço de Catálogo e Biblioteca**.
-  - [ ] Validar se o livro físico existe, está ativo e disponível para empréstimo.
-- [ ] **M2.3: Resiliência de Rede**
-  - [ ] Configurar `http.Client` com timeouts rígidos (máximo 3s).
-  - [ ] Implementar retentativas automáticas (retry) com backoff exponencial para contornar oscilações de rede.
+- [x] **M2.1: Desenvolvimento do Cliente de Usuários**
+  - [x] Criar `ClienteUsuario` em `/internal/cliente` que efetua chamadas para `GET /api/usuarios/{id}` do **Serviço de Autenticação e Usuário**.
+  - [x] Validar se o usuário existe e se está ativo (`ativo == true`) antes de autorizar qualquer empréstimo.
+- [x] **M2.2: Desenvolvimento do Cliente de Catálogo**
+  - [x] Criar `ClienteCatalogo` que efetua chamadas para `GET /api/livros/{id}` do **Serviço de Catálogo e Biblioteca**.
+  - [x] Validar se o livro físico existe, está ativo e disponível para empréstimo.
+- [x] **M2.3: Resiliência de Rede**
+  - [x] Configurar `http.Client` com timeouts rígidos (máximo 3s).
+  - [x] Implementar retentativas automáticas (retry) com backoff exponencial para contornar oscilações de rede.
 
 ---
 

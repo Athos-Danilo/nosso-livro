@@ -12,6 +12,7 @@ var (
 	ErrLivroJaEmprestado       = errors.New("o livro já se encontra emprestado e ativo")
 	ErrUsuarioInativo          = errors.New("o usuário está inativo")
 	ErrLimiteEmprestimos       = errors.New("o usuário atingiu o limite máximo de empréstimos ativos")
+	ErrLivroNaoEncontrado      = errors.New("livro não encontrado")
 )
 
 // Emprestimo representa o registro transacional de um empréstimo de livro
