@@ -3,6 +3,7 @@ import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from app.trabalhadores.consumidor_eventos import iniciar_consumidor
+from app.api.recomendacoes import roteador
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("principal")
@@ -27,6 +28,9 @@ app = FastAPI(
     lifespan=ciclo_vida
 )
 
+# Registro do roteador de recomendações
+app.include_router(roteador)
+
 @app.get("/", tags=["Raiz"])
 async def obter_estado_servico():
     """Retorna o status atual do serviço de recomendações."""
@@ -35,3 +39,4 @@ async def obter_estado_servico():
         "estado": "operacional",
         "mensagem": "Microsserviço de recomendação ativo."
     }
+

@@ -13,7 +13,7 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 - [X] **Fase 1: Configuração do Ambiente e Banco de Dados (Python + Alembic)**
 - [X] **Fase 2: Consumidor RabbitMQ (Mensageria Assíncrona com `aio-pika`)**
 - [X] **Fase 3: Motor de Recomendação (Lógica de Negócio e Stubs - RF10)**
-- [ ] **Fase 4: APIs REST e Endpoints de Consulta (FastAPI)**
+- [X] **Fase 4: APIs REST e Endpoints de Consulta (FastAPI)**
 - [ ] **Fase 5: Testes Automatizados e Cobertura (pytest)**
 - [ ] **Fase 6: Dockerização, Observabilidade e Práticas de Produção**
 
@@ -78,15 +78,15 @@ Estruturação da inteligência do sistema em formato modular de fácil substitu
 ## 🌐 Fase 4: APIs REST e Endpoints de Consulta (FastAPI)
 Rotas de retorno de dados para exibição de recomendações e estatísticas no Frontend.
 
-- [ ] **M4.1: Desenvolvimento das APIs**
-  - [ ] `GET /api/recomendacoes/usuario/{id_usuario}` (Protegido - Membro):
+- [X] **M4.1: Desenvolvimento das APIs**
+  - [X] `GET /api/recomendacoes/usuario/{id_usuario}` (Protegido - Membro):
     - Retorna a lista de IDs de livros sugeridos de forma personalizada com base no algoritmo da Fase 3.
-  - [ ] `GET /api/recomendacoes/populares` (Público):
+  - [X] `GET /api/recomendacoes/populares` (Público):
     - Retorna os títulos de livros mais emprestados no sistema geral para exibição em vitrines de destaque no frontend.
-  - [ ] `GET /api/recomendacoes/historico/{id_usuario}` (Protegido - RF08):
+  - [X] `GET /api/recomendacoes/historico/{id_usuario}` (Protegido - RF08):
     - Retorna a lista do histórico de livros lidos do usuário com estado de leitura.
-- [ ] **M4.2: Validação de Token JWT**
-  - [ ] Adicionar dependência para descriptografia do token repassado pelo Gateway de API.
+- [X] **M4.2: Validação de Token JWT**
+  - [X] Adicionar dependência para descriptografia do token repassado pelo Gateway de API.
 
 ---
 
