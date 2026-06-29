@@ -10,6 +10,7 @@ import {
   ErroTimeoutServico,
   ErroServicoIndisponivel,
 } from '../clientes/errosHttp';
+import logger from '../logger';
 
 // ─── Middleware Centralizador de Erros ────────────────────────────────────────
 
@@ -79,7 +80,10 @@ export function tratadorDeErros(
     return;
   }
 
-  // ── Erro desconhecido ───────────────────────────────────────────────────
-  console.error('[Erro] Erro não tratado:', erro);
+  // ── Erro desconhecido ────────────────────────────────────────────
+  logger.error(
+    { erro, metodo: _req.method, rota: _req.path },
+    'Erro não tratado capturado pelo middleware de erros.'
+  );
   res.status(500).json({ erro: 'Erro interno do servidor.' });
 }

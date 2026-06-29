@@ -1,0 +1,36 @@
+# ─── Arquivos e pastas ignorados pelo Docker build context ───────────────────
+# Reduz o tamanho do contexto de build enviado ao Docker daemon,
+# acelerando o processo e evitando o envio de arquivos desnecessários.
+
+# Dependências (reinstaladas dentro do contêiner via npm ci)
+node_modules/
+
+# Artefatos de compilação TypeScript (gerados durante o build)
+dist/
+
+# Arquivos de ambiente (nunca enviar segredos para o contêiner via build context)
+.env
+.env.*
+!.env.exemplo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Diretórios de desenvolvimento e configuração local
+.git/
+.gitignore
+coverage/
+
+# Arquivos de teste (não necessários em produção)
+**/*.spec.ts
+**/*.test.ts
+vitest.config.ts
+
+# Documentação e arquivos de apoio
+*.md
+
+# Configurações de editores
+.vscode/
+.idea/
+*.editorconfig

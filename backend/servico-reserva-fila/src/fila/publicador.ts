@@ -1,5 +1,6 @@
 import { obterCanal, NOME_EXCHANGE } from './rabbitmq';
 import type { MensagemReservaCriada, MensagemReservaAtribuida } from './tipos';
+import logger from '../logger';
 
 // ─── Opções de publicação ─────────────────────────────────────────────────────
 /** Mensagens persistentes sobrevivem a reinicializações do broker */
@@ -23,11 +24,12 @@ function publicar(chaveRoteamento: string, payload: unknown): void {
   );
 
   if (publicado) {
-    console.log(`[Publicador] Evento "${chaveRoteamento}" publicado com sucesso.`);
+    logger.info({ evento: chaveRoteamento }, `Evento "${chaveRoteamento}" publicado com sucesso.`);
   } else {
     // O buffer interno do canal está cheio — backpressure do RabbitMQ
-    console.warn(
-      `[Publicador] Buffer cheio ao publicar "${chaveRoteamento}". A mensagem pode ter sido descartada.`
+    logger.warn(
+      { evento: chaveRoteamento },
+      `Buffer do canal cheio ao publicar "${chaveRoteamento}". A mensagem pode ter sido descartada.`
     );
   }
 }

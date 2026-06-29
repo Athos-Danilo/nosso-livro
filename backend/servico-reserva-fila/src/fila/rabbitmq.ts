@@ -1,4 +1,5 @@
 import amqplib, { type Channel } from 'amqplib';
+import logger from '../logger';
 
 // ─── Configurações do broker ──────────────────────────────────────────────────
 /** Nome da exchange principal do projeto (tipo: topic) */
@@ -42,7 +43,7 @@ async function declararEstrutura(canalAtivo: Channel): Promise<void> {
     'emprestimo.devolvido'
   );
 
-  console.log('[RabbitMQ] Exchange e fila declaradas com sucesso.');
+  logger.info('Exchange e filas do RabbitMQ declaradas com sucesso.');
 }
 
 /**
@@ -53,7 +54,7 @@ async function conectar(): Promise<void> {
   const urlBroker = process.env.URL_RABBITMQ ?? 'amqp://guest:guest@localhost:5672';
 
   try {
-    console.log(`[RabbitMQ] Tentativa ${tentativaAtual + 1} de conexão com o broker...`);
+    logger.info({ tentativa: tentativaAtual + 1 }, 'Tentando conectar ao broker RabbitMQ...');
 
     // amqplib >=0.10 retorna ChannelModel (referenciado aqui como ModeloCanal)
     modelo = await amqplib.connect(urlBroker);
@@ -68,30 +69,30 @@ async function conectar(): Promise<void> {
     tentativaAtual = 0;
     tentandoReconectar = false;
 
-    console.log('[RabbitMQ] Conexão estabelecida com sucesso.');
+    logger.info('Conexão com o broker RabbitMQ estabelecida com sucesso.');
 
     // ─── Tratamento de erros na conexão ativa ──────────────────────────
     modelo.on('error', (erro: Error) => {
-      console.error('[RabbitMQ] Erro na conexão:', erro.message);
+      logger.error({ erro: erro.message }, 'Erro na conexão com o RabbitMQ.');
       agendarReconexao();
     });
 
     modelo.on('close', () => {
-      console.warn('[RabbitMQ] Conexão encerrada inesperadamente. Reconectando...');
+      logger.warn('Conexão com o RabbitMQ encerrada inesperadamente. Reconectando...');
       agendarReconexao();
     });
 
     canal.on('error', (erro: Error) => {
-      console.error('[RabbitMQ] Erro no canal:', erro.message);
+      logger.error({ erro: erro.message }, 'Erro no canal do RabbitMQ.');
     });
 
     canal.on('close', () => {
-      console.warn('[RabbitMQ] Canal fechado. Aguardando reconexão da conexão...');
+      logger.warn('Canal do RabbitMQ fechado. Aguardando reconexão da conexão...');
     });
   } catch (erro) {
-    console.error(
-      '[RabbitMQ] Falha ao conectar:',
-      erro instanceof Error ? erro.message : erro
+    logger.error(
+      { erro: erro instanceof Error ? erro.message : erro },
+      'Falha ao conectar ao broker RabbitMQ.'
     );
     agendarReconexao();
   }
@@ -115,7 +116,7 @@ function agendarReconexao(): void {
   );
   tentativaAtual++;
 
-  console.log(`[RabbitMQ] Próxima tentativa em ${espera / 1000}s...`);
+  logger.warn({ proximaTentativaMs: espera }, `Próxima tentativa de reconexão com o broker em ${espera / 1000}s.`);
   setTimeout(() => conectar(), espera);
 }
 
@@ -134,7 +135,7 @@ export async function iniciarConexaoRabbitMQ(): Promise<void> {
 export function obterCanal(): Channel {
   if (!canal) {
     throw new Error(
-      '[RabbitMQ] Canal não disponível. O broker pode estar offline ou reconectando.'
+      'Canal do RabbitMQ não disponível. O broker pode estar offline ou reconectando.'
     );
   }
   return canal;
@@ -148,8 +149,8 @@ export async function fecharConexaoRabbitMQ(): Promise<void> {
   try {
     if (canal) await canal.close();
     if (modelo) await modelo.close();
-    console.log('[RabbitMQ] Conexão encerrada com sucesso.');
+    logger.info('Conexão com o broker RabbitMQ encerrada com sucesso.');
   } catch (erro) {
-    console.error('[RabbitMQ] Erro ao encerrar conexão:', erro);
+    logger.error({ erro }, 'Erro ao encerrar conexão com o RabbitMQ.');
   }
 }

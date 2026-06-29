@@ -2,6 +2,7 @@ import { EstadoReserva, type Reserva } from '@prisma/client';
 import prisma from '../banco/prisma';
 import { buscarUsuarioPorId, buscarLivroPorId } from '../clientes';
 import { publicarReservaCriada, publicarReservaAtribuida } from '../fila';
+import logger from '../logger';
 import {
   ErroReservaDuplicada,
   ErroReservaNaoEncontrada,
@@ -39,8 +40,12 @@ async function executarComRetry<T>(
       if (codigoErro === 'P2034' && tentativa < MAX_TENTATIVAS_TRANSACAO - 1) {
         tentativa++;
         // Espera exponencial entre tentativas: 50ms, 100ms, 200ms...
-        await new Promise((r) => setTimeout(r, 50 * Math.pow(2, tentativa)));
-        console.warn(`[Transação] Conflito de serialização. Tentativa ${tentativa + 1}/${MAX_TENTATIVAS_TRANSACAO}...`);
+        const espera = 50 * Math.pow(2, tentativa);
+        await new Promise((r) => setTimeout(r, espera));
+        logger.warn(
+          { tentativa: tentativa + 1, totalTentativas: MAX_TENTATIVAS_TRANSACAO, esperaMs: espera },
+          'Conflito de serialização detectado. Retentando transação...'
+        );
         continue;
       }
       throw erro;
@@ -243,15 +248,15 @@ export async function cancelarReservasExpiradas(): Promise<void> {
 
   if (expiradas.length === 0) return;
 
-  console.log(`[Expiração] ${expiradas.length} reserva(s) expirada(s) encontrada(s). Cancelando...`);
+  logger.info({ quantidade: expiradas.length }, 'Reservas expiradas encontradas. Iniciando cancelamento...');
 
   // Cancela cada uma sequencialmente (sem idUsuarioSolicitante = cancelamento interno)
   for (const { id } of expiradas) {
     try {
       await cancelarReserva(id);
-      console.log(`[Expiração] Reserva ${id} cancelada por prazo vencido.`);
+      logger.info({ idReserva: id }, 'Reserva cancelada por prazo de retirada vencido.');
     } catch (erro) {
-      console.error(`[Expiração] Erro ao cancelar reserva ${id}:`, erro);
+      logger.error({ erro, idReserva: id }, 'Erro ao cancelar reserva expirada.');
     }
   }
 }

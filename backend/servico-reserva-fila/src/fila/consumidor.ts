@@ -4,6 +4,7 @@ import { obterCanal } from './rabbitmq';
 import { publicarReservaAtribuida } from './publicador';
 import type { MensagemEmprestimoDevolvido } from './tipos';
 import prisma from '../banco/prisma';
+import logger from '../logger';
 
 // ─── Constantes de negócio ────────────────────────────────────────────────────
 /** Nome da fila que este serviço escuta */
@@ -34,14 +35,20 @@ async function processarEmprestimoDevolvido(mensagem: ConsumeMessage): Promise<v
   try {
     payload = JSON.parse(mensagem.content.toString()) as MensagemEmprestimoDevolvido;
   } catch {
-    console.error('[Consumidor] Payload inválido recebido — descartando mensagem.');
+    logger.warn(
+      { conteudo: mensagem.content.toString().slice(0, 100) },
+      'Payload inválido recebido via RabbitMQ — descartando mensagem.'
+    );
     // Rejeita sem requeue: mensagem malformada não pode ser reprocessada
     canal.nack(mensagem, false, false);
     return;
   }
 
-  const { id_livro: idLivro } = payload;
-  console.log(`[Consumidor] Processando devolução do livro ID: ${idLivro}`);
+  const { id_livro: idLivro, id_emprestimo: idEmprestimo } = payload;
+  logger.info(
+    { idLivro, idEmprestimo },
+    'Evento "emprestimo.devolvido" recebido. Processando fila de espera...'
+  );
 
   try {
     // ─── Transação: buscar e atribuir próxima reserva ─────────────────
@@ -58,7 +65,7 @@ async function processarEmprestimoDevolvido(mensagem: ConsumeMessage): Promise<v
       });
 
       if (!proximaReserva) {
-        console.log(`[Consumidor] Nenhuma reserva pendente para o livro ${idLivro}.`);
+        logger.info({ idLivro }, 'Nenhuma reserva pendente encontrada para o livro devolvido.');
         return null; // Nenhuma reserva aguardando — fluxo encerrado
       }
 
@@ -74,8 +81,14 @@ async function processarEmprestimoDevolvido(mensagem: ConsumeMessage): Promise<v
         },
       });
 
-      console.log(
-        `[Consumidor] Reserva ${reservaAtualizada.id} atribuída ao usuário ${reservaAtualizada.idUsuario}.`
+      logger.info(
+        {
+          idReserva: reservaAtualizada.id,
+          idUsuario: reservaAtualizada.idUsuario,
+          idLivro: reservaAtualizada.idLivro,
+          prazoRetirada: prazoRetirada.toISOString(),
+        },
+        'Reserva atribuída com sucesso ao próximo usuário da fila.'
       );
 
       return reservaAtualizada;
@@ -95,9 +108,9 @@ async function processarEmprestimoDevolvido(mensagem: ConsumeMessage): Promise<v
     // Só confirmamos após o processamento completo — garante consistência
     canal.ack(mensagem);
   } catch (erro) {
-    console.error(
-      '[Consumidor] Erro ao processar devolução de empréstimo:',
-      erro instanceof Error ? erro.message : erro
+    logger.error(
+      { erro: erro instanceof Error ? erro.message : erro, idLivro },
+      'Erro ao processar evento "emprestimo.devolvido". Mensagem será reprocessada.'
     );
 
     // Rejeita a mensagem e solicita requeue para nova tentativa futura
@@ -121,16 +134,19 @@ export async function iniciarConsumidor(): Promise<void> {
     FILA_EMPRESTIMO_DEVOLVIDO,
     (mensagem) => {
       if (!mensagem) {
-        console.warn('[Consumidor] Mensagem nula recebida (consumer cancelado pelo broker).');
+        logger.warn('Mensagem nula recebida — consumer pode ter sido cancelado pelo broker.');
         return;
       }
       // Processa de forma assíncrona sem bloquear o loop de eventos
       processarEmprestimoDevolvido(mensagem).catch((erro) => {
-        console.error('[Consumidor] Erro não tratado no processamento:', erro);
+        logger.error({ erro }, 'Erro não tratado no processamento de mensagem do RabbitMQ.');
       });
     },
     { noAck: false } // ack manual — garantia de entrega exactly-once
   );
 
-  console.log('[Consumidor] Aguardando eventos de "emprestimo.devolvido"...');
+  logger.info(
+    { fila: FILA_EMPRESTIMO_DEVOLVIDO },
+    'Consumidor de eventos registrado. Aguardando mensagens...'
+  );
 }

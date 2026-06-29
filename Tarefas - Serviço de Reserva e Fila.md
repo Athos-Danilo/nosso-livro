@@ -16,7 +16,7 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 - [x] **Fase 4: Regras de Negócio e Lógica de Fila de Espera (Algoritmos de Fila)**
 - [x] **Fase 5: APIs REST, Rotas e Middlewares (Express/Fastify)**
 - [x] **Fase 6: Testes Automatizados (Jest/Vitest + Supertest)**
-- [ ] **Fase 7: Dockerização, Desligamento Gracioso e Logs Estruturados**
+- [x] **Fase 7: Dockerização, Desligamento Gracioso e Logs Estruturados**
 
 ---
 
@@ -124,10 +124,10 @@ Qualidade de código.
 ## 🚀 Fase 7: Dockerização, Desligamento Gracioso e Produção
 Deploy e padrões operacionais.
 
-- [ ] **M7.1: Dockerfile Multi-stage Otimizado**
-  - [ ] Compilar TypeScript para JavaScript e gerar imagem final enxuta em `node:18-alpine`.
-- [ ] **M7.2: Desligamento Gracioso (Graceful Shutdown)**
-  - [ ] Interceptação de `SIGINT` e `SIGTERM` para fechar o servidor Express, desconectar do RabbitMQ e fechar a conexão ativa do Prisma Client.
-- [ ] **M7.3: Health Check e Observabilidade**
-  - [ ] Criar endpoints `/saude` e `/pronto`.
-  - [ ] Logs estruturados JSON em português utilizando Winston ou Pino.
+- [x] **M7.1: Dockerfile Multi-stage Otimizado**
+  - [x] Compilar TypeScript para JavaScript e gerar imagem final enxuta em `node:18-alpine`.
+- [x] **M7.2: Desligamento Gracioso (Graceful Shutdown)**
+  - [x] Interceptação de `SIGINT` e `SIGTERM` para fechar o servidor Express, desconectar do RabbitMQ e fechar a conexão ativa do Prisma Client.
+- [x] **M7.3: Health Check e Observabilidade**
+  - [x] Criar endpoints `/saude` e `/pronto`.
+  - [x] Logs estruturados JSON em português utilizando Winston ou Pino.
