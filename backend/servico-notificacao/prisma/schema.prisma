@@ -1,0 +1,70 @@
+// Schema Prisma — Serviço de Notificação
+// Banco de dados: banco_notificacoes (PostgreSQL)
+// Idioma do projeto: PT-BR
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Enumerador de tipos de notificação ──────────────────────────────────────
+// EMAIL     → Notificação enviada por e-mail via SMTP.
+// WHATSAPP  → Notificação enviada por WhatsApp (stub/mock para demonstração).
+enum TipoNotificacao {
+  EMAIL
+  WHATSAPP
+}
+
+// ─── Enumerador de estados de envio ──────────────────────────────────────────
+// ENVIADO  → Disparo concluído com sucesso.
+// FALHOU   → Erro durante o disparo (mensagem de erro registrada em `mensagemErro`).
+// PENDENTE → Na fila de reprocessamento aguardando nova tentativa.
+enum EstadoNotificacao {
+  ENVIADO
+  FALHOU
+  PENDENTE
+}
+
+// ─── Modelo principal de Notificação ─────────────────────────────────────────
+model Notificacao {
+  // Identificador único gerado automaticamente (UUID v4)
+  id             String             @id @default(uuid())
+
+  // UUID do usuário destinatário (referencial ao Serviço de Autenticação e Usuário)
+  idUsuario      String
+
+  // Canal de envio da notificação
+  tipo           TipoNotificacao
+
+  // Estado atual do ciclo de vida do disparo
+  estado         EstadoNotificacao  @default(PENDENTE)
+
+  // Assunto ou título da notificação (ex: "Empréstimo confirmado!")
+  titulo         String
+
+  // Corpo completo da mensagem enviada (HTML para e-mail, texto para WhatsApp)
+  conteudo       String
+
+  // Log de erro em caso de falha de envio (null quando enviado com sucesso)
+  mensagemErro   String?
+
+  // Número de tentativas de envio realizadas (para controle de retentativas)
+  tentativas     Int                @default(0)
+
+  // Timestamp de criação do registro
+  criadoEm      DateTime           @default(now())
+
+  // ─── Índices de busca ──────────────────────────────────────────────
+  // Acelera buscas por destinatário (histórico do usuário)
+  @@index([idUsuario])
+  // Acelera filtros por estado (busca de PENDENTES para reprocessamento)
+  @@index([estado])
+  // Índice composto: busca eficiente de notificações de um usuário por estado
+  @@index([idUsuario, estado])
+
+  // Nome da tabela no banco de dados
+  @@map("notificacoes")
+}

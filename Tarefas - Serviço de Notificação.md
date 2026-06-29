@@ -23,14 +23,14 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 ## 🗄️ Fase 1: Configuração do Ambiente e Banco de Dados
 Setup inicial do microsserviço em TypeScript e estruturação do banco de histórico de notificações.
 
-- [ ] **M1.1: Inicialização do Módulo Node.js**
-  - [ ] Inicializar o projeto com `npm init -y` na pasta `./backend/servico-notificacao/`.
-  - [ ] Instalar dependências de produção: `express` (para health check), `amqplib`, `nodemailer`, `@prisma/client`, `zod`, `dotenv` e `axios`.
-  - [ ] Instalar dependências de dev: `typescript`, `@types/node`, `@types/express`, `@types/amqplib`, `@types/nodemailer`, `prisma` e `ts-node-dev`.
-  - [ ] Configurar compilation flags no `tsconfig.json`.
-- [ ] **M1.2: Modelagem Física do Banco (`banco_notificacoes`)**
-  - [ ] Executar `npx prisma init` para configurar o acesso ao Neon.
-  - [ ] Mapear o modelo de histórico no `schema.prisma` utilizando nomes em português:
+- [x] **M1.1: Inicialização do Módulo Node.js**
+  - [x] Inicializar o projeto com `npm init -y` na pasta `./backend/servico-notificacao/`.
+  - [x] Instalar dependências de produção: `express` (para health check), `amqplib`, `nodemailer`, `@prisma/client`, `zod`, `dotenv` e `axios`.
+  - [x] Instalar dependências de dev: `typescript`, `@types/node`, `@types/express`, `@types/amqplib`, `@types/nodemailer`, `prisma` e `ts-node-dev`.
+  - [x] Configurar compilation flags no `tsconfig.json`.
+- [x] **M1.2: Modelagem Física do Banco (`banco_notificacoes`)**
+  - [x] Executar `npx prisma init` para configurar o acesso ao Neon.
+  - [x] Mapear o modelo de histórico no `schema.prisma` utilizando nomes em português:
     - Modelo `Notificacao`:
       - `id` (UUID primário gerado automaticamente).
       - `idUsuario` (UUID referencial do destinatário).

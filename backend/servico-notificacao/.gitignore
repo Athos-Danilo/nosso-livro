@@ -1,0 +1,16 @@
+# Dependências instaladas
+node_modules/
+
+# Artefatos de build TypeScript
+dist/
+
+# Arquivos de ambiente com credenciais
+.env
+.env.test
+
+# Logs
+*.log
+npm-debug.log*
+
+# Cobertura de testes
+coverage/
