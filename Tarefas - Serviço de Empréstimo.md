@@ -10,7 +10,7 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 
 ## 🗺️ Mapa de Progresso Geral
 
-- [ ] **Fase 1: Configuração do Módulo e Banco de Dados (Go + PostgreSQL)**
+- [x] **Fase 1: Configuração do Módulo e Banco de Dados (Go + PostgreSQL)**
 - [ ] **Fase 2: Clientes HTTP Resilientes (Integração Síncrona Inter-serviços)**
 - [ ] **Fase 3: Conexão e Publicação com RabbitMQ (Mensageria)**
 - [ ] **Fase 4: Camada de Serviços e Lógica de Negócios (Transações e Concorrência)**
@@ -23,9 +23,9 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 ## 🗄️ Fase 1: Configuração do Módulo e Banco de Dados
 Inicialização do ambiente, Clean Architecture e migração do banco transacional.
 
-- [ ] **M1.1: Inicialização do Projeto Go**
-  - [ ] Executar `go mod init nosso-livro/servico-emprestimo` dentro da pasta `./backend/servico-emprestimo/`
-  - [ ] Organizar diretórios segundo o padrão Clean Architecture em português:
+- [x] **M1.1: Inicialização do Projeto Go**
+  - [x] Executar `go mod init nosso-livro/servico-emprestimo` dentro da pasta `./backend/servico-emprestimo/`
+  - [x] Organizar diretórios segundo o padrão Clean Architecture em português:
     - `/cmd/api/principal.go`
     - `/internal/dominio` (Entidades, interfaces e contratos)
     - `/internal/repositorio` (Acesso ao banco `banco_emprestimos`)
@@ -34,13 +34,13 @@ Inicialização do ambiente, Clean Architecture e migração do banco transacion
     - `/internal/controlador` (Controladores HTTP)
     - `/internal/evento` (Publishers de eventos do RabbitMQ)
     - `/migrations` (Estruturação das tabelas via SQL em português)
-- [ ] **M1.2: Configuração de Migrações com `golang-migrate`**
-  - [ ] Criar a primeira migração (`000001_cria_tabela_emprestimos.up.sql`):
+- [x] **M1.2: Configuração de Migrações com `golang-migrate`**
+  - [x] Criar a primeira migração (`000001_cria_tabela_emprestimos.up.sql`):
     - Tabela `emprestimos`: `id` (UUID primário), `id_usuario` (UUID), `id_livro` (UUID), `id_biblioteca` (UUID), `data_emprestimo` (timestamp), `data_devolucao_prevista` (timestamp), `data_devolucao_real` (timestamp, nullable), `estado` (Ex: `'ATIVO'`, `'DEVOLVIDO'`, `'ATRASADO'`), `criado_em` e `atualizado_em`.
     - Índices criados para otimização de consultas de relatórios: `emprestimos.id_usuario`, `emprestimos.id_livro` e `emprestimos.estado`.
-- [ ] **M1.3: Conexão e Configuração de Pool PostgreSQL**
-  - [ ] Configurar conexão para `banco_emprestimos` hospedado na Neon.
-  - [ ] Utilizar pool de conexões otimizado (`pgx/v5` ou `sqlx`) e implementar retry automático contra falhas por inatividade temporária (cold start).
+- [x] **M1.3: Conexão e Configuração de Pool PostgreSQL**
+  - [x] Configurar conexão para `banco_emprestimos` hospedado na Neon.
+  - [x] Utilizar pool de conexões otimizado (`pgx/v5` ou `sqlx`) e implementar retry automático contra falhas por inatividade temporária (cold start).
 
 ---
 
