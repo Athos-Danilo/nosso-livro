@@ -15,7 +15,7 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 - [X] **Fase 3: Motor de Recomendação (Lógica de Negócio e Stubs - RF10)**
 - [X] **Fase 4: APIs REST e Endpoints de Consulta (FastAPI)**
 - [X] **Fase 5: Testes Automatizados e Cobertura (pytest)**
-- [ ] **Fase 6: Dockerização, Observabilidade e Práticas de Produção**
+- [X] **Fase 6: Dockerização, Observabilidade e Práticas de Produção**
 
 ---
 
@@ -105,10 +105,10 @@ Garantia de integridade do motor de sugestões e de consistência do consumo de 
 ## 🚀 Fase 6: Dockerização, Observabilidade e Práticas de Produção
 Deploy e acompanhamento dinâmico do comportamento de consumo.
 
-- [ ] **M6.1: Dockerfile Otimizado**
-  - [ ] Criar `Dockerfile` multi-stage com imagem final `python:3.11-slim` executada como usuário não-root.
-- [ ] **M6.2: Graceful Shutdown das Conexões**
-  - [ ] Configurar desativação do FastAPI fechando o canal e conexões assíncronas do RabbitMQ (`aio-pika`) e o pool do PostgreSQL de forma limpa.
-- [ ] **M6.3: Health Check e Observabilidade**
-  - [ ] Rotas `/saude` e `/pronto` de integridade.
-  - [ ] Logs JSON estruturados identificando eventos recebidos, tempos de processamento da recomendação e erros de processamento assíncrono.
+- [X] **M6.1: Dockerfile Otimizado**
+  - [X] Criar `Dockerfile` multi-stage com imagem final `python:3.11-slim` executada como usuário não-root.
+- [X] **M6.2: Graceful Shutdown das Conexões**
+  - [X] Configurar desativação do FastAPI fechando o canal e conexões assíncronas do RabbitMQ (`aio-pika`) e o pool do PostgreSQL de forma limpa.
+- [X] **M6.3: Health Check e Observabilidade**
+  - [X] Rotas `/saude` e `/pronto` de integridade.
+  - [X] Logs JSON estruturados identificando eventos recebidos, tempos de processamento da recomendação e erros de processamento assíncrono.
