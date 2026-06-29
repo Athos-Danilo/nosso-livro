@@ -14,7 +14,7 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 - [X] **Fase 2: Consumidor RabbitMQ (Mensageria Assíncrona com `aio-pika`)**
 - [X] **Fase 3: Motor de Recomendação (Lógica de Negócio e Stubs - RF10)**
 - [X] **Fase 4: APIs REST e Endpoints de Consulta (FastAPI)**
-- [ ] **Fase 5: Testes Automatizados e Cobertura (pytest)**
+- [X] **Fase 5: Testes Automatizados e Cobertura (pytest)**
 - [ ] **Fase 6: Dockerização, Observabilidade e Práticas de Produção**
 
 ---
@@ -93,12 +93,12 @@ Rotas de retorno de dados para exibição de recomendações e estatísticas no 
 ## 🧪 Fase 5: Testes Automatizados e Cobertura (pytest)
 Garantia de integridade do motor de sugestões e de consistência do consumo de eventos.
 
-- [ ] **M5.1: Configuração de Testes de Recomendação**
-  - [ ] Desenvolver testes unitários para a classe `ServicoRecomendacao`.
-  - [ ] Simular um histórico de leitura artificial do usuário e verificar se as recomendações sugeridas respeitam as categorias de preferência definidas no mock.
-- [ ] **M5.2: Testes de Integração do Consumidor**
-  - [ ] Mockar mensagens simuladas do RabbitMQ no formato JSON (`emprestimo.criado` e `emprestimo.devolvido`) e injetar diretamente no consumidor.
-  - [ ] Verificar se as tabelas `HistoricoLeitura` e `PopularidadeLivro` são alteradas corretamente.
+- [X] **M5.1: Configuração de Testes de Recomendação**
+  - [X] Desenvolver testes unitários para a classe `ServicoRecomendacao`.
+  - [X] Simular um histórico de leitura artificial do usuário e verificar se as recomendações sugeridas respeitam as categorias de preferência definidas no mock.
+- [X] **M5.2: Testes de Integração do Consumidor**
+  - [X] Mockar mensagens simuladas do RabbitMQ no formato JSON (`emprestimo.criado` e `emprestimo.devolvido`) e injetar diretamente no consumidor.
+  - [X] Verificar se as tabelas `HistoricoLeitura` e `PopularidadeLivro` são alteradas corretamente.
 
 ---
 
