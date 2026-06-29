@@ -12,10 +12,10 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 
 - [X] **Fase 1: Configuração do Ambiente e Banco de Dados (Python + Alembic)**
 - [X] **Fase 2: Consumidor RabbitMQ (Mensageria Assíncrona com `aio-pika`)**
-- [ ] **Fase 3: Motor de Recomendação (Lógica de Negócio e Stubs - RF10)**
-- [ ] **Fase 4: APIs REST e Endpoints de Consulta (FastAPI)**
-- [ ] **Fase 5: Testes Automatizados e Cobertura (pytest)**
-- [ ] **Fase 6: Dockerização, Observabilidade e Práticas de Produção**
+- [X] **Fase 3: Motor de Recomendação (Lógica de Negócio e Stubs - RF10)**
+- [X] **Fase 4: APIs REST e Endpoints de Consulta (FastAPI)**
+- [X] **Fase 5: Testes Automatizados e Cobertura (pytest)**
+- [X] **Fase 6: Dockerização, Observabilidade e Práticas de Produção**
 
 ---
 
@@ -64,51 +64,51 @@ Captação de eventos de empréstimos e devoluções para retroalimentar o hist�
 ## 🤖 Fase 3: Motor de Recomendação (Lógica de Negócio e Stubs - RF10)
 Estruturação da inteligência do sistema em formato modular de fácil substituição.
 
-- [ ] **M3.1: Implementação da Lógica do Stub de Recomendação**
-  - [ ] Desenvolver classe `ServicoRecomendacao` em `/app/servicos/recomendador.py`.
-  - [ ] Criar lógica heurística inicial baseada em dados:
+- [X] **M3.1: Implementação da Lógica do Stub de Recomendação**
+  - [X] Desenvolver classe `ServicoRecomendacao` em `/app/servicos/recomendador.py`.
+  - [X] Criar lógica heurística inicial baseada em dados:
     - Buscar categorias que o usuário mais leu na tabela `HistoricoLeitura`.
     - Buscar livros mais populares pertencentes a essas mesmas categorias da tabela `PopularidadeLivro` (excluindo os livros que o usuário já leu).
     - Caso o usuário não tenha histórico, retornar uma lista padrão baseada nos mais emprestados globalmente (fallback).
-- [ ] **M3.2: Modularidade para Machine Learning**
-  - [ ] Desenvolver a assinatura do método de recomendação de forma abstrata. Isso garante que a substituição futura por modelos de Machine Learning (como IA baseada em embeddings) exija apenas a mudança interna na lógica do serviço, mantendo intactas as rotas da API.
+- [X] **M3.2: Modularidade para Machine Learning**
+  - [X] Desenvolver a assinatura do método de recomendação de forma abstrata. Isso garante que a substituição futura por modelos de Machine Learning (como IA baseada em embeddings) exija apenas a mudança interna na lógica do serviço, mantendo intactas as rotas da API.
 
 ---
 
 ## 🌐 Fase 4: APIs REST e Endpoints de Consulta (FastAPI)
 Rotas de retorno de dados para exibição de recomendações e estatísticas no Frontend.
 
-- [ ] **M4.1: Desenvolvimento das APIs**
-  - [ ] `GET /api/recomendacoes/usuario/{id_usuario}` (Protegido - Membro):
+- [X] **M4.1: Desenvolvimento das APIs**
+  - [X] `GET /api/recomendacoes/usuario/{id_usuario}` (Protegido - Membro):
     - Retorna a lista de IDs de livros sugeridos de forma personalizada com base no algoritmo da Fase 3.
-  - [ ] `GET /api/recomendacoes/populares` (Público):
+  - [X] `GET /api/recomendacoes/populares` (Público):
     - Retorna os títulos de livros mais emprestados no sistema geral para exibição em vitrines de destaque no frontend.
-  - [ ] `GET /api/recomendacoes/historico/{id_usuario}` (Protegido - RF08):
+  - [X] `GET /api/recomendacoes/historico/{id_usuario}` (Protegido - RF08):
     - Retorna a lista do histórico de livros lidos do usuário com estado de leitura.
-- [ ] **M4.2: Validação de Token JWT**
-  - [ ] Adicionar dependência para descriptografia do token repassado pelo Gateway de API.
+- [X] **M4.2: Validação de Token JWT**
+  - [X] Adicionar dependência para descriptografia do token repassado pelo Gateway de API.
 
 ---
 
 ## 🧪 Fase 5: Testes Automatizados e Cobertura (pytest)
 Garantia de integridade do motor de sugestões e de consistência do consumo de eventos.
 
-- [ ] **M5.1: Configuração de Testes de Recomendação**
-  - [ ] Desenvolver testes unitários para a classe `ServicoRecomendacao`.
-  - [ ] Simular um histórico de leitura artificial do usuário e verificar se as recomendações sugeridas respeitam as categorias de preferência definidas no mock.
-- [ ] **M5.2: Testes de Integração do Consumidor**
-  - [ ] Mockar mensagens simuladas do RabbitMQ no formato JSON (`emprestimo.criado` e `emprestimo.devolvido`) e injetar diretamente no consumidor.
-  - [ ] Verificar se as tabelas `HistoricoLeitura` e `PopularidadeLivro` são alteradas corretamente.
+- [X] **M5.1: Configuração de Testes de Recomendação**
+  - [X] Desenvolver testes unitários para a classe `ServicoRecomendacao`.
+  - [X] Simular um histórico de leitura artificial do usuário e verificar se as recomendações sugeridas respeitam as categorias de preferência definidas no mock.
+- [X] **M5.2: Testes de Integração do Consumidor**
+  - [X] Mockar mensagens simuladas do RabbitMQ no formato JSON (`emprestimo.criado` e `emprestimo.devolvido`) e injetar diretamente no consumidor.
+  - [X] Verificar se as tabelas `HistoricoLeitura` e `PopularidadeLivro` são alteradas corretamente.
 
 ---
 
 ## 🚀 Fase 6: Dockerização, Observabilidade e Práticas de Produção
 Deploy e acompanhamento dinâmico do comportamento de consumo.
 
-- [ ] **M6.1: Dockerfile Otimizado**
-  - [ ] Criar `Dockerfile` multi-stage com imagem final `python:3.11-slim` executada como usuário não-root.
-- [ ] **M6.2: Graceful Shutdown das Conexões**
-  - [ ] Configurar desativação do FastAPI fechando o canal e conexões assíncronas do RabbitMQ (`aio-pika`) e o pool do PostgreSQL de forma limpa.
-- [ ] **M6.3: Health Check e Observabilidade**
-  - [ ] Rotas `/saude` e `/pronto` de integridade.
-  - [ ] Logs JSON estruturados identificando eventos recebidos, tempos de processamento da recomendação e erros de processamento assíncrono.
+- [X] **M6.1: Dockerfile Otimizado**
+  - [X] Criar `Dockerfile` multi-stage com imagem final `python:3.11-slim` executada como usuário não-root.
+- [X] **M6.2: Graceful Shutdown das Conexões**
+  - [X] Configurar desativação do FastAPI fechando o canal e conexões assíncronas do RabbitMQ (`aio-pika`) e o pool do PostgreSQL de forma limpa.
+- [X] **M6.3: Health Check e Observabilidade**
+  - [X] Rotas `/saude` e `/pronto` de integridade.
+  - [X] Logs JSON estruturados identificando eventos recebidos, tempos de processamento da recomendação e erros de processamento assíncrono.
