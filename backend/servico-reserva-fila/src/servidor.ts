@@ -1,53 +1,26 @@
-import express from 'express';
-import cors from 'cors';
+/**
+ * Ponto de entrada do servidor — inicialização e efeitos colaterais.
+ *
+ * Este módulo é responsável por:
+ * 1. Iniciar o servidor HTTP na porta configurada.
+ * 2. Conectar ao broker RabbitMQ.
+ * 3. Registrar o consumidor de eventos.
+ * 4. Iniciar o job de expiração automática de reservas.
+ * 5. Gerenciar o desligamento gracioso (SIGINT / SIGTERM).
+ *
+ * A lógica do app Express está em `./app.ts`, separada dos efeitos colaterais
+ * para permitir testes de integração sem inicialização de infraestrutura.
+ */
 import dotenv from 'dotenv';
+import app from './app';
 import { iniciarConexaoRabbitMQ, fecharConexaoRabbitMQ, iniciarConsumidor } from './fila';
 import prisma from './banco/prisma';
-import rotasReservas from './rotas/reservas';
-import { tratadorDeErros } from './middlewares/tratadorDeErros';
 import { cancelarReservasExpiradas } from './regras/reservaServico';
 
 // Carrega as variáveis de ambiente do arquivo .env
 dotenv.config();
 
 const porta = Number(process.env.PORTA) || 3001;
-const app = express();
-
-// ─── Middlewares globais ─────────────────────────────────────────────────────
-app.use(cors({
-  origin: process.env.CORS_ORIGEM ?? '*',
-  methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-usuario-dados'],
-}));
-app.use(express.json());
-
-// ─── Rotas de saúde ──────────────────────────────────────────────────────────
-// GET /saude — verifica se o processo está vivo (liveness probe)
-app.get('/saude', (_req, res) => {
-  res.status(200).json({
-    status: 'ativo',
-    servico: 'servico-reserva-fila',
-    versao: '1.0.0',
-    horario: new Date().toISOString(),
-  });
-});
-
-// GET /pronto — verifica se o serviço está pronto para receber tráfego (readiness probe)
-app.get('/pronto', async (_req, res) => {
-  try {
-    // Verifica conectividade com o banco (query leve)
-    await prisma.$queryRaw`SELECT 1`;
-    res.status(200).json({ status: 'pronto' });
-  } catch {
-    res.status(503).json({ status: 'indisponivel', motivo: 'banco de dados inacessivel' });
-  }
-});
-
-// ─── Rotas do domínio ────────────────────────────────────────────────────────
-app.use('/api/reservas', rotasReservas);
-
-// ─── Middleware de erros (deve ser o último) ─────────────────────────────────
-app.use(tratadorDeErros);
 
 // ─── Job de expiração automática de reservas ─────────────────────────────────
 // Verifica a cada 30 minutos se há reservas ATRIBUIDAS com prazo vencido.
@@ -118,5 +91,3 @@ const desligar = async () => {
 
 process.on('SIGINT', () => { desligar().catch(console.error); });
 process.on('SIGTERM', () => { desligar().catch(console.error); });
-
-export default app;

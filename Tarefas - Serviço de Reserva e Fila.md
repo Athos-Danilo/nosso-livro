@@ -10,12 +10,12 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 
 ## 🗺️ Mapa de Progresso Geral
 
-- [ ] **Fase 1: Configuração do Ambiente e Banco de Dados (Node.js + TS + Prisma)**
-- [ ] **Fase 2: Clientes HTTP e Validações Síncronas (Axios/Fetch)**
-- [ ] **Fase 3: Integração com RabbitMQ (Consumo e Publicação de Eventos)**
-- [ ] **Fase 4: Regras de Negócio e Lógica de Fila de Espera (Algoritmos de Fila)**
-- [ ] **Fase 5: APIs REST, Rotas e Middlewares (Express/Fastify)**
-- [ ] **Fase 6: Testes Automatizados (Jest/Vitest + Supertest)**
+- [x] **Fase 1: Configuração do Ambiente e Banco de Dados (Node.js + TS + Prisma)**
+- [x] **Fase 2: Clientes HTTP e Validações Síncronas (Axios/Fetch)**
+- [x] **Fase 3: Integração com RabbitMQ (Consumo e Publicação de Eventos)**
+- [x] **Fase 4: Regras de Negócio e Lógica de Fila de Espera (Algoritmos de Fila)**
+- [x] **Fase 5: APIs REST, Rotas e Middlewares (Express/Fastify)**
+- [x] **Fase 6: Testes Automatizados (Jest/Vitest + Supertest)**
 - [ ] **Fase 7: Dockerização, Desligamento Gracioso e Logs Estruturados**
 
 ---
@@ -113,11 +113,11 @@ Rotas HTTP expostas.
 ## 🧪 Fase 6: Testes Automatizados (Jest/Vitest + Supertest)
 Qualidade de código.
 
-- [ ] **M6.1: Testes Unitários de Fila de Espera**
-  - [ ] Testar cenários de reordenação de posições pós-cancelamento de reservas intermediárias e fluxo de atribuição automática do livro para o primeiro da lista no caso de devoluções.
-- [ ] **M6.2: Testes de Integração e Concorrência**
-  - [ ] Testar endpoints usando banco de testes e mockar o RabbitMQ.
-  - [ ] Simular 50 acessos concorrentes para criar reserva no mesmo livro ao mesmo tempo. Garantir que as posições sejam atribuídas estritamente na ordem correta (`1, 2, 3... 50`) sem duplicidades de posição.
+- [x] **M6.1: Testes Unitários de Fila de Espera**
+  - [x] Testar cenários de reordenação de posições pós-cancelamento de reservas intermediárias e fluxo de atribuição automática do livro para o primeiro da lista no caso de devoluções.
+- [x] **M6.2: Testes de Integração e Concorrência**
+  - [x] Testar endpoints usando banco de testes e mockar o RabbitMQ.
+  - [x] Simular 50 acessos concorrentes para criar reserva no mesmo livro ao mesmo tempo. Garantir que as posições sejam atribuídas estritamente na ordem correta (`1, 2, 3... 50`) sem duplicidades de posição.
 
 ---
 
