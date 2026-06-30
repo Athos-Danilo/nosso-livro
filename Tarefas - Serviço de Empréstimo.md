@@ -15,7 +15,7 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 - [x] **Fase 3: Conexão e Publicação com RabbitMQ (Mensageria)**
 - [x] **Fase 4: Camada de Serviços e Lógica de Negócios (Transações e Concorrência)**
 - [x] **Fase 5: Rotas HTTP, Middlewares e Handlers (Controladores)**
-- [ ] **Fase 6: Testes Automatizados e Concorrência (Prevenção de Condição de Corrida)**
+- [x] **Fase 6: Testes Automatizados e Concorrência (Prevenção de Condição de Corrida)**
 - [ ] **Fase 7: Dockerização, Desligamento Gracioso e Monitoramento**
 
 ---
@@ -112,14 +112,14 @@ Desenvolvimento das rotas de consumo externo e integração com segurança.
 ## 🧪 Fase 6: Testes Automatizados e Concorrência
 Garantia de que transações concorrentes e fluxos de integração funcionem.
 
-- [ ] **M6.1: Testes Unitários de Lógica de Negócio**
-  - [ ] Testar regras de validação de datas (prazos de devolução expirados, cálculo de dias decorridos).
-- [ ] **M6.2: Testes de Integração com Banco e Chamadas Mockadas**
-  - [ ] Implementar testes utilizando `testcontainers-go` com banco PostgreSQL dinâmico.
-  - [ ] Mockar as respostas do `ClienteUsuario` e `ClienteCatalogo`.
-- [ ] **M6.3: Testes de Stress de Concorrência Massiva (Race Detector)**
-  - [ ] Desenvolver um teste de concorrência que simula 50 goroutines simultâneas tentando registrar empréstimo para o mesmo ID de livro. Garantir que exatamente 1 empréstimo seja aceito com sucesso e as outras 49 requisições retornem erro controlado.
-  - [ ] Executar toda a suíte de testes com a flag `-race` do Go ativa.
+- [x] **M6.1: Testes Unitários de Lógica de Negócio**
+  - [x] Testar regras de validação de datas (prazos de devolução expirados, cálculo de dias decorridos).
+- [x] **M6.2: Testes de Integração com Banco e Chamadas Mockadas**
+  - [x] Implementar testes utilizando `testcontainers-go` com banco PostgreSQL dinâmico.
+  - [x] Mockar as respostas do `ClienteUsuario` e `ClienteCatalogo`.
+- [x] **M6.3: Testes de Stress de Concorrência Massiva (Race Detector)**
+  - [x] Desenvolver um teste de concorrência que simula 50 goroutines simultâneas tentando registrar empréstimo para o mesmo ID de livro. Garantir que exatamente 1 empréstimo seja aceito com sucesso e as outras 49 requisições retornem erro controlado.
+  - [x] Executar toda a suíte de testes com a flag `-race` do Go ativa.
 
 ---
 
