@@ -1,0 +1,11 @@
+node_modules
+dist
+.env
+.git
+.dockerignore
+Dockerfile
+coverage
+__testes__
+README.md
+jest.config.ts
+tsconfig.json
