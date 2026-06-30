@@ -14,7 +14,7 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 - [x] **Fase 2: Clientes HTTP Resilientes (Integração Síncrona Inter-serviços)**
 - [x] **Fase 3: Conexão e Publicação com RabbitMQ (Mensageria)**
 - [x] **Fase 4: Camada de Serviços e Lógica de Negócios (Transações e Concorrência)**
-- [ ] **Fase 5: Rotas HTTP, Middlewares e Handlers (Controladores)**
+- [x] **Fase 5: Rotas HTTP, Middlewares e Handlers (Controladores)**
 - [ ] **Fase 6: Testes Automatizados e Concorrência (Prevenção de Condição de Corrida)**
 - [ ] **Fase 7: Dockerização, Desligamento Gracioso e Monitoramento**
 
@@ -92,20 +92,20 @@ Lógica de empréstimos e devoluções com controle concorrente estrito.
 ## 🌐 Fase 5: Rotas HTTP, Middlewares e Handlers (Controladores)
 Desenvolvimento das rotas de consumo externo e integração com segurança.
 
-- [ ] **M5.1: Desenvolvimento dos Endpoints**
-  - [ ] `POST /api/emprestimos` (Protegido - Membro):
-    - Recebe `id_livro` e `id_biblioteca` no JSON de entrada.
-    - Extrai o `id_usuario` diretamente das claims do JWT inseridas no contexto pelo middleware.
-    - Cria o empréstimo seguindo a lógica de negócio e retorna o status `201 Created`.
-  - [ ] `POST /api/emprestimos/{id}/devolucao` (Protegido - Administrador/Membro):
-    - Finaliza o empréstimo alterando o estado no banco e disparando evento de devolução.
-  - [ ] `GET /api/emprestimos` (Protegido):
-    - Lista os empréstimos cadastrados com filtros por usuário, livro, estado e paginação.
-  - [ ] `GET /api/emprestimos/historico` (Protegido - RF08):
-    - Gera histórico ou logs consolidados de empréstimos por filtro de livro ou por usuário específico.
-- [ ] **M5.2: Middlewares de Proteção**
-  - [ ] Middleware CORS e Middleware de logs das requisições.
-  - [ ] Middleware de Autenticação JWT (para descriptografar o cabeçalho do API Gateway e injetar os dados do usuário).
+- [x] **M5.1: Desenvolvimento dos Endpoints**
+  - [x] `POST /api/emprestimos` (Protegido - Membro):
+    - [x] Recebe `id_livro` e `id_biblioteca` no JSON de entrada.
+    - [x] Extrai o `id_usuario` diretamente das claims do JWT inseridas no contexto pelo middleware.
+    - [x] Cria o empréstimo seguindo a lógica de negócio e retorna o status `201 Created`.
+  - [x] `POST /api/emprestimos/{id}/devolucao` (Protegido - Administrador/Membro):
+    - [x] Finaliza o empréstimo alterando o estado no banco e disparando evento de devolução.
+  - [x] `GET /api/emprestimos` (Protegido):
+    - [x] Lista os empréstimos cadastrados com filtros por usuário, livro, estado e paginação.
+  - [x] `GET /api/emprestimos/historico` (Protegido - RF08):
+    - [x] Gera histórico ou logs consolidados de empréstimos por filtro de livro ou por usuário específico.
+- [x] **M5.2: Middlewares de Proteção**
+  - [x] Middleware CORS e Middleware de logs das requisições.
+  - [x] Middleware de Autenticação JWT (para descriptografar o cabeçalho do API Gateway e injetar os dados do usuário).
 
 ---
 

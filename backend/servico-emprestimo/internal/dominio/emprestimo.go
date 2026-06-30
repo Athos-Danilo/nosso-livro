@@ -37,4 +37,6 @@ type RepositorioEmprestimo interface {
 	BuscarAtivosPorUsuario(ctx context.Context, idUsuario string) ([]*Emprestimo, error)
 	BuscarAtivoPorLivro(ctx context.Context, idLivro string) (*Emprestimo, error)
 	Atualizar(ctx context.Context, emprestimo *Emprestimo) error
+	BuscarTodos(ctx context.Context, idUsuario, idLivro, estado string, limite, offset int) ([]*Emprestimo, error)
+	BuscarHistorico(ctx context.Context, idUsuario, idLivro string) ([]*Emprestimo, error)
 }

@@ -130,3 +130,110 @@ func (r *RepositorioEmprestimoPostgres) Atualizar(ctx context.Context, e *domini
 	}
 	return nil
 }
+
+// BuscarTodos lista os empréstimos cadastrados com filtros e paginação
+func (r *RepositorioEmprestimoPostgres) BuscarTodos(ctx context.Context, idUsuario, idLivro, estado string, limite, offset int) ([]*dominio.Emprestimo, error) {
+	query := `
+		SELECT id, id_usuario, id_livro, id_biblioteca, data_emprestimo, data_devolucao_prevista, data_devolucao_real, estado, criado_em, atualizado_em
+		FROM emprestimos
+		WHERE 1=1`
+
+	var args []interface{}
+	posicaoParam := 1
+
+	if idUsuario != "" {
+		query += fmt.Sprintf(" AND id_usuario = $%d", posicaoParam)
+		args = append(args, idUsuario)
+		posicaoParam++
+	}
+
+	if idLivro != "" {
+		query += fmt.Sprintf(" AND id_livro = $%d", posicaoParam)
+		args = append(args, idLivro)
+		posicaoParam++
+	}
+
+	if estado != "" {
+		query += fmt.Sprintf(" AND estado = $%d", posicaoParam)
+		args = append(args, estado)
+		posicaoParam++
+	}
+
+	query += fmt.Sprintf(" ORDER BY criado_em DESC LIMIT $%d OFFSET $%d", posicaoParam, posicaoParam+1)
+	args = append(args, limite, offset)
+
+	rows, err := r.pool.Query(ctx, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("erro ao buscar todos os empréstimos com filtros: %w", err)
+	}
+	defer rows.Close()
+
+	var emprestimos []*dominio.Emprestimo
+	for rows.Next() {
+		var e dominio.Emprestimo
+		err := rows.Scan(
+			&e.ID, &e.IDUsuario, &e.IDLivro, &e.IDBiblioteca, &e.DataEmprestimo, &e.DataDevolucaoPrevista, &e.DataDevolucaoReal, &e.Estado, &e.CriadoEm, &e.AtualizadoEm,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("erro ao escanear linha do empréstimo buscado: %w", err)
+		}
+		emprestimos = append(emprestimos, &e)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("erro pós-iteração de empréstimos buscados: %w", err)
+	}
+
+	return emprestimos, nil
+}
+
+// BuscarHistorico retorna logs consolidados de empréstimos por usuário e/ou livro
+func (r *RepositorioEmprestimoPostgres) BuscarHistorico(ctx context.Context, idUsuario, idLivro string) ([]*dominio.Emprestimo, error) {
+	query := `
+		SELECT id, id_usuario, id_livro, id_biblioteca, data_emprestimo, data_devolucao_prevista, data_devolucao_real, estado, criado_em, atualizado_em
+		FROM emprestimos
+		WHERE 1=1`
+
+	var args []interface{}
+	posicaoParam := 1
+
+	if idUsuario != "" {
+		query += fmt.Sprintf(" AND id_usuario = $%d", posicaoParam)
+		args = append(args, idUsuario)
+		posicaoParam++
+	}
+
+	if idLivro != "" {
+		query += fmt.Sprintf(" AND id_livro = $%d", posicaoParam)
+		args = append(args, idLivro)
+		posicaoParam++
+	}
+
+	// Ordena por data_emprestimo decrescente para mostrar histórico do mais recente ao mais antigo
+	query += " ORDER BY data_emprestimo DESC"
+
+	rows, err := r.pool.Query(ctx, query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("erro ao buscar histórico de empréstimos: %w", err)
+	}
+	defer rows.Close()
+
+	var emprestimos []*dominio.Emprestimo
+	for rows.Next() {
+		var e dominio.Emprestimo
+		err := rows.Scan(
+			&e.ID, &e.IDUsuario, &e.IDLivro, &e.IDBiblioteca, &e.DataEmprestimo, &e.DataDevolucaoPrevista, &e.DataDevolucaoReal, &e.Estado, &e.CriadoEm, &e.AtualizadoEm,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("erro ao escanear linha de histórico de empréstimo: %w", err)
+		}
+		emprestimos = append(emprestimos, &e)
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("erro pós-iteração de histórico de empréstimos: %w", err)
+	}
+
+	return emprestimos, nil
+}
+

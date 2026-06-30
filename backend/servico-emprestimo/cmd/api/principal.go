@@ -10,14 +10,22 @@ import (
 	"syscall"
 	"time"
 
+	"nosso-livro/servico-emprestimo/internal/cliente"
+	"nosso-livro/servico-emprestimo/internal/controlador"
 	"nosso-livro/servico-emprestimo/internal/dominio"
+	"nosso-livro/servico-emprestimo/internal/evento"
 	"nosso-livro/servico-emprestimo/internal/repositorio"
+	"nosso-livro/servico-emprestimo/internal/servico"
 )
 
 func main() {
 	// Configura o logger padrão para emitir logs no formato JSON estruturado no console
 	slog.SetDefault(slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{Level: slog.LevelInfo})))
 	slog.Info("Iniciando o Serviço de Empréstimo...")
+
+	// Contexto global para ciclo de vida de goroutines em background
+	ctxGlobal, cancelGlobal := context.WithCancel(context.Background())
+	defer cancelGlobal()
 
 	// 1. Conexão com o Banco de Dados
 	urlBanco := os.Getenv("URL_BANCO_DADOS")
@@ -37,17 +45,43 @@ func main() {
 	var _ dominio.RepositorioEmprestimo = repoEmprestimo
 	slog.Info("Repositório de empréstimos carregado e validado estaticamente.")
 
-	// 2. Configuração do Roteador HTTP (ServeMux nativo do Go 1.22+ com suporte a métodos e caminhos)
+	// 2. Conexão e Inicialização do RabbitMQ (Mensageria)
+	urlRabbit := os.Getenv("URL_RABBITMQ")
+	if urlRabbit == "" {
+		urlRabbit = "amqp://guest:guest@localhost:5672"
+	}
+	gerenciadorRabbit := evento.NovoGerenciadorRabbitMQ(urlRabbit)
+	gerenciadorRabbit.Iniciar(ctxGlobal)
+	publicadorEventos := evento.NovoPublicadorEventos(gerenciadorRabbit)
+
+	// 3. Inicialização dos Clientes HTTP Resilientes
+	urlAutenticacao := os.Getenv("URL_SERVICO_AUTENTICACAO")
+	if urlAutenticacao == "" {
+		urlAutenticacao = "http://localhost:8080"
+	}
+	urlCatalogo := os.Getenv("URL_SERVICO_CATALOGO")
+	if urlCatalogo == "" {
+		urlCatalogo = "http://localhost:3002"
+	}
+
+	clienteHTTP := cliente.NovoClienteHTTPResiliente()
+	cliUsuario := cliente.NovoClienteUsuario(urlAutenticacao, clienteHTTP)
+	cliCatalogo := cliente.NovoClienteCatalogo(urlCatalogo, clienteHTTP)
+
+	// 4. Inicialização da Camada de Serviço e Controladores
+	servicoEmprestimo := servico.NovoServicoEmprestimo(repoEmprestimo, cliUsuario, cliCatalogo, publicadorEventos, poolBanco)
+	controladorEmprestimo := controlador.NovoControladorEmprestimo(servicoEmprestimo, repoEmprestimo)
+
+	// 5. Configuração do Roteador HTTP (ServeMux nativo do Go 1.22+ com suporte a métodos e caminhos)
 	mux := http.NewServeMux()
 
-	// Endpoint público de saúde (Liveness Probe)
+	// Endpoints públicos de diagnóstico (Liveness / Readiness Probes)
 	mux.HandleFunc("GET /saude", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprint(w, `{"status": "ativo", "mensagem": "Serviço de Empréstimo está funcionando corretamente"}`)
 	})
 
-	// Endpoint de prontidão (Readiness Probe) integrado com o ping do banco de dados
 	mux.HandleFunc("GET /pronto", func(w http.ResponseWriter, r *http.Request) {
 		ctxTimeout, cancel := context.WithTimeout(r.Context(), 3*time.Second)
 		defer cancel()
@@ -65,7 +99,17 @@ func main() {
 		fmt.Fprint(w, `{"status": "pronto", "mensagem": "integração com banco operacional"}`)
 	})
 
-	// 3. Middlewares globais e configuração de porta
+	// Endpoints da API protegidos pelo middleware de autenticação JWT
+	mux.Handle("POST /api/emprestimos", controlador.AutenticarJWT(http.HandlerFunc(controladorEmprestimo.CriarEmprestimo)))
+	mux.Handle("POST /api/emprestimos/{id}/devolucao", controlador.AutenticarJWT(http.HandlerFunc(controladorEmprestimo.DevolverEmprestimo)))
+	mux.Handle("GET /api/emprestimos", controlador.AutenticarJWT(http.HandlerFunc(controladorEmprestimo.ListarEmprestimos)))
+	mux.Handle("GET /api/emprestimos/historico", controlador.AutenticarJWT(http.HandlerFunc(controladorEmprestimo.ObterHistorico)))
+
+	// 6. Configuração e aplicação de middlewares globais
+	var handlerPrincipal http.Handler = mux
+	handlerPrincipal = controlador.LogRequisicoes(handlerPrincipal)
+	handlerPrincipal = controlador.CORS(handlerPrincipal)
+
 	porta := os.Getenv("PORTA")
 	if porta == "" {
 		porta = os.Getenv("PORT")
@@ -78,7 +122,7 @@ func main() {
 
 	servidor := &http.Server{
 		Addr:    porta,
-		Handler: mux, // Posteriormente, adicionar middlewares de log, CORS e recuperação de pânico
+		Handler: handlerPrincipal,
 	}
 
 	// Inicia o servidor HTTP em uma goroutine paralela
@@ -98,6 +142,9 @@ func main() {
 	<-canalSinal
 	slog.Info("Sinal de encerramento detectado. Iniciando Graceful Shutdown de segurança...")
 
+	// Cancela contexto global de tarefas em background (como tentativas de reconexão do RabbitMQ)
+	cancelGlobal()
+
 	// Limita o tempo de espera para esvaziar conexões ativas antes de forçar a saída
 	ctxDesligamento, cancelDesligamento := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancelDesligamento()
@@ -108,6 +155,11 @@ func main() {
 	} else {
 		slog.Info("Servidor HTTP encerrado com sucesso de forma ordenada.")
 	}
+
+	// Encerra a conexão com o broker RabbitMQ
+	slog.Info("Encerrando conexão com o broker RabbitMQ...")
+	gerenciadorRabbit.Fechar()
+	slog.Info("Conexão com o RabbitMQ finalizada.")
 
 	// Encerra o pool de conexões com o PostgreSQL
 	slog.Info("Encerrando pool de conexões com o banco de dados...")
