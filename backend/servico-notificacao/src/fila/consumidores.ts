@@ -7,6 +7,12 @@ import type {
   MensagemReservaAtribuida,
 } from './tipos';
 import logger from '../logger';
+import {
+  processarEmprestimoCriado,
+  processarEmprestimoDevolvido,
+  processarReservaCriada,
+  processarReservaAtribuida,
+} from '../servicos/processador.notificacao';
 
 // ─── Tipo do handler de processamento ────────────────────────────────────────
 /**
@@ -18,8 +24,9 @@ type HandlerEvento = (payload: unknown, chaveRoteamento: string) => Promise<void
 // ─── Mapa de handlers por evento ─────────────────────────────────────────────
 /**
  * Registro dos handlers de processamento de cada evento.
- * As fases subsequentes (4 e 5) implementarão a lógica real de envio.
- * Por ora, cada handler apenas registra o evento recebido via log.
+ * Cada handler valida o payload, executa o pipeline completo de notificação
+ * (busca de usuário → template → envio com retentativas → registro no banco)
+ * e delega a lógica ao processador centralizado.
  */
 const handlers: Record<string, HandlerEvento> = {
   'emprestimo.criado': async (payload) => {
@@ -31,9 +38,9 @@ const handlers: Record<string, HandlerEvento> = {
         idLivro: dados.id_livro,
         dataLimite: dados.data_limite_devolucao,
       },
-      'Evento "emprestimo.criado" recebido. Notificação de empréstimo será enviada.'
+      'Evento "emprestimo.criado" recebido. Iniciando pipeline de notificação.'
     );
-    // TODO (Fase 5): chamar processarNotificacao() com template de empréstimo
+    await processarEmprestimoCriado(dados);
   },
 
   'emprestimo.devolvido': async (payload) => {
@@ -45,9 +52,9 @@ const handlers: Record<string, HandlerEvento> = {
         idLivro: dados.id_livro,
         dataDevolucao: dados.data_devolucao_real,
       },
-      'Evento "emprestimo.devolvido" recebido. Notificação de devolução será enviada.'
+      'Evento "emprestimo.devolvido" recebido. Iniciando pipeline de notificação.'
     );
-    // TODO (Fase 5): chamar processarNotificacao() com template de devolução
+    await processarEmprestimoDevolvido(dados);
   },
 
   'reserva.criada': async (payload) => {
@@ -59,9 +66,9 @@ const handlers: Record<string, HandlerEvento> = {
         idLivro: dados.id_livro,
         posicao: dados.posicao,
       },
-      'Evento "reserva.criada" recebido. Notificação de ingresso na fila será enviada.'
+      'Evento "reserva.criada" recebido. Iniciando pipeline de notificação.'
     );
-    // TODO (Fase 5): chamar processarNotificacao() com template de fila de espera
+    await processarReservaCriada(dados);
   },
 
   'reserva.atribuida': async (payload) => {
@@ -73,9 +80,9 @@ const handlers: Record<string, HandlerEvento> = {
         idLivro: dados.id_livro,
         prazoRetirada: dados.prazo_retirada,
       },
-      'Evento "reserva.atribuida" recebido. Notificação de livro liberado será enviada.'
+      'Evento "reserva.atribuida" recebido. Iniciando pipeline de notificação.'
     );
-    // TODO (Fase 5): chamar processarNotificacao() com template de livro liberado
+    await processarReservaAtribuida(dados);
   },
 };
 

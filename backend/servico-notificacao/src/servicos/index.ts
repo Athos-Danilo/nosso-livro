@@ -22,3 +22,11 @@ export type {
 // Mock de WhatsApp
 export { enviarWhatsApp } from './whatsapp.servico';
 export type { OpcoesWhatsApp, ResultadoWhatsApp } from './whatsapp.servico';
+
+// Processador de notificações (pipeline completo — Fase 5)
+export {
+  processarEmprestimoCriado,
+  processarEmprestimoDevolvido,
+  processarReservaCriada,
+  processarReservaAtribuida,
+} from './processador.notificacao';
