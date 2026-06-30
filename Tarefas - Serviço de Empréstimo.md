@@ -16,7 +16,7 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 - [x] **Fase 4: Camada de Serviços e Lógica de Negócios (Transações e Concorrência)**
 - [x] **Fase 5: Rotas HTTP, Middlewares e Handlers (Controladores)**
 - [x] **Fase 6: Testes Automatizados e Concorrência (Prevenção de Condição de Corrida)**
-- [ ] **Fase 7: Dockerização, Desligamento Gracioso e Monitoramento**
+- [x] **Fase 7: Dockerização, Desligamento Gracioso e Monitoramento**
 
 ---
 
@@ -126,10 +126,10 @@ Garantia de que transações concorrentes e fluxos de integração funcionem.
 ## 🚀 Fase 7: Dockerização, Desligamento Gracioso e Monitoramento
 Preparação operacional para ambientes Docker e nuvem de produção.
 
-- [ ] **M7.1: Dockerfile Otimizado**
-  - [ ] Criar `Dockerfile` multi-stage compilando o binário Go de forma estática e gerando imagem final enxuta baseada em `scratch` ou `alpine` mínimo.
-- [ ] **M7.2: Desligamento Gracioso (Graceful Shutdown)**
-  - [ ] Interceptação dos sinais `SIGINT` e `SIGTERM`: fechar servidor HTTP, concluir transações em andamento, desconectar do RabbitMQ e fechar o pool de conexões do banco de dados.
-- [ ] **M7.3: Health Check e Observabilidade**
-  - [ ] Endpoints de saúde `/saude` e `/pronto`.
-  - [ ] Logs estruturados JSON em português com o pacote nativo `slog`.
+- [x] **M7.1: Dockerfile Otimizado**
+  - [x] Criar `Dockerfile` multi-stage compilando o binário Go de forma estática e gerando imagem final enxuta baseada em `scratch` ou `alpine` mínimo.
+- [x] **M7.2: Desligamento Gracioso (Graceful Shutdown)**
+  - [x] Interceptação dos sinais `SIGINT` e `SIGTERM`: fechar servidor HTTP, concluir transações em andamento, desconectar do RabbitMQ e fechar o pool de conexões do banco de dados.
+- [x] **M7.3: Health Check e Observabilidade**
+  - [x] Endpoints de saúde `/saude` e `/pronto`.
+  - [x] Logs estruturados JSON em português com o pacote nativo `slog`.
