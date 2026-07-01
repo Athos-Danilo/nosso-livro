@@ -11,7 +11,7 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 ## 🗺️ Mapa de Progresso Geral
 
 - [x] **Fase 1: Configuração do Módulo e Ambiente (Go + HTTP)**
-- [ ] **Fase 2: Motor de Roteamento e Proxy Reverso (Mapeamento & Proxy)**
+- [x] **Fase 2: Motor de Roteamento e Proxy Reverso (Mapeamento & Proxy)**
 - [ ] **Fase 3: Middleware de CORS Global e Segurança Básica (CORS & Headers)**
 - [ ] **Fase 4: Validação de Token JWT e Propagação de Contexto (Autenticação)**
 - [ ] **Fase 5: Tratamento de Erros, Resiliência e Timeouts (Resiliência)**
@@ -48,18 +48,18 @@ Configuração inicial do projeto Go e preparação das variáveis de ambiente.
 ## 🔗 Fase 2: Motor de Roteamento e Proxy Reverso
 Mapeamento das rotas de borda e encaminhamento HTTP síncrono para os microsserviços corretos.
 
-- [ ] **M2.1: Roteador HTTP Centralizado**
-  - [ ] Configurar roteador HTTP utilizando o `http.NewServeMux` nativo do Go (1.22+) ou biblioteca leve (`go-chi/chi`).
-  - [ ] Mapear as rotas de borda correspondentes a cada microsserviço:
+- [x] **M2.1: Roteador HTTP Centralizado**
+  - [x] Configurar roteador HTTP utilizando o `http.NewServeMux` nativo do Go (1.22+) ou biblioteca leve (`go-chi/chi`).
+  - [x] Mapear as rotas de borda correspondentes a cada microsserviço:
     - `/api/autenticacao/*` e `/api/usuarios/*` -> Redirecionar para `URL_SERVICO_USUARIO`
     - `/api/livros/*` e `/api/bibliotecas/*` -> Redirecionar para `URL_SERVICO_CATALOGO`
     - `/api/emprestimos/*` -> Redirecionar para `URL_SERVICO_EMPRESTIMO`
     - `/api/reservas/*` -> Redirecionar para `URL_SERVICO_RESERVA`
     - `/api/recomendacoes/*` -> Redirecionar para `URL_SERVICO_RECOMENDACAO`
-- [ ] **M2.2: Implementação do Proxy Reverso**
-  - [ ] Desenvolver a lógica de proxy utilizando o pacote padrão `net/http/httputil` com a struct `ReverseProxy`.
-  - [ ] Garantir o repasse integral do método HTTP, rota, cabeçalhos de origem, query params e corpo da requisição (payload JSON).
-  - [ ] Ajustar os caminhos (URIs) no redirecionamento caso o microsserviço de destino utilize caminhos relativos diferentes.
+- [x] **M2.2: Implementação do Proxy Reverso**
+  - [x] Desenvolver a lógica de proxy utilizando o pacote padrão `net/http/httputil` com a struct `ReverseProxy`.
+  - [x] Garantir o repasse integral do método HTTP, rota, cabeçalhos de origem, query params e corpo da requisição (payload JSON).
+  - [x] Ajustar os caminhos (URIs) no redirecionamento caso o microsserviço de destino utilize caminhos relativos diferentes.
 
 ---
 

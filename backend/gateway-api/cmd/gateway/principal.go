@@ -12,6 +12,7 @@ import (
 
 	"nosso-livro/gateway-api/internal/configuracao"
 	"nosso-livro/gateway-api/internal/logger"
+	"nosso-livro/gateway-api/internal/proxy"
 )
 
 func main() {
@@ -22,7 +23,34 @@ func main() {
 	logger.Inicializar(cfg.Ambiente)
 	slog.Info("Iniciando o Gateway de API...", slog.String("ambiente", cfg.Ambiente), slog.String("porta", cfg.Porta))
 
-	// 3. Configura o Roteador HTTP (ServeMux nativo do Go 1.22+)
+	// 3. Inicializa os proxies reversos para os microsservicos
+	proxyUsuario, err := proxy.NovoProxyReverso(cfg.UrlServicoUsuario)
+	if err != nil {
+		slog.Error("Falha ao criar proxy para o servico de usuario", slog.String("erro", err.Error()))
+		os.Exit(1)
+	}
+	proxyCatalogo, err := proxy.NovoProxyReverso(cfg.UrlServicoCatalogo)
+	if err != nil {
+		slog.Error("Falha ao criar proxy para o servico de catalogo", slog.String("erro", err.Error()))
+		os.Exit(1)
+	}
+	proxyEmprestimo, err := proxy.NovoProxyReverso(cfg.UrlServicoEmprestimo)
+	if err != nil {
+		slog.Error("Falha ao criar proxy para o servico de emprestimo", slog.String("erro", err.Error()))
+		os.Exit(1)
+	}
+	proxyReserva, err := proxy.NovoProxyReverso(cfg.UrlServicoReserva)
+	if err != nil {
+		slog.Error("Falha ao criar proxy para o servico de reserva", slog.String("erro", err.Error()))
+		os.Exit(1)
+	}
+	proxyRecomendacao, err := proxy.NovoProxyReverso(cfg.UrlServicoRecomendacao)
+	if err != nil {
+		slog.Error("Falha ao criar proxy para o servico de recomendacao", slog.String("erro", err.Error()))
+		os.Exit(1)
+	}
+
+	// 4. Configura o Roteador HTTP (ServeMux nativo do Go 1.22+)
 	mux := http.NewServeMux()
 
 	// Endpoint publico de saude (Liveness Probe)
@@ -34,13 +62,23 @@ func main() {
 
 	// Endpoint de prontidao (Readiness Probe)
 	mux.HandleFunc("GET /pronto", func(w http.ResponseWriter, r *http.Request) {
-		// Por enquanto na Fase 1, retorna pronto diretamente
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprint(w, `{"status": "pronto", "mensagem": "Gateway pronto para receber conexoes"}`)
 	})
 
-	// 4. Configura o Servidor HTTP para Graceful Shutdown
+	// 5. Roteamento e Proxy Reverso para os microsservicos
+	// Nota: No ServeMux do Go, rotas terminadas em "/" atuam como prefixo,
+	// capturando todos os subcaminhos (ex: /api/usuarios/me).
+	mux.Handle("/api/autenticacao/", proxyUsuario)
+	mux.Handle("/api/usuarios/", proxyUsuario)
+	mux.Handle("/api/livros/", proxyCatalogo)
+	mux.Handle("/api/bibliotecas/", proxyCatalogo)
+	mux.Handle("/api/emprestimos/", proxyEmprestimo)
+	mux.Handle("/api/reservas/", proxyReserva)
+	mux.Handle("/api/recomendacoes/", proxyRecomendacao)
+
+	// 6. Configura o Servidor HTTP para Graceful Shutdown
 	endereco := ":" + cfg.Porta
 	servidor := &http.Server{
 		Addr:    endereco,
