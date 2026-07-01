@@ -12,6 +12,7 @@ import (
 
 	"nosso-livro/gateway-api/internal/configuracao"
 	"nosso-livro/gateway-api/internal/logger"
+	"nosso-livro/gateway-api/internal/middleware"
 	"nosso-livro/gateway-api/internal/proxy"
 )
 
@@ -78,11 +79,17 @@ func main() {
 	mux.Handle("/api/reservas/", proxyReserva)
 	mux.Handle("/api/recomendacoes/", proxyRecomendacao)
 
-	// 6. Configura o Servidor HTTP para Graceful Shutdown
+	// 6. Encadeamento de middlewares globais de borda
+	// Ordem de execucao: Seguranca (Filtro 2MB/Headers) -> CORS (Origens/Preflight) -> Roteador (mux)
+	var handlerGlobal http.Handler = mux
+	handlerGlobal = middleware.MiddlewareCORS(cfg)(handlerGlobal)
+	handlerGlobal = middleware.MiddlewareSeguranca(handlerGlobal)
+
+	// 7. Configura o Servidor HTTP para Graceful Shutdown
 	endereco := ":" + cfg.Porta
 	servidor := &http.Server{
 		Addr:    endereco,
-		Handler: mux,
+		Handler: handlerGlobal,
 	}
 
 	// Inicia o servidor HTTP em uma goroutine paralela

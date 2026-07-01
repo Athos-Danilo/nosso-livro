@@ -12,6 +12,7 @@ type Configuracao struct {
 	Porta                  string
 	Ambiente               string
 	ChaveSecretaJWT        string
+	CorsOrigensPermitidas  string
 	UrlServicoUsuario      string
 	UrlServicoCatalogo     string
 	UrlServicoEmprestimo   string
@@ -39,6 +40,11 @@ func Carregar() *Configuracao {
 	chaveSecretaJWT := os.Getenv("CHAVE_SECRETA_JWT")
 	if chaveSecretaJWT == "" {
 		chaveSecretaJWT = "chave_secreta_padrao_desenvolvimento_nosso_livro"
+	}
+
+	corsOrigens := os.Getenv("CORS_ORIGENS_PERMITIDAS")
+	if corsOrigens == "" {
+		corsOrigens = "*"
 	}
 
 	urlUsuario := os.Getenv("URL_SERVICO_USUARIO")
@@ -70,6 +76,7 @@ func Carregar() *Configuracao {
 		Porta:                  porta,
 		Ambiente:               ambiente,
 		ChaveSecretaJWT:        chaveSecretaJWT,
+		CorsOrigensPermitidas:  corsOrigens,
 		UrlServicoUsuario:      urlUsuario,
 		UrlServicoCatalogo:     urlCatalogo,
 		UrlServicoEmprestimo:   urlEmprestimo,

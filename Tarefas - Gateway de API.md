@@ -12,7 +12,7 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 
 - [x] **Fase 1: Configuração do Módulo e Ambiente (Go + HTTP)**
 - [x] **Fase 2: Motor de Roteamento e Proxy Reverso (Mapeamento & Proxy)**
-- [ ] **Fase 3: Middleware de CORS Global e Segurança Básica (CORS & Headers)**
+- [x] **Fase 3: Middleware de CORS Global e Segurança Básica (CORS & Headers)**
 - [ ] **Fase 4: Validação de Token JWT e Propagação de Contexto (Autenticação)**
 - [ ] **Fase 5: Tratamento de Erros, Resiliência e Timeouts (Resiliência)**
 - [ ] **Fase 6: Testes Automatizados (Roteamento & JWT)**
@@ -66,13 +66,13 @@ Mapeamento das rotas de borda e encaminhamento HTTP síncrono para os microsserv
 ## 🛡️ Fase 3: Middleware de CORS Global e Segurança Básica
 Tratamento das requisições do Frontend e proteções na borda da API.
 
-- [ ] **M3.1: Middleware de CORS Global**
-  - [ ] Desenvolver middleware para aceitar requisições de origens permitidas (lidas de variáveis de ambiente, ex: local `http://localhost:5173` ou Vercel em produção).
-  - [ ] Definir os cabeçalhos corretos: `Access-Control-Allow-Origin`, `Access-Control-Allow-Methods` (GET, POST, PUT, DELETE, OPTIONS), e `Access-Control-Allow-Headers` (Content-Type, Authorization).
-  - [ ] Responder imediatamente com status `204 No Content` para requisições do tipo Preflight (`OPTIONS`), interrompendo o fluxo antes do proxy.
-- [ ] **M3.2: Proteção Elementar de Borda**
-  - [ ] Limitar o tamanho dos corpos de requisições HTTP permitidos (ex: máximo 2MB) para prevenir ataques simples de negação de serviço (DoS).
-  - [ ] Configurar cabeçalhos padrões de segurança: `X-Content-Type-Options: nosniff` e `X-Frame-Options: DENY`.
+- [x] **M3.1: Middleware de CORS Global**
+  - [x] Desenvolver middleware para aceitar requisições de origens permitidas (lidas de variáveis de ambiente, ex: local `http://localhost:5173` ou Vercel em produção).
+  - [x] Definir os cabeçalhos corretos: `Access-Control-Allow-Origin`, `Access-Control-Allow-Methods` (GET, POST, PUT, DELETE, OPTIONS, PATCH), e `Access-Control-Allow-Headers` (Content-Type, Authorization).
+  - [x] Responder imediatamente com status `204 No Content` para requisições do tipo Preflight (`OPTIONS`), interrompendo o fluxo antes do proxy.
+- [x] **M3.2: Proteção Elementar de Borda**
+  - [x] Limitar o tamanho dos corpos de requisições HTTP permitidos (ex: máximo 2MB) para prevenir ataques simples de negação de serviço (DoS).
+  - [x] Configurar cabeçalhos padrões de segurança: `X-Content-Type-Options: nosniff` e `X-Frame-Options: DENY`.
 
 ---
 
