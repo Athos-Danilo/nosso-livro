@@ -14,7 +14,7 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 - [x] **Fase 2: Motor de Roteamento e Proxy Reverso (Mapeamento & Proxy)**
 - [x] **Fase 3: Middleware de CORS Global e Segurança Básica (CORS & Headers)**
 - `[x]` **Fase 4: Validação de Token JWT e Propagação de Contexto (Autenticação)**
-- [ ] **Fase 5: Tratamento de Erros, Resiliência e Timeouts (Resiliência)**
+- `[x]` **Fase 5: Tratamento de Erros, Resiliência e Timeouts (Resiliência)**
 - [ ] **Fase 6: Testes Automatizados (Roteamento & JWT)**
 - [ ] **Fase 7: Dockerização, Desligamento Gracioso e Logs (Produção)**
 
@@ -104,12 +104,12 @@ Centralização da autenticação na borda e comunicação do usuário logado pa
 ## 💾 Fase 5: Tratamento de Erros, Resiliência e Timeouts
 Garantias de resiliência e estabilidade da comunicação de borda com os serviços internos.
 
-- [ ] **M5.1: Configuração de Timeouts do Proxy**
-  - [ ] Configurar limites de tempo rígidos para chamadas do Proxy Reverso (ex: timeout de conexão de 2s e timeout de resposta de 5s).
-  - [ ] Evitar consumo indefinido de threads e portas de rede por conta de microsserviços em lentidão extrema ou travados.
-- [ ] **M5.2: Manipulador de Erros do Proxy (ErrorHandler)**
-  - [ ] Customizar a propriedade `ErrorHandler` do `ReverseProxy` para capturar falhas de rede (ex: `connection refused` ao tentar chamar um serviço offline).
-  - [ ] Retornar um JSON limpo e padronizado em português com status `503 Service Unavailable` em vez de expor erros nativos de rede ou falhas brancas de conexão.
+- [x] **M5.1: Configuração de Timeouts do Proxy**
+  - [x] Configurar limites de tempo rígidos para chamadas do Proxy Reverso (ex: timeout de conexão de 2s e timeout de resposta de 5s).
+  - [x] Evitar consumo indefinido de threads e portas de rede por conta de microsserviços em lentidão extrema ou travados.
+- [x] **M5.2: Manipulador de Erros do Proxy (ErrorHandler)**
+  - [x] Customizar a propriedade `ErrorHandler` do `ReverseProxy` para capturar falhas de rede (ex: `connection refused` ao tentar chamar um serviço offline).
+  - [x] Retornar um JSON limpo e padronizado em português com status `503 Service Unavailable` em vez de expor erros nativos de rede ou falhas brancas de conexão.
 
 ---
 
