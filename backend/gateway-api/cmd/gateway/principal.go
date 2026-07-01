@@ -80,8 +80,9 @@ func main() {
 	mux.Handle("/api/recomendacoes/", proxyRecomendacao)
 
 	// 6. Encadeamento de middlewares globais de borda
-	// Ordem de execucao: Seguranca (Filtro 2MB/Headers) -> CORS (Origens/Preflight) -> Roteador (mux)
+	// Ordem de execucao: Seguranca (Filtro 2MB/Headers) -> CORS (Origens/Preflight) -> Autenticacao (JWT) -> Roteador (mux)
 	var handlerGlobal http.Handler = mux
+	handlerGlobal = middleware.MiddlewareAutenticacao(cfg)(handlerGlobal)
 	handlerGlobal = middleware.MiddlewareCORS(cfg)(handlerGlobal)
 	handlerGlobal = middleware.MiddlewareSeguranca(handlerGlobal)
 

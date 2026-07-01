@@ -13,7 +13,7 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 - [x] **Fase 1: Configuração do Módulo e Ambiente (Go + HTTP)**
 - [x] **Fase 2: Motor de Roteamento e Proxy Reverso (Mapeamento & Proxy)**
 - [x] **Fase 3: Middleware de CORS Global e Segurança Básica (CORS & Headers)**
-- [ ] **Fase 4: Validação de Token JWT e Propagação de Contexto (Autenticação)**
+- `[x]` **Fase 4: Validação de Token JWT e Propagação de Contexto (Autenticação)**
 - [ ] **Fase 5: Tratamento de Erros, Resiliência e Timeouts (Resiliência)**
 - [ ] **Fase 6: Testes Automatizados (Roteamento & JWT)**
 - [ ] **Fase 7: Dockerização, Desligamento Gracioso e Logs (Produção)**
@@ -79,25 +79,25 @@ Tratamento das requisições do Frontend e proteções na borda da API.
 ## 🔑 Fase 4: Validação de Token JWT e Propagação de Contexto
 Centralização da autenticação na borda e comunicação do usuário logado para os microsserviços.
 
-- [ ] **M4.1: Extração e Validação do JWT**
-  - [ ] Criar o middleware de validação de token JWT.
-  - [ ] Capturar o cabeçalho `Authorization: Bearer <token>`.
-  - [ ] Validar a assinatura do token usando a chave `CHAVE_SECRETA_JWT` e confirmar o prazo de validade (`exp`) por meio do pacote `github.com/golang-jwt/jwt/v5`.
-  - [ ] Retornar status HTTP `401 Unauthorized` com corpo JSON em português se o token for inválido, ausente ou expirado.
-- [ ] **M4.2: Liberação de Rotas Públicas (Pass-through)**
-  - [ ] Criar uma lista de exceções (rotas públicas) que contornam a obrigatoriedade do token:
+- [x] **M4.1: Extração e Validação do JWT**
+  - [x] Criar o middleware de validação de token JWT.
+  - [x] Capturar o cabeçalho `Authorization: Bearer <token>`.
+  - [x] Validar a assinatura do token usando a chave `CHAVE_SECRETA_JWT` e confirmar o prazo de validade (`exp`) por meio do pacote `github.com/golang-jwt/jwt/v5`.
+  - [x] Retornar status HTTP `401 Unauthorized` com corpo JSON em português se o token for inválido, ausente ou expirado.
+- [x] **M4.2: Liberação de Rotas Públicas (Pass-through)**
+  - [x] Criar uma lista de exceções (rotas públicas) que contornam a obrigatoriedade do token:
     - `POST /api/autenticacao/cadastro` (Registro de usuário)
     - `POST /api/autenticacao/login` (Autenticação inicial)
     - `/saude` (Health check do Gateway)
     - `/pronto` (Readiness check do Gateway)
-- [ ] **M4.3: Injeção de Cabeçalhos Internos (Propagação de Contexto)**
-  - [ ] Em caso de token válido, decodificar as claims internas (`sub`, `email`, `whatsapp`, `permissao`).
-  - [ ] Injetar as claims extraídas nos cabeçalhos da requisição que será enviada aos microsserviços internos:
+- [x] **M4.3: Injeção de Cabeçalhos Internos (Propagação de Contexto)**
+  - [x] Em caso de token válido, decodificar as claims internas (`sub`, `email`, `whatsapp`, `permissao`).
+  - [x] Injetar as claims extraídas nos cabeçalhos da requisição que será enviada aos microsserviços internos:
     - `X-Usuario-ID` (ID do usuário autenticado)
     - `X-Usuario-Email` (E-mail do usuário autenticado)
     - `X-Usuario-WhatsApp` (Telefone do usuário autenticado)
     - `X-Usuario-Permissao` (Cargo/função de permissão do usuário, ex: `'administrador'`, `'membro'`)
-  - [ ] **Proteção de Spoofing:** Garantir que o Gateway remova/sobrescreva quaisquer cabeçalhos que iniciem com `X-Usuario-` presentes na requisição externa original do cliente, impedindo que usuários mal-intencionados forjem a própria identidade.
+  - [x] **Proteção de Spoofing:** Garantir que o Gateway remova/sobrescreva quaisquer cabeçalhos que iniciem com `X-Usuario-` presentes na requisição externa original do cliente, impedindo que usuários mal-intencionados forjem a própria identidade.
 
 ---
 

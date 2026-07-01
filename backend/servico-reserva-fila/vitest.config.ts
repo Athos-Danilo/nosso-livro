@@ -2,14 +2,14 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
+    // Carrega variáveis do .env.test nos workers
+    setupFiles: ['testSetup.ts'],
+
     // Ambiente de execução: Node.js (sem DOM)
     environment: 'node',
 
     // Padrão de arquivos de teste
     include: ['src/**/*.spec.ts', 'src/**/*.test.ts'],
-
-    // Carrega variáveis de ambiente do arquivo .env.test antes de cada suíte
-    envFile: '.env.test',
 
     // Timeout global para testes individuais (30s — acomoda o teste de concorrência)
     testTimeout: 30_000,
