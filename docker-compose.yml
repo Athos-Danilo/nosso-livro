@@ -1,0 +1,183 @@
+version: '3.8'
+
+services:
+  # ─── Banco de Dados Central ──────────────────────────────────────────────────
+  db:
+    image: postgres:16-alpine
+    container_name: postgres_nosso_livro
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres-init/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - rede-nosso-livro
+
+  # ─── Message Broker (RabbitMQ) ─────────────────────────────────────────────
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq_nosso_livro
+    restart: always
+    ports:
+      - "5672:5672"     # Protocolo AMQP
+      - "15672:15672"   # Console de Gerenciamento
+    networks:
+      - rede-nosso-livro
+
+  # ─── Gateway de API (Go) ─────────────────────────────────────────────────────
+  gateway-api:
+    build:
+      context: ./backend/gateway-api
+      dockerfile: Dockerfile
+    container_name: gateway_api_nosso_livro
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - PORTA=3000
+      - AMBIENTE=desenvolvimento
+      - CHAVE_SECRETA_JWT=chave_secreta_padrao_desenvolvimento_nosso_livro
+      - CORS_ORIGENS_PERMITIDAS=http://localhost:5173
+      - URL_SERVICO_USUARIO=http://servico-autenticacao-usuario:8080
+      - URL_SERVICO_CATALOGO=http://servico-catalogo-biblioteca:8000
+      - URL_SERVICO_EMPRESTIMO=http://servico-emprestimo:8081
+      - URL_SERVICO_RESERVA=http://servico-reserva-fila:3001
+      - URL_SERVICO_RECOMENDACAO=http://servico-recomendacao:8001
+    depends_on:
+      - servico-autenticacao-usuario
+      - servico-catalogo-biblioteca
+      - servico-emprestimo
+      - servico-reserva-fila
+      - servico-recomendacao
+    networks:
+      - rede-nosso-livro
+
+  # ─── Serviço de Autenticação e Usuário (Go) ──────────────────────────────────
+  servico-autenticacao-usuario:
+    build:
+      context: ./backend/servico-autenticacao-usuario
+      dockerfile: Dockerfile
+    container_name: servico_autenticacao_usuario
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      - URL_BANCO_DADOS=postgresql://postgres:postgrespassword@db:5432/banco_autenticacao?sslmode=disable
+      - CHAVE_SECRETA_JWT=chave_secreta_padrao_desenvolvimento_nosso_livro
+      - PORTA=8080
+    depends_on:
+      - db
+    networks:
+      - rede-nosso-livro
+
+  # ─── Serviço de Catálogo e Biblioteca (Python/FastAPI) ───────────────────────
+  servico-catalogo-biblioteca:
+    build:
+      context: ./backend/servico-catalogo-biblioteca
+      dockerfile: Dockerfile
+    container_name: servico_catalogo_biblioteca
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - URL_BANCO_DADOS=postgresql://postgres:postgrespassword@db:5432/banco_catalogo?sslmode=disable
+      - CHAVE_SECRETA_JWT=chave_secreta_padrao_desenvolvimento_nosso_livro
+    depends_on:
+      - db
+    networks:
+      - rede-nosso-livro
+
+  # ─── Serviço de Empréstimo (Go) ──────────────────────────────────────────────
+  servico-emprestimo:
+    build:
+      context: ./backend/servico-emprestimo
+      dockerfile: Dockerfile
+    container_name: servico_emprestimo
+    restart: always
+    ports:
+      - "8081:8081"
+    environment:
+      - URL_BANCO_DADOS=postgresql://postgres:postgrespassword@db:5432/banco_emprestimos?sslmode=disable
+      - URL_RABBITMQ=amqp://guest:guest@rabbitmq:5672
+      - URL_SERVICO_AUTENTICACAO=http://servico-autenticacao-usuario:8080
+      - URL_SERVICO_CATALOGO=http://servico-catalogo-biblioteca:8000
+      - PORTA=8081
+    depends_on:
+      - db
+      - rabbitmq
+    networks:
+      - rede-nosso-livro
+
+  # ─── Serviço de Reserva e Fila (Node.js/TS) ─────────────────────────────────
+  servico-reserva-fila:
+    build:
+      context: ./backend/servico-reserva-fila
+      dockerfile: Dockerfile
+    container_name: servico_reserva_fila
+    restart: always
+    ports:
+      - "3001:3001"
+    environment:
+      - URL_BANCO_DADOS=postgresql://postgres:postgrespassword@db:5432/banco_reservas?schema=public
+      - URL_RABBITMQ=amqp://guest:guest@rabbitmq:5672
+      - URL_SERVICO_USUARIO=http://servico-autenticacao-usuario:8080
+      - URL_SERVICO_CATALOGO=http://servico-catalogo-biblioteca:8000
+      - PORTA=3001
+    depends_on:
+      - db
+      - rabbitmq
+    networks:
+      - rede-nosso-livro
+
+  # ─── Serviço de Recomendação (Python/FastAPI) ────────────────────────────────
+  servico-recomendacao:
+    build:
+      context: ./backend/servico-recomendacao
+      dockerfile: Dockerfile
+    container_name: servico_recomendacao
+    restart: always
+    ports:
+      - "8001:8001"
+    environment:
+      - URL_BANCO_RECOMENDACOES=postgresql://postgres:postgrespassword@db:5432/banco_recomendacoes?sslmode=disable
+      - URL_RABBITMQ=amqp://guest:guest@rabbitmq:5672
+    depends_on:
+      - db
+      - rabbitmq
+    networks:
+      - rede-nosso-livro
+
+  # ─── Serviço de Notificação (Node.js/TS) ─────────────────────────────────────
+  servico-notificacao:
+    build:
+      context: ./backend/servico-notificacao
+      dockerfile: Dockerfile
+    container_name: servico_notificacao
+    restart: always
+    ports:
+      - "3002:3002"
+    environment:
+      - URL_BANCO_DADOS=postgresql://postgres:postgrespassword@db:5432/banco_notificacoes?schema=public
+      - URL_RABBITMQ=amqp://guest:guest@rabbitmq:5672
+      - URL_SERVICO_USUARIO=http://servico-autenticacao-usuario:8080
+      - PORTA=3002
+      - SMTP_HOST=smtp.ethereal.email
+      - SMTP_PORT=587
+      - SMTP_USUARIO=seu_usuario_ethereal@ethereal.email
+      - SMTP_SENHA=sua_senha_ethereal
+    depends_on:
+      - db
+      - rabbitmq
+    networks:
+      - rede-nosso-livro
+
+volumes:
+  pgdata:
+
+networks:
+  rede-nosso-livro:
+    driver: bridge
