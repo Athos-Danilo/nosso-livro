@@ -15,7 +15,7 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 - [x] **Fase 3: Middleware de CORS Global e Segurança Básica (CORS & Headers)**
 - `[x]` **Fase 4: Validação de Token JWT e Propagação de Contexto (Autenticação)**
 - `[x]` **Fase 5: Tratamento de Erros, Resiliência e Timeouts (Resiliência)**
-- [ ] **Fase 6: Testes Automatizados (Roteamento & JWT)**
+- [x] **Fase 6: Testes Automatizados (Roteamento & JWT)**
 - [ ] **Fase 7: Dockerização, Desligamento Gracioso e Logs (Produção)**
 
 ---
@@ -116,12 +116,12 @@ Garantias de resiliência e estabilidade da comunicação de borda com os servi�
 ## 🧪 Fase 6: Testes Automatizados
 Garantia de segurança da borda e validação do fluxo de roteamento do proxy.
 
-- [ ] **M6.1: Testes Unitários de Middlewares**
-  - [ ] Validar CORS: testar respostas de cabeçalhos com origens autorizadas e requisições OPTIONS.
-  - [ ] Validar Autenticação: testar o middleware de JWT fornecendo tokens válidos (esperando a injeção dos cabeçalhos contextuais), expirados, corrompidos e assinados com chaves incorretas.
-- [ ] **M6.2: Testes de Roteamento e Proxy Reverso**
-  - [ ] Desenvolver suíte de testes de integração utilizando servidores de teste locais (`httptest.NewServer`).
-  - [ ] Simular os microsserviços internos com mocks de endpoints e validar se as requisições enviadas ao Gateway chegam corretamente aos seus respectivos destinos com os cabeçalhos `X-Usuario-*` propagados.
+- [x] **M6.1: Testes Unitários de Middlewares**
+  - [x] Validar CORS: testar respostas de cabeçalhos com origens autorizadas e requisições OPTIONS.
+  - [x] Validar Autenticação: testar o middleware de JWT fornecendo tokens válidos (esperando a injeção dos cabeçalhos contextuais), expirados, corrompidos e assinados com chaves incorretas.
+- [x] **M6.2: Testes de Roteamento e Proxy Reverso**
+  - [x] Desenvolver suíte de testes de integração utilizando servidores de teste locais (`httptest.NewServer`).
+  - [x] Simular os microsserviços internos com mocks de endpoints e validar se as requisições enviadas ao Gateway chegam corretamente aos seus respectivos destinos com os cabeçalhos `X-Usuario-*` propagados.
 
 ---
 
