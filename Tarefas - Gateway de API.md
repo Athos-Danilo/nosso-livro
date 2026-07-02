@@ -16,7 +16,7 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a imple
 - `[x]` **Fase 4: Validação de Token JWT e Propagação de Contexto (Autenticação)**
 - `[x]` **Fase 5: Tratamento de Erros, Resiliência e Timeouts (Resiliência)**
 - [x] **Fase 6: Testes Automatizados (Roteamento & JWT)**
-- [ ] **Fase 7: Dockerização, Desligamento Gracioso e Logs (Produção)**
+- [x] **Fase 7: Dockerização, Desligamento Gracioso e Logs (Produção)**
 
 ---
 
@@ -128,14 +128,14 @@ Garantia de segurança da borda e validação do fluxo de roteamento do proxy.
 ## 🚀 Fase 7: Dockerização, Desligamento Gracioso e Logs
 Configurações finais de observabilidade e empacotamento para ambiente de produção local e nuvem.
 
-- [ ] **M7.1: Dockerfile Otimizado**
-  - [ ] Criar `Dockerfile` multi-stage compilando o binário Go de forma estática no primeiro estágio.
-  - [ ] Utilizar no segundo estágio uma imagem final mínima (`alpine` ou `scratch`) contendo apenas o binário compilado e certificados SSL essenciais.
-- [ ] **M7.2: Desligamento Gracioso (Graceful Shutdown)**
-  - [ ] Interceptação de sinais do sistema operacional `SIGINT` e `SIGTERM`.
-  - [ ] Interromper a escuta do servidor HTTP e aguardar a conclusão das requisições proxy ativas no momento (com timeout limite de 10s).
-- [ ] **M7.3: Health Check e Logs Estruturados**
-  - [ ] Criar endpoint `/saude` para retornar status básico do Gateway (`ativo`).
-  - [ ] Criar endpoint `/pronto` para checar de forma integrada se o Serviço de Autenticação e Usuário está disponível.
-  - [ ] Implementar logs estruturados em JSON no padrão `slog` ou `zerolog` em português.
-  - [ ] Registrar dados como: IP de origem, método HTTP, URI de acesso, status HTTP de retorno e tempo total de latência.
+- [x] **M7.1: Dockerfile Otimizado**
+  - [x] Criar `Dockerfile` multi-stage compilando o binário Go de forma estática no primeiro estágio.
+  - [x] Utilizar no segundo estágio uma imagem final mínima (`alpine` ou `scratch`) contendo apenas o binário compilado e certificados SSL essenciais.
+- [x] **M7.2: Desligamento Gracioso (Graceful Shutdown)**
+  - [x] Interceptação de sinais do sistema operacional `SIGINT` e `SIGTERM`.
+  - [x] Interromper a escuta do servidor HTTP e aguardar a conclusão das requisições proxy ativas no momento (com timeout limite de 10s).
+- [x] **M7.3: Health Check e Logs Estruturados**
+  - [x] Criar endpoint `/saude` para retornar status básico do Gateway (`ativo`).
+  - [x] Criar endpoint `/pronto` para checar de forma integrada se o Serviço de Autenticação e Usuário está disponível.
+  - [x] Implementar logs estruturados em JSON no padrão `slog` ou `zerolog` em português.
+  - [x] Registrar dados como: IP de origem, método HTTP, URI de acesso, status HTTP de retorno e tempo total de latência.

@@ -64,6 +64,16 @@ func main() {
 	// Endpoint de prontidao (Readiness Probe)
 	mux.HandleFunc("GET /pronto", func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
+		
+		clienteHTTP := &http.Client{Timeout: 1 * time.Second}
+		resposta, erro := clienteHTTP.Get(cfg.UrlServicoUsuario + "/saude")
+		if erro != nil || resposta.StatusCode != http.StatusOK {
+			w.WriteHeader(http.StatusServiceUnavailable)
+			fmt.Fprint(w, `{"status": "indisponivel", "mensagem": "Servico de Autenticacao e Usuario indisponivel"}`)
+			return
+		}
+		defer resposta.Body.Close()
+
 		w.WriteHeader(http.StatusOK)
 		fmt.Fprint(w, `{"status": "pronto", "mensagem": "Gateway pronto para receber conexoes"}`)
 	})
@@ -80,11 +90,12 @@ func main() {
 	mux.Handle("/api/recomendacoes/", proxyRecomendacao)
 
 	// 6. Encadeamento de middlewares globais de borda
-	// Ordem de execucao: Seguranca (Filtro 2MB/Headers) -> CORS (Origens/Preflight) -> Autenticacao (JWT) -> Roteador (mux)
+	// Ordem de execucao: Logs -> Seguranca (Filtro 2MB/Headers) -> CORS (Origens/Preflight) -> Autenticacao (JWT) -> Roteador (mux)
 	var handlerGlobal http.Handler = mux
 	handlerGlobal = middleware.MiddlewareAutenticacao(cfg)(handlerGlobal)
 	handlerGlobal = middleware.MiddlewareCORS(cfg)(handlerGlobal)
 	handlerGlobal = middleware.MiddlewareSeguranca(handlerGlobal)
+	handlerGlobal = middleware.MiddlewareLogs(handlerGlobal)
 
 	// 7. Configura o Servidor HTTP para Graceful Shutdown
 	endereco := ":" + cfg.Porta
