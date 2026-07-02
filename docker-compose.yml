@@ -8,7 +8,7 @@ services:
     restart: always
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_PASSWORD: "8156"
     ports:
       - "5432:5432"
     volumes:
@@ -66,7 +66,7 @@ services:
     ports:
       - "8080:8080"
     environment:
-      - URL_BANCO_DADOS=postgresql://postgres:postgrespassword@db:5432/banco_autenticacao?sslmode=disable
+      - URL_BANCO_DADOS=postgresql://postgres:8156@db:5432/banco_autenticacao?sslmode=disable
       - CHAVE_SECRETA_JWT=chave_secreta_padrao_desenvolvimento_nosso_livro
       - PORTA=8080
     depends_on:
@@ -84,7 +84,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - URL_BANCO_DADOS=postgresql://postgres:postgrespassword@db:5432/banco_catalogo?sslmode=disable
+      - URL_BANCO_DADOS=postgresql+asyncpg://postgres:8156@db:5432/banco_catalogo
       - CHAVE_SECRETA_JWT=chave_secreta_padrao_desenvolvimento_nosso_livro
     depends_on:
       - db
@@ -101,7 +101,7 @@ services:
     ports:
       - "8081:8081"
     environment:
-      - URL_BANCO_DADOS=postgresql://postgres:postgrespassword@db:5432/banco_emprestimos?sslmode=disable
+      - URL_BANCO_DADOS=postgresql://postgres:8156@db:5432/banco_emprestimos?sslmode=disable
       - URL_RABBITMQ=amqp://guest:guest@rabbitmq:5672
       - URL_SERVICO_AUTENTICACAO=http://servico-autenticacao-usuario:8080
       - URL_SERVICO_CATALOGO=http://servico-catalogo-biblioteca:8000
@@ -122,7 +122,7 @@ services:
     ports:
       - "3001:3001"
     environment:
-      - URL_BANCO_DADOS=postgresql://postgres:postgrespassword@db:5432/banco_reservas?schema=public
+      - URL_BANCO_DADOS=postgresql://postgres:8156@db:5432/banco_reservas?schema=public
       - URL_RABBITMQ=amqp://guest:guest@rabbitmq:5672
       - URL_SERVICO_USUARIO=http://servico-autenticacao-usuario:8080
       - URL_SERVICO_CATALOGO=http://servico-catalogo-biblioteca:8000
@@ -143,7 +143,7 @@ services:
     ports:
       - "8001:8001"
     environment:
-      - URL_BANCO_RECOMENDACOES=postgresql://postgres:postgrespassword@db:5432/banco_recomendacoes?sslmode=disable
+      - URL_BANCO_RECOMENDACOES=postgresql+asyncpg://postgres:8156@db:5432/banco_recomendacoes
       - URL_RABBITMQ=amqp://guest:guest@rabbitmq:5672
     depends_on:
       - db
@@ -161,7 +161,7 @@ services:
     ports:
       - "3002:3002"
     environment:
-      - URL_BANCO_DADOS=postgresql://postgres:postgrespassword@db:5432/banco_notificacoes?schema=public
+      - URL_BANCO_DADOS=postgresql://postgres:8156@db:5432/banco_notificacoes?schema=public
       - URL_RABBITMQ=amqp://guest:guest@rabbitmq:5672
       - URL_SERVICO_USUARIO=http://servico-autenticacao-usuario:8080
       - PORTA=3002

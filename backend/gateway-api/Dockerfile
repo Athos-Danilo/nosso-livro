@@ -1,5 +1,5 @@
 # Estágio 1: Compilação do binário de forma estática
-FROM golang:1.22-alpine AS construtor
+FROM golang:1.26.3-alpine AS construtor
 
 RUN apk add --no-cache git gcc musl-dev
 

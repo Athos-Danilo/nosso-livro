@@ -12,7 +12,7 @@
 # ──────────────────────────────────────────────────────
 # Estágio 1: Construtor (builder)
 # ──────────────────────────────────────────────────────
-FROM node:18-alpine AS construtor
+FROM node:20-alpine AS construtor
 
 # Instala dependências nativas necessárias para pacotes com bindings nativos
 # (ex: `pg` usa `libpq` internamente)
@@ -45,7 +45,7 @@ RUN npm run build
 # ──────────────────────────────────────────────────────
 # Estágio 2: Produção (imagem final enxuta)
 # ──────────────────────────────────────────────────────
-FROM node:18-alpine AS producao
+FROM node:20-alpine AS producao
 
 # Metadados da imagem (boas práticas OCI)
 LABEL maintainer="Marcus Vinícius"
@@ -62,6 +62,7 @@ WORKDIR /app
 
 # Copia package.json para instalar apenas dependências de produção
 COPY package.json package-lock.json ./
+COPY prisma.config.ts ./
 
 # Instala apenas dependências de produção (sem devDependencies)
 RUN npm ci --omit=dev && npm cache clean --force

@@ -1,5 +1,5 @@
 # ─── Estágio 1: Build ──────────────────────────────────────────────────────────
-FROM node:18-alpine AS construtor
+FROM node:20-alpine AS construtor
 
 # Define o diretório de trabalho
 WORKDIR /app
@@ -28,7 +28,7 @@ RUN npx prisma generate
 RUN npm run build
 
 # ─── Estágio 2: Produção ───────────────────────────────────────────────────────
-FROM node:18-alpine AS producao
+FROM node:20-alpine AS producao
 
 # Define ambiente de produção
 ENV NODE_ENV=production
@@ -36,6 +36,7 @@ WORKDIR /app
 
 # Copia package.json para instalar apenas as libs de produção
 COPY package*.json ./
+COPY prisma.config.ts ./
 RUN npm ci --only=production && npm cache clean --force
 
 # Copia o Prisma e o client gerado no estágio de build
