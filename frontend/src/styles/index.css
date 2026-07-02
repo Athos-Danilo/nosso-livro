@@ -1,0 +1,65 @@
+/* Arquivo CSS Principal - Nosso Livro */
+@import './variaveis.css';
+@import './reset.css';
+
+/* Scrollbar Personalizada */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--cor-fundo);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--cor-borda);
+  border-radius: var(--raio-borda-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cor-texto-desativado);
+}
+
+/* Micro-animações e Utilitários de Efeitos */
+.efeito-glow {
+  transition: box-shadow var(--transicao-rapida), border-color var(--transicao-rapida);
+}
+
+.efeito-glow:focus-within {
+  border-color: var(--cor-primaria);
+  box-shadow: 0 0 0 2px var(--cor-borda-foco);
+}
+
+.card-glass {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: var(--raio-borda-md);
+  box-shadow: var(--sombra-md);
+  transition: transform var(--transicao-suave), box-shadow var(--transicao-suave), border-color var(--transicao-suave);
+}
+
+.card-glass:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: var(--sombra-lg), 0 0 15px rgba(var(--cor-primaria-rgb), 0.1);
+}
+
+.btn-animado {
+  position: relative;
+  overflow: hidden;
+  transition: background-color var(--transicao-rapida), transform var(--transicao-rapida), box-shadow var(--transicao-rapida);
+}
+
+.btn-animado:active {
+  transform: scale(0.98);
+}
+
+/* Estilos Globais de Layout */
+.container-central {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}

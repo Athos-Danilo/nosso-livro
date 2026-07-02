@@ -1,0 +1,50 @@
+/* Design System - Variáveis do Projeto Nosso Livro (Tema Escuro Premium) */
+:root {
+  /* Cores de Fundo */
+  --cor-fundo: hsl(222, 47%, 10%);
+  --cor-card: hsl(224, 30%, 15%);
+  --cor-card-hover: hsl(224, 30%, 20%);
+  --cor-popover: hsl(222, 47%, 8%);
+
+  /* Cores de Marca / Ação */
+  --cor-primaria: hsl(210, 100%, 66%);
+  --cor-primaria-hover: hsl(210, 100%, 75%);
+  --cor-primaria-rgb: 82, 166, 255; /* Para cores semi-transparentes */
+
+  --cor-acento: hsl(40, 90%, 55%);
+  --cor-acento-hover: hsl(40, 90%, 65%);
+
+  /* Cores de Feedback */
+  --cor-sucesso: hsl(142, 70%, 45%);
+  --cor-erro: hsl(0, 84%, 60%);
+  --cor-alerta: hsl(48, 96%, 53%);
+
+  /* Cores de Texto */
+  --cor-texto-principal: hsl(210, 40%, 98%);
+  --cor-texto-secundario: hsl(215, 20%, 70%);
+  --cor-texto-desativado: hsl(215, 15%, 45%);
+
+  /* Bordas e Sombras */
+  --cor-borda: hsla(217, 30%, 30%, 0.35);
+  --cor-borda-foco: hsla(210, 100%, 66%, 0.5);
+  
+  --sombra-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --sombra-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+  --sombra-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.5);
+  
+  /* Efeito de Vidro (Glassmorphism) */
+  --glass-bg: rgba(30, 41, 59, 0.45);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: blur(12px);
+
+  /* Fontes e Tamanhos */
+  --fonte-principal: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  
+  --raio-borda-sm: 6px;
+  --raio-borda-md: 12px;
+  --raio-borda-lg: 20px;
+
+  /* Tempos de Transição */
+  --transicao-rapida: 0.15s ease;
+  --transicao-suave: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
