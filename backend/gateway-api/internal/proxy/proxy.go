@@ -39,6 +39,16 @@ func NovoProxyReverso(enderecoDestino string) (*httputil.ReverseProxy, error) {
 		)
 	}
 
+	// Remove cabecalhos de CORS redundantes vindos dos microsservicos para evitar duplicacao
+	proxy.ModifyResponse = func(res *http.Response) error {
+		res.Header.Del("Access-Control-Allow-Origin")
+		res.Header.Del("Access-Control-Allow-Methods")
+		res.Header.Del("Access-Control-Allow-Headers")
+		res.Header.Del("Access-Control-Allow-Credentials")
+		res.Header.Del("Access-Control-Expose-Headers")
+		return nil
+	}
+
 	// M5.1: Configura timeouts de resiliencia no Transport
 	proxy.Transport = &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
