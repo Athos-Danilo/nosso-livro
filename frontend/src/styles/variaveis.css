@@ -6,6 +6,16 @@
   --cor-card-hover: hsl(224, 30%, 20%);
   --cor-popover: hsl(222, 47%, 8%);
 
+  /* Tema Santuário Literário */
+  --cor-ouro-envelhecido: hsl(43, 70%, 50%);
+  --cor-ouro-rgb: 212, 175, 55;
+  --cor-ouro-brilho: hsla(43, 70%, 50%, 0.45);
+  --cor-papel-polen: #f6f3eb;
+  --cor-papel-polen-glass: rgba(246, 243, 235, 0.9);
+  --cor-verde-biblioteca: hsl(165, 35%, 15%);
+  --cor-verde-biblioteca-hover: hsl(165, 35%, 20%);
+  --cor-vermelho-ferrugem: hsl(10, 60%, 45%);
+
   /* Cores de Marca / Ação */
   --cor-primaria: hsl(210, 100%, 66%);
   --cor-primaria-hover: hsl(210, 100%, 75%);
