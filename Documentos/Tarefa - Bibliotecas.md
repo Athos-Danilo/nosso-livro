@@ -1,82 +1,73 @@
-# 📋 Checklist de Tarefas - Tela de Bibliotecas
+# 📋 Checklist de Tarefas - Tela de Bibliotecas (Santuário Literário)
 
-Este documento funciona como um guia de acompanhamento (To-Do List) para a conclusão e polimento da tela de **Bibliotecas** do sistema "Nosso Livro". O objetivo é catalogar de forma elegante todas as bibliotecas físicas e pontos de coleta integrados à rede de compartilhamento da instituição.
+Este documento funciona como um guia de acompanhamento (To-Do List) para a conclusão e polimento da tela de **Bibliotecas** (Pontos de Coleta) do sistema "Nosso Livro", adaptada para a estética clássica do **"Santuário Literário"**.
 
 > [!IMPORTANT]
-> **REGRA DE IDIOMA E PADRÕES DO PROJETO (PT-BR):**
-> Toda a interface visual, mensagens de feedback, placeholders, logs de console, estruturas de variáveis e comentários deste componente devem ser estritamente em **Português do Brasil (PT-BR)**.
-> **DIRETRIZ DESIGN PREMIUM:**
-> A interface deve possuir estética glassmorphism refinada, efeitos dinâmicos de hover, foco e animações fluidas baseadas no design system definido em [variaveis.css](file:///c:/Users/Athos/ADS/Meus%20Projetos/nosso-livro/frontend/src/styles/variaveis.css).
+> **DIRETRIZ DESIGN PREMIUM & TEMÁTICA:**
+> A interface deve simular um catálogo físico clássico de biblioteca. Os pontos de coleta são representados como **gaveteiros de madeira nobre (mogno)** com puxadores em latão/ouro envelhecido, que deslizam ligeiramente para a frente no hover. Os detalhes utilizam a paleta de ouro envelhecido, papel pólen e verde-biblioteca.
+> Toda a interface visual, mensagens de feedback, placeholders e comentários devem ser estritamente em **Português do Brasil (PT-BR)**.
 
 ---
 
 ## 🗺️ Mapa de Progresso da Tela
 
-- [ ] **Fase 1: Layout e Apresentação dos Pontos de Coleta**
-- [ ] **Fase 2: Interações Visuais e Informações Detalhadas**
-- [ ] **Fase 3: Integração de Consumo com a API de Bibliotecas**
-- [ ] **Fase 4: Formulário de Nova Biblioteca (Modo Administrador)**
-- [ ] **Fase 5: Otimizações de Interface, Skeletons e Fallbacks**
+- [ ] **Fase 1: Painel de Arquivo de Biblioteca (Estrutura e Gaveteiros)**
+- [ ] **Fase 2: Interações Cinematográficas e Abertura de Gavetas**
+- [ ] **Fase 3: Integração com Endpoint de Pontos de Coleta**
+- [ ] **Fase 4: Registro de Novo Ponto (Modo Bibliotecário/Admin)**
+- [ ] **Fase 5: Skeletons em Papel Pólen e Polimento Geral**
 
 ---
 
-## 🎨 Fase 1: Layout e Apresentação dos Pontos de Coleta
-Desenvolvimento da grade visual das bibliotecas cadastradas no ecossistema.
+## 🎨 Fase 1: Painel de Arquivo de Biblioteca (Estrutura e Gaveteiros)
+Construção do grid responsivo de bibliotecas baseadas em gaveteiros de madeira e detalhes de ouro.
 
-- [ ] **M1.1: Grid de Bibliotecas (Classe Glassmorphism)**
-  - [ ] Projetar a exibição das bibliotecas físicas cadastradas usando uma grade flexível (`grid-template-columns: repeat(auto-fit, minmax(280px, 1fr))`).
-  - [ ] Aplicar estilo `card-glass` com bordas suaves e arredondadas para os cards individuais de cada biblioteca.
-- [ ] **M1.2: Cabeçalho com Nome da Biblioteca e Ícone**
-  - [ ] Inserir ícones representativos (`lucide-react` `Library` ou `MapPin`) no cabeçalho de cada card de biblioteca física, estilizados com a cor primária (`--cor-primaria`).
-  - [ ] Exibir o nome da biblioteca com tamanho de fonte de `1.25rem` e peso negrito.
-
----
-
-## 🎬 Fase 2: Interações Visuais e Informações Detalhadas
-Apresentação detalhada de horários de funcionamento, endereços e acervos locais.
-
-- [ ] **M2.1: Exibição Elegante de Detalhes de Contato e Localização**
-  - [ ] Listar endereço completo, telefone/whatsapp de contato e horários de funcionamento em blocos de texto limpos e organizados com ícones correspondentes.
-  - [ ] Exibir de forma atraente a quantidade total de livros físicos armazenados naquela biblioteca específica (Ex: "Acervo local: 42 títulos").
-- [ ] **M2.2: Hover Animado e Detalhes**
-  - [ ] Ao passar o mouse sobre o card da biblioteca, elevar o contêiner em 5px (`translateY(-5px)`) e acentuar a borda com a cor primária (`--cor-borda-foco`).
-  - [ ] Adicionar link rápido "Ver Livros nesta Biblioteca" que redireciona para a tela de catálogo pré-filtrada pelos livros exclusivos daquela unidade física.
+- [ ] **M1.1: Grid de Gaveteiros em Mogno**
+  - [ ] Projetar a exibição usando uma grade flexível (`grid-template-columns: repeat(auto-fit, minmax(280px, 1fr))`).
+  - [ ] Estilizar os cards de biblioteca como gavetas de arquivo de fichas clássicas (`background` em gradiente marrom-mogno escuro, bordas com acabamento chanfrado e puxador de ouro/latão sutil simulado via SVG/CSS).
+- [ ] **M1.2: Rótulos e Plaquetas Identificadoras**
+  - [ ] Adicionar uma plaqueta de metal dourada no topo de cada gaveta contendo a sigla institucional e o nome do ponto de coleta em fonte vintage (Cinzel/Tapestry).
+  - [ ] Exibir a quantidade de livros disponíveis como um contador em papel pólen embutido.
 
 ---
 
-## 🔗 Fase 3: Integração de Consumo com a API de Bibliotecas
-Conexão do frontend com o microsserviço de catálogo e bibliotecas em Python/FastAPI.
+## 🎬 Fase 2: Interações Cinematográficas e Abertura de Gavetas
+Enriquecer a experiência com efeitos táteis tridimensionais que simulam a física de gavetas reais.
 
-- [ ] **M3.1: Chamada HTTP ao Endpoint de Bibliotecas**
-  - [ ] Efetuar chamada assíncrona ao endpoint `GET /api/bibliotecas` para listar as bibliotecas físicas salvas.
-  - [ ] Mapear o retorno no estado local do React ao carregar a página.
-- [ ] **M3.2: Exibição Dinâmica do Acervo de Livros por Unidade**
-  - [ ] Garantir que a quantidade de livros exibida em cada unidade reflita o estoque real consultado dinamicamente das bases de dados.
-- [ ] **M3.3: Tratamento de Retornos Vazios**
-  - [ ] Tratar de forma amigável caso não existam bibliotecas cadastradas, indicando que o administrador deve realizar o primeiro cadastro.
+- [ ] **M2.1: Efeito de Deslizamento 3D no Hover**
+  - [ ] Ao passar o cursor sobre a gaveta, aplicar transição de movimento vertical/profundidade (`transform: translateY(-4px) translateZ(10px)`), dando a nítida sensação física de que a gaveta está abrindo.
+  - [ ] Adicionar partículas de poeira de luz (dust motes) saindo da gaveta ao passar o mouse.
+- [ ] **M2.2: Ficha de Catálogo Expansível**
+  - [ ] Ao clicar na gaveta, abrir um modal ou expandir o container revelando as informações completas da biblioteca em formato de ficha de papel pólen (`#f6f3eb` com texto escuro e borda dupla em relevo).
 
 ---
 
-## ⚙️ Fase 4: Formulário de Nova Biblioteca (Modo Administrador)
-Permitir que usuários gestores insiram novas bibliotecas físicas de forma integrada.
+## 🛡️ Fase 3: Integração com Endpoint de Pontos de Coleta
+Consumo da API de bibliotecas físicas e sincronização em tempo real.
 
-- [ ] **M4.1: Condicionamento de Botão para Administrador**
-  - [ ] Exibir o botão "Cadastrar Biblioteca" apenas se a claims do token JWT indicar perfil administrador (`usuario.permissao === 'administrador'`).
-- [ ] **M4.2: Modal com Formulário de Cadastro**
-  - [ ] Desenhar formulário contendo: Nome da Biblioteca, Endereço Completo, Horário de Funcionamento (Abertura e Fechamento) e Telefone.
-  - [ ] Implementar validação local de formulário antes de disparar a requisição.
-- [ ] **M4.3: Conexão com Endpoint de Cadastro**
-  - [ ] Integrar o envio do formulário à requisição `POST /api/bibliotecas`.
-  - [ ] Exibir mensagem flutuante Toast de sucesso após o cadastro concluído, fechando o modal e atualizando a listagem principal na tela com uma animação de fade-in.
+- [ ] **M3.1: Requisição de Leitura de Pontos de Coleta**
+  - [ ] Chamar o endpoint da API para buscar a listagem de bibliotecas.
+  - [ ] Controlar estado de carregamento com loaders literários (livro folheando suas páginas em ouro envelhecido).
+- [ ] **M3.2: Exibição de Erros por Carimbos**
+  - [ ] Em caso de falha de conexão, aplicar o carimbo vermelho `"INDISPONÍVEL: ARQUIVO DE BIBLIOTECAS INACESSÍVEL"` com inclinação de `-6deg`.
 
 ---
 
-## 🚀 Fase 5: Otimizações de Interface, Skeletons e Fallbacks
-Garantir carregamento fluido e resiliência visual.
+## 🔗 Fase 4: Registro de Novo Ponto (Modo Bibliotecário/Admin)
+Formulário clássico de adição de bibliotecas exclusivo para administradores da rede.
 
-- [ ] **M5.1: Skeletons de Cards de Biblioteca**
-  - [ ] Exibir esqueletos pulsantes com a proporção exata dos cards de bibliotecas físicas durante a requisição de carregamento inicial.
-- [ ] **M5.2: Responsividade no Mobile-first**
-  - [ ] Garantir legibilidade dos endereços e horários em telas estreitas, ajustando as colunas dos cards para ocuparem 100% de largura no celular.
-- [ ] **M5.3: Tratamento de Erro de Conexão**
-  - [ ] Apresentar mensagem intuitiva caso o serviço de catálogo e bibliotecas esteja instável, fornecendo opção rápida para nova tentativa.
+- [ ] **M4.1: Ficha de Cadastro de Biblioteca**
+  - [ ] Formular painel de inserção com campos flutuantes (Nome, Localização, Horário de Funcionamento).
+  - [ ] O formulário deve possuir o estilo de ficha de papel pólen com validações sob demanda.
+- [ ] **M4.2: Carimbo "REGISTRADO" no Sucesso**
+  - [ ] Após a inserção no banco de dados, aplicar o carimbo vintage verde-floresta `"REGISTRADO"` no centro do formulário e fechar o modal suavemente.
+
+---
+
+## 🚀 Fase 5: Skeletons em Papel Pólen e Polimento Geral
+Finalização visual para uma transição fluida durante o carregamento de dados.
+
+- [ ] **M5.1: Skeletons em Formato de Fichas Vazias**
+  - [ ] Durante o carregamento da lista de bibliotecas, exibir skeletons animados simulando gavetas de madeira fechadas com um efeito de pulsar sutil de luz âmbar.
+- [ ] **M5.2: Polimento das Bordas e Sombras**
+  - [ ] Ajustar as sombras projetadas entre as gavetas adjacentes para dar profundidade tridimensional ao catálogo.

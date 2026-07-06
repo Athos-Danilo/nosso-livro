@@ -1,102 +1,96 @@
-# 📋 Checklist de Tarefas - Tela de Catálogo de Livros
+# 📋 Checklist de Tarefas - Tela de Catálogo de Livros (Santuário Literário)
 
-Este documento funciona como um guia de acompanhamento (To-Do List) para a conclusão e polimento da tela de **Catálogo de Livros** do sistema "Nosso Livro". O objetivo é criar uma vitrine de livros extremamente atraente, com filtros instantâneos e interatividade de alta fidelidade.
+Este documento funciona como um guia de acompanhamento (To-Do List) para a conclusão e polimento da tela de **Catálogo de Livros** do sistema "Nosso Livro", adaptada para a estética clássica do **"Santuário Literário"**.
 
 > [!IMPORTANT]
-> **REGRA DE IDIOMA E PADRÕES DO PROJETO (PT-BR):**
-> Toda a interface visual, mensagens de feedback, placeholders, logs de console, estruturas de variáveis e comentários deste componente devem ser estritamente em **Português do Brasil (PT-BR)**.
-> **DIRETRIZ DESIGN PREMIUM:**
-> A interface deve possuir estética glassmorphism refinada, efeitos dinâmicos de hover, foco e animações fluidas baseadas no design system definido em [variaveis.css](file:///c:/Users/Athos/ADS/Meus%20Projetos/nosso-livro/frontend/src/styles/variaveis.css).
+> **DIRETRIZ DESIGN PREMIUM & TEMÁTICA:**
+> O catálogo de livros deve parecer um acervo físico imersivo. Cada livro é exibido como um **livro físico tridimensional** com acabamentos dourados nas capas. Ao passar o mouse, a capa se move em perspectiva 3D (tilt effect). As informações técnicas são apresentadas em fichas clássicas de papel pólen com debossed e selos de carimbo em tinta indicando a disponibilidade.
+> Toda a interface visual, mensagens de feedback, placeholders e comentários devem ser estritamente em **Português do Brasil (PT-BR)**.
 
 ---
 
 ## 🗺️ Mapa de Progresso da Tela
 
-- [ ] **Fase 1: Painel de Filtros e Grid de Livros**
-- [ ] **Fase 2: Cards de Livros com Efeitos Visuais Avançados**
-- [ ] **Fase 3: Modal de Detalhes e Ações Rápidas**
-- [ ] **Fase 4: Integração com APIs (Catálogo, Empréstimos e Reservas)**
-- [ ] **Fase 5: Interface de Cadastro de Livros (Modo Administrador)**
-- [ ] **Fase 6: Paginação Infinita, Skeletons e Performance**
+- [ ] **Fase 1: Gaveta de Busca e Grid de Acervos**
+- [ ] **Fase 2: Livros Tridimensionais com Perspectiva e Selos de Status**
+- [ ] **Fase 3: Ficha Técnica Detalhada (Modal de Papel Pólen)**
+- [ ] **Fase 4: Consumo e Integração com FastAPI, Go e Node.js**
+- [ ] **Fase 5: Registro de Novas Obras (Aba de Bibliotecário/Admin)**
+- [ ] **Fase 6: Paginação com Skeletons de Livros e Debounce**
 
 ---
 
-## 🎨 Fase 1: Painel de Filtros e Grid de Livros
-Criação do cabeçalho de busca rápida e estruturação do catálogo.
+## 🎨 Fase 1: Gaveta de Busca e Grid de Acervos
+Construção da gaveta superior de pesquisa e estruturação do grid físico de livros.
 
-- [ ] **M1.1: Barra de Pesquisa e Filtros Rápidos**
-  - [ ] Projetar barra de pesquisa superior estilizada, com ícone de lupa que muda de cor ao focar.
-  - [ ] Implementar painel de filtros expansível (Gênero, Autor, Disponibilidade) com transição de colapso/expansão suave (`max-height` animado).
-  - [ ] Criar tags/chips ativos de filtro selecionados (Ex: "Disponível", "Ficção") que podem ser removidos com um clique.
-- [ ] **M1.2: Grid Responsivo Dinâmico**
-  - [ ] Definir o grid com CSS Grid configurado para se adaptar automaticamente a diferentes tamanhos de tela (`repeat(auto-fill, minmax(180px, 1fr))`).
-  - [ ] Configurar espaçamento harmonioso (`gap: 24px`) e alinhamento centralizado.
-
----
-
-## 🎬 Fase 2: Cards de Livros com Efeitos Visuais Avançados
-Projetar os elementos que compõem o livro, tornando-os atraentes e fáceis de escanear.
-
-- [ ] **M2.1: Card de Livro com Capa e Info Básica**
-  - [ ] Desenhar o card usando a classe `card-glass` com borda arredondada de `--raio-borda-md`.
-  - [ ] Criar placeholder dinâmico com gradiente e título do livro centralizado para cobrir a ausência de imagem de capa física.
-- [ ] **M2.2: Efeito Hover Tridimensional ou de Elevação**
-  - [ ] Ao passar o mouse sobre o card do livro, aplicar efeito hover de elevação suave (`translateY(-8px)`) e uma sombra projetada difusa (`--sombra-lg`).
-  - [ ] Aplicar zoom sutil na imagem da capa (`transform: scale(1.05)`) sem que ela ultrapasse os limites do card (`overflow: hidden`).
-- [ ] **M2.3: Crachás de Status (Badges) Estilizados**
-  - [ ] Inserir badge dinâmico indicando o status do livro: "Disponível" em `--cor-sucesso`, "Emprestado" em `--cor-erro` ou "Reservado" em `--cor-alerta`.
-  - [ ] Adicionar um efeito pulsação sutil na cor da badge de status disponível.
+- [ ] **M1.1: Gaveta de Busca e Filtros Vintage**
+  - [ ] Projetar a barra de busca inspirada em arquivos de fichas de biblioteca, com ícone de lupa dourada.
+  - [ ] Implementar painel de filtros expansível (Gêneros, Autores, Editora) com transições suaves que simulam a abertura de uma pasta física de couro.
+  - [ ] Adicionar chips/etiquetas de filtros ativos no tom de papel pólen e borda dourada fina.
+- [ ] **M1.2: Grid de Prateleiras de Biblioteca**
+  - [ ] Estruturar o CSS Grid para dispor os livros simulando prateleiras de madeira de biblioteca (`repeat(auto-fill, minmax(180px, 1fr))`).
+  - [ ] Adicionar linhas divisórias de prateleiras sutis em tom ouro envelhecido abaixo de cada fileira de livros.
 
 ---
 
-## 🔎 Fase 3: Modal de Detalhes e Ações Rápidas
-Ficha técnica completa do livro selecionado e ativação dos fluxos do sistema.
+## 🎬 Fase 2: Livros Tridimensionais com Perspectiva e Selos de Status
+Criação dos cards de livros como modelos tridimensionais físicos interativos.
 
-- [ ] **M3.1: Modal com Backdrop Blur e Animação de Entrada**
-  - [ ] Criar modal de detalhes que se sobrepõe à tela com fundo escurecido semi-transparente e desfoque (`backdrop-filter: blur(8px)`).
-  - [ ] Configurar animação de entrada do modal: surgir do centro com escala inicial reduzida (Ex: `scale(0.95)` para `scale(1)`) e fade-in associado em 250ms.
-- [ ] **M3.2: Ficha Técnica Detalhada do Livro**
-  - [ ] Exibir título completo, autor, editora, ano de publicação, quantidade de páginas, sinopse, e bibliotecas físicas que possuem exemplares.
-  - [ ] Criar seção mostrando a fila de espera atual (quantas pessoas estão na fila para este livro caso ele esteja indisponível).
-- [ ] **M3.3: Botões de Ação Condicionais no Modal**
-  - [ ] Se o livro estiver disponível: Exibir botão "Solicitar Empréstimo" (destacado).
-  - [ ] Se o livro estiver emprestado: Exibir botão "Entrar na Fila de Reserva" (cor de acento).
-  - [ ] Se o usuário já estiver na fila de espera do livro: Exibir botão "Cancelar Reserva" com visual discreto.
-
----
-
-## 🔗 Fase 4: Integração com APIs (Catálogo, Empréstimos e Reservas)
-Conectar a tela do catálogo com as APIs correspondentes de cada microsserviço.
-
-- [ ] **M4.1: Consumo do Serviço de Catálogo (Python/FastAPI)**
-  - [ ] Chamar `GET /api/catalogo/livros` para listar todos os livros cadastrados.
-  - [ ] Implementar parâmetros de filtro na query (pesquisa de texto, filtros por categoria).
-- [ ] **M4.2: Integração com o Serviço de Empréstimos (Go)**
-  - [ ] Ao clicar em "Solicitar Empréstimo", disparar a requisição `POST /api/emprestimos` passando o ID do livro e a biblioteca de retirada desejada.
-  - [ ] Exibir mensagem de sucesso animada: "Empréstimo registrado com sucesso! Retire seu livro na biblioteca selecionada."
-- [ ] **M4.3: Integração com o Serviço de Reservas (Node.js)**
-  - [ ] Ao clicar em "Entrar na Fila de Reserva", disparar a requisição `POST /api/reservas` passando o ID do livro.
-  - [ ] Mostrar pop-up de sucesso informando a posição que o usuário ocupa na fila de espera.
+- [ ] **M2.1: Efeito Livro 3D e Capa Texturizada**
+  - [ ] Projetar o card de livro com perspectiva 3D (lombada lateral simulada em couro escuro e a capa do livro com acabamentos dourados e texturas envelhecidas).
+  - [ ] Ao passar o mouse, aplicar efeito tilt de rotação em perspectiva 3D (`transform: rotateY(-18deg) scale(1.05) translateZ(10px)`).
+- [ ] **M2.2: Selos de Disponibilidade (Carimbos de Tinta)**
+  - [ ] Inserir selo dinâmico de status com visual de carimbo de biblioteca inclinado a `-6deg`:
+    - `"DISPONÍVEL"` em tom verde-floresta.
+    - `"EMPRESTADO"` em tom vermelho-ferrugem.
+    - `"RESERVADO"` em tom amarelo-ouro.
+  - [ ] Aplicar textura envelhecida de carimbada falha nas badges de status.
 
 ---
 
-## ⚙️ Fase 5: Interface de Cadastro de Livros (Modo Administrador)
-Rotas e formulários exclusivos para usuários administradores.
+## 🔎 Fase 3: Ficha Técnica Detalhada (Modal de Papel Pólen)
+Visualização completa do livro simulando a abertura de uma pasta institucional de fichamento.
 
-- [ ] **M5.1: Botão de Cadastro Exclusivo**
-  - [ ] Mostrar botão "Cadastrar Novo Livro" na barra superior do catálogo somente se `usuario.permissao === 'administrador'`.
-- [ ] **M5.2: Formulário do Administrador**
-  - [ ] Criar modal ou aba para cadastrar novos livros, contendo campos para: Título, Autor, Gênero, Editora, Ano, Sinopse e quantidade de cópias.
-  - [ ] Realizar validação de campos obrigatórios no frontend antes de enviar a requisição `POST /api/catalogo/livros`.
+- [ ] **M3.1: Modal Ficha Técnica em Papel Pólen**
+  - [ ] Projetar modal com fundo de vidro fosco (`backdrop-filter: blur(12px)`) e o container central no estilo folha de papel pólen (`--cor-papel-polen-glass`) com moldura dupla em relevo.
+  - [ ] Configurar animação de entrada do modal imitando uma folha sendo depositada na mesa.
+- [ ] **M3.2: Ficha Catalográfica e Fila de Espera**
+  - [ ] Dispor os dados (Título, Autor, Ano, Sinopse) em layout de catalogação clássica, com fontes serifadas elegantes.
+  - [ ] Exibir o status da fila de espera do livro com visual de lista de assinaturas antigas.
+- [ ] **M3.3: Botões de Solicitação Literária**
+  - [ ] Botão "Solicitar Empréstimo" estilizado em gradiente Azul Marinho Nobre.
+  - [ ] Botão "Entrar na Fila de Espera" em tom verde-biblioteca clássico.
 
 ---
 
-## 🚀 Fase 6: Paginação Infinita, Skeletons e Performance
-Otimização para grandes volumes de dados.
+## 🔗 Fase 4: Consumo e Integração com FastAPI, Go e Node.js
+Integração dos fluxos literários com os respectivos microsserviços.
 
-- [ ] **M6.1: Rolagem Infinita (Infinite Scroll) ou Paginação Inteligente**
-  - [ ] Implementar carregamento sob demanda ao rolar a página até o fim, evitando carregar todo o acervo de uma vez.
-- [ ] **M6.2: Skeletons Animados Premium**
-  - [ ] Exibir esqueletos pulsantes com a proporção exata dos cards de livros enquanto os dados estão sendo buscados.
-- [ ] **M6.3: Otimização de Imagens e Debounce de Busca**
-  - [ ] Adicionar `debounce` de 300ms no campo de busca para evitar dezenas de requisições desnecessárias ao servidor enquanto o usuário digita.
+- [ ] **M4.1: Conexão com Microsserviço de Catálogo (Python/FastAPI)**
+  - [ ] Integrar consumo de `GET /api/catalogo/livros` com paginação e envio de filtros de pesquisa.
+- [ ] **M4.2: Registro de Empréstimos (Serviço em Go)**
+  - [ ] Integrar envio de empréstimo `POST /api/emprestimos` com o livro selecionado.
+  - [ ] Exibir mensagem de sucesso via carimbo verde `"EMPRÉSTIMO APROVADO"`.
+- [ ] **M4.3: Registro de Reservas (Serviço em Node.js)**
+  - [ ] Integrar criação de reserva `POST /api/reservas`.
+  - [ ] Exibir crachá de confirmação com a posição na fila de espera.
+
+---
+
+## ⚙️ Fase 5: Registro de Novas Obras (Aba de Bibliotecário/Admin)
+Formulários de catalogação exclusivos para administradores.
+
+- [ ] **M5.1: Botão "Adicionar Obra ao Acervo"**
+  - [ ] Exibir botão somente se `usuario.permissao === 'administrador'`, com ícone clássico de pena/tinteiro.
+- [ ] **M5.2: Ficha de Cadastro de Livro**
+  - [ ] Formulário em papel pólen com validação sob demanda, exibindo carimbo vermelho `"INVÁLIDO"` caso ocorram erros nos inputs.
+
+---
+
+## 🚀 Fase 6: Paginação com Skeletons de Livros e Debounce
+Polimento de desempenho para acervos massivos.
+
+- [ ] **M6.1: Paginação Infinita e Skeletons de Livros**
+  - [ ] Carregamento dinâmico ao rolar a tela, exibindo skeletons simulando silhuetas de livros cinza cardboard em prateleiras escuras de madeira.
+- [ ] **M6.2: Debounce de Pesquisa de Ficha**
+  - [ ] Implementar `debounce` de 300ms no input de busca para evitar múltiplas chamadas à API enquanto o usuário digita.

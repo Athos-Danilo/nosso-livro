@@ -1,54 +1,59 @@
-/* Design System - Variáveis do Projeto Nosso Livro (Tema Escuro Premium) */
+/* Design System - Variáveis do Projeto Nosso Livro (Tema "Santuário Literário") */
 :root {
-  /* Cores de Fundo */
-  --cor-fundo: hsl(222, 47%, 10%);
-  --cor-card: hsl(224, 30%, 15%);
-  --cor-card-hover: hsl(224, 30%, 20%);
-  --cor-popover: hsl(222, 47%, 8%);
+  /* Cores de Fundo da Biblioteca */
+  --cor-fundo: hsl(215, 30%, 6%); /* Tom escuro de mogno/azul-petróleo */
+  --cor-card: hsl(215, 25%, 11%); /* Tom de mogno escuro suave */
+  --cor-card-hover: hsl(215, 25%, 15%);
+  --cor-popover: hsl(215, 30%, 4%);
 
-  /* Tema Santuário Literário */
+  /* Paleta "Santuário Literário" */
   --cor-ouro-envelhecido: hsl(43, 70%, 50%);
   --cor-ouro-rgb: 212, 175, 55;
   --cor-ouro-brilho: hsla(43, 70%, 50%, 0.45);
+  
   --cor-papel-polen: #f6f3eb;
-  --cor-papel-polen-glass: rgba(246, 243, 235, 0.9);
+  --cor-papel-polen-glass: rgba(246, 243, 235, 0.95);
+  --cor-papel-texto: #2b2a27; /* Texto escuro ideal para leitura sobre papel pólen */
+
   --cor-verde-biblioteca: hsl(165, 35%, 15%);
   --cor-verde-biblioteca-hover: hsl(165, 35%, 20%);
-  --cor-vermelho-ferrugem: hsl(10, 60%, 45%);
+  --cor-verde-biblioteca-rgb: 26, 54, 93;
 
-  /* Cores de Marca / Ação */
-  --cor-primaria: hsl(210, 100%, 66%);
-  --cor-primaria-hover: hsl(210, 100%, 75%);
-  --cor-primaria-rgb: 82, 166, 255; /* Para cores semi-transparentes */
+  --cor-vermelho-ferrugem: hsl(10, 60%, 45%); /* Para alertas e carimbos de erro */
 
-  --cor-acento: hsl(40, 90%, 55%);
-  --cor-acento-hover: hsl(40, 90%, 65%);
+  /* Cores de Marca / Ações principais (Destaque em Ouro e Azul Marinho) */
+  --cor-primaria: hsl(43, 70%, 50%); /* Destaque principal em Ouro Envelhecido */
+  --cor-primaria-hover: hsl(43, 75%, 58%);
+  --cor-primaria-rgb: 212, 175, 55;
+
+  --cor-azul-nobre: #102a43; /* Azul marinho nobre dos títulos e botões principais */
+  --cor-azul-nobre-hover: #1d3557;
 
   /* Cores de Feedback */
-  --cor-sucesso: hsl(142, 70%, 45%);
-  --cor-erro: hsl(0, 84%, 60%);
-  --cor-alerta: hsl(48, 96%, 53%);
+  --cor-sucesso: #2e7d32; /* Verde floresta */
+  --cor-erro: hsl(10, 60%, 45%); /* Vermelho ferrugem */
+  --cor-alerta: #d4af37; /* Amarelo ouro */
 
-  /* Cores de Texto */
-  --cor-texto-principal: hsl(210, 40%, 98%);
-  --cor-texto-secundario: hsl(215, 20%, 70%);
-  --cor-texto-desativado: hsl(215, 15%, 45%);
+  /* Cores de Texto sobre o Fundo Escuro */
+  --cor-texto-principal: #f6f3eb; /* Papel pólen para leitura perfeita no escuro */
+  --cor-texto-secundario: #b8b5ac;
+  --cor-texto-desativado: #6e6b61;
 
-  /* Bordas e Sombras */
-  --cor-borda: hsla(217, 30%, 30%, 0.35);
-  --cor-borda-foco: hsla(210, 100%, 66%, 0.5);
+  /* Bordas e Sombras em Ouro Sutil */
+  --cor-borda: rgba(212, 175, 55, 0.18);
+  --cor-borda-foco: rgba(212, 175, 55, 0.6);
   
-  --sombra-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --sombra-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
-  --sombra-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.5);
+  --sombra-sm: 0 2px 4px rgba(0, 0, 0, 0.2);
+  --sombra-md: 0 8px 16px rgba(0, 0, 0, 0.35);
+  --sombra-lg: 0 16px 32px rgba(0, 0, 0, 0.5);
   
-  /* Efeito de Vidro (Glassmorphism) */
-  --glass-bg: rgba(30, 41, 59, 0.45);
-  --glass-border: rgba(255, 255, 255, 0.08);
+  /* Efeito de Vidro (Glassmorphism) com Borda de Ouro */
+  --glass-bg: rgba(11, 17, 24, 0.6);
+  --glass-border: rgba(212, 175, 55, 0.12);
   --glass-blur: blur(12px);
 
-  /* Fontes e Tamanhos */
-  --fonte-principal: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  /* Fontes e Raio de Bordas */
+  --fonte-principal: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   
   --raio-borda-sm: 6px;
   --raio-borda-md: 12px;
