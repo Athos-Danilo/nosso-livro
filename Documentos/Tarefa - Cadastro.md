@@ -26,12 +26,13 @@ Construção do layout do card de registro de leitor baseado em papel pólen tex
   - [x] Reutilizar o card `.card-santuario` com papel pólen (`--cor-papel-polen-glass`), moldura dupla interna em debossed/embossed e sombra profunda de luxo.
   - [x] Garantir responsividade completa, adaptando os paddings para telas mobile.
 - [x] **M1.2: Distribuição dos Inputs do Formulário**
-  - [x] Criar campos de entrada com labels flutuantes para:
+  - [x] Criar campos de entrada individuais com labels flutuantes para:
     - Nome Completo
-    - E-mail ou WhatsApp (mesmo placeholder interativo flutuante)
+    - WhatsApp (obrigatório pelo backend, com máscara ativa)
+    - E-mail (obrigatório pelo backend)
     - Senha (mínimo 6 caracteres)
     - Confirmar Senha
-  - [x] Adicionar os respectivos ícones da biblioteca Lucide à esquerda (`User`, `Mail` ou `Phone`, `Lock`).
+  - [x] Adicionar os respectivos ícones da biblioteca Lucide à esquerda (`User`, `Phone`, `Mail`, `Lock`).
 - [x] **M1.3: Botões e Links de Transição**
   - [x] Estilizar o botão principal "Registrar na Ficha de Leitores" com o gradiente Azul Marinho Nobre (`#1d3557` a `#102a43`) e hover com borda azul escura.
   - [x] Inserir o link de retorno "Já tem conta? Entrar" estilizado de forma limpa no rodapé (texto azul marinho negrito, sem sublinhados, hover de opacidade).
@@ -45,10 +46,10 @@ Enriquecer a experiência do leitor com transições elegantes e máscaras de te
   - [x] Criar animação de transição a partir da tela de login (um slide suave da direita para a esquerda).
   - [x] Configurar delay escalonado nos campos do formulário para surgimento sequencial.
 - [x] **M2.2: Máscara Dinâmica de Telefone/WhatsApp**
-  - [x] Se o usuário digitar números no campo de E-mail/WhatsApp, aplicar a máscara `(XX) XXXXX-XXXX` dinamicamente em tempo real.
+  - [x] No campo de WhatsApp, aplicar a máscara `(XX) XXXXX-XXXX` dinamicamente em tempo real ao digitar.
   - [x] Tratar a digitação para apagar os caracteres da máscara caso o usuário dê backspace.
 - [x] **M2.3: Foco Dinâmico e Brilho Ouro Envelhecido**
-  - [x] Ao focar in qualquer input, a caixa de entrada deve mudar o fundo para branco (`#ffffff`), as bordas para ouro envelhecido (`var(--cor-ouro-envelhecido)`) e aplicar o box-shadow dourado sutil.
+  - [x] Ao focar em qualquer input, a caixa de entrada deve mudar o fundo para branco (`#ffffff`), as bordas para ouro envelhecido (`var(--cor-ouro-envelhecido)`) e aplicar o box-shadow dourado sutil.
   - [x] Fazer com que o ícone do input mude de cor para o tom dourado ao receber foco.
 
 ---

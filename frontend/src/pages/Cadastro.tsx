@@ -6,12 +6,14 @@ import '../styles/index.css';
 
 export const Cadastro: React.FC = () => {
   const [nome, setNome] = useState('');
-  const [emailOuWhatsapp, setEmailOuWhatsapp] = useState('');
+  const [whatsapp, setWhatsapp] = useState('');
+  const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
   
   // Estados de erro específicos (validação sob demanda)
   const [erroNome, setErroNome] = useState('');
+  const [erroWhatsapp, setErroWhatsapp] = useState('');
   const [erroEmail, setErroEmail] = useState('');
   const [erroSenha, setErroSenha] = useState('');
   const [erroConfirmarSenha, setErroConfirmarSenha] = useState('');
@@ -21,8 +23,9 @@ export const Cadastro: React.FC = () => {
   const [carregando, setCarregando] = useState(false);
   const [tentouSubmeter, setTentouSubmeter] = useState(false);
   
-  // Estados de foco e toque para animação dos inputs
+  // Estados de foco
   const [nomeFocado, setNomeFocado] = useState(false);
+  const [whatsappFocado, setWhatsappFocado] = useState(false);
   const [emailFocado, setEmailFocado] = useState(false);
   const [senhaFocado, setSenhaFocado] = useState(false);
   const [confirmarSenhaFocado, setConfirmarSenhaFocado] = useState(false);
@@ -41,14 +44,12 @@ export const Cadastro: React.FC = () => {
     const { clientX, clientY } = e;
     const largura = window.innerWidth;
     const altura = window.innerHeight;
-    
-    // Parallax suave deslocando até 12px
     const x = (clientX - largura / 2) / (largura / 2) * 12;
     const y = (clientY - altura / 2) / (altura / 2) * 12;
     setMousePos({ x, y });
   };
 
-  // Gerador de Partículas de Poeira de Luz (Dust Motes)
+  // Gerador de Partículas de Poeira de Luz
   const particulas = useRef(
     Array.from({ length: 12 }, (_, i) => ({
       id: i,
@@ -59,50 +60,6 @@ export const Cadastro: React.FC = () => {
       duration: `${Math.random() * 15 + 10}s`
     }))
   );
-
-  // Efeito typewriter de placeholder interativo flutuante para E-mail ou WhatsApp
-  const [placeholderText, setPlaceholderText] = useState('');
-  const [placeholderIndex, setPlaceholderIndex] = useState(0);
-  const [charIndex, setCharIndex] = useState(0);
-  const [isDeleting, setIsDeleting] = useState(false);
-  
-  const placeholders = useRef([
-    'exemplo@biblioteca.com',
-    '(11) 99999-8888',
-    'leitor.institucional@nosso.org',
-    '(21) 98888-7777'
-  ]);
-
-  useEffect(() => {
-    let timer: any;
-    const currentFullText = placeholders.current[placeholderIndex];
-    
-    const tick = () => {
-      if (!isDeleting) {
-        setPlaceholderText(currentFullText.substring(0, charIndex + 1));
-        setCharIndex(prev => prev + 1);
-        
-        if (charIndex >= currentFullText.length - 1) {
-          timer = setTimeout(() => setIsDeleting(true), 2500);
-          return;
-        }
-      } else {
-        setPlaceholderText(currentFullText.substring(0, charIndex - 1));
-        setCharIndex(prev => prev - 1);
-        
-        if (charIndex <= 1) {
-          setIsDeleting(false);
-          setPlaceholderIndex(prev => (prev + 1) % placeholders.current.length);
-          setCharIndex(0);
-          return;
-        }
-      }
-      timer = setTimeout(tick, isDeleting ? 40 : 80);
-    };
-
-    timer = setTimeout(tick, 100);
-    return () => clearTimeout(timer);
-  }, [charIndex, isDeleting, placeholderIndex]);
 
   // Limpeza de timers no desmonte
   useEffect(() => {
@@ -132,13 +89,8 @@ export const Cadastro: React.FC = () => {
     }
   };
 
-  const handleEmailWhatsappChange = (val: string) => {
-    const regexLetras = /[a-zA-Z]/;
-    if (regexLetras.test(val)) {
-      setEmailOuWhatsapp(val);
-    } else {
-      setEmailOuWhatsapp(formatarWhatsapp(val));
-    }
+  const handleWhatsappChange = (val: string) => {
+    setWhatsapp(formatarWhatsapp(val));
   };
 
   // Medidor Temático de Força da Senha
@@ -163,7 +115,7 @@ export const Cadastro: React.FC = () => {
     setForcaSenha(calcularForcaSenha(senha));
   }, [senha]);
 
-  // Validador de Nome Completo
+  // Validadores
   const validarNome = (valor: string) => {
     if (!valor.trim()) {
       return 'Este campo é obrigatório.';
@@ -174,31 +126,28 @@ export const Cadastro: React.FC = () => {
     return '';
   };
 
-  // Validador de E-mail ou WhatsApp
-  const validarEmailOuWhatsapp = (valor: string) => {
+  const validarWhatsapp = (valor: string) => {
     if (!valor.trim()) {
       return 'Este campo é obrigatório.';
     }
-    
-    const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const regexApenasNumeros = /^\d+$/;
     const apenasNum = valor.replace(/\D/g, '');
-    
-    if (valor.includes('@')) {
-      if (!regexEmail.test(valor)) {
-        return 'Insira um endereço de e-mail válido.';
-      }
-    } else if (regexApenasNumeros.test(apenasNum) && apenasNum.length > 0) {
-      if (apenasNum.length < 11) {
-        return 'O número de WhatsApp deve conter pelo menos 11 dígitos (com DDD).';
-      }
-    } else {
-      return 'Insira um e-mail válido ou os números do seu WhatsApp.';
+    if (apenasNum.length < 11) {
+      return 'O WhatsApp deve conter pelo menos 11 dígitos (com DDD).';
     }
     return '';
   };
 
-  // Validador de Senha
+  const validarEmail = (valor: string) => {
+    if (!valor.trim()) {
+      return 'Este campo é obrigatório.';
+    }
+    const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!regexEmail.test(valor)) {
+      return 'Insira um endereço de e-mail válido.';
+    }
+    return '';
+  };
+
   const validarSenha = (valor: string) => {
     if (!valor) {
       return 'A senha é obrigatória.';
@@ -209,7 +158,6 @@ export const Cadastro: React.FC = () => {
     return '';
   };
 
-  // Validador de Confirmação de Senha
   const validarConfirmarSenha = (valor: string, senhaOriginal: string) => {
     if (!valor) {
       return 'A confirmação da senha é obrigatória.';
@@ -228,10 +176,16 @@ export const Cadastro: React.FC = () => {
   }, [nome]);
 
   useEffect(() => {
-    setErroEmail(validarEmailOuWhatsapp(emailOuWhatsapp));
+    setErroWhatsapp(validarWhatsapp(whatsapp));
     setTentouSubmeter(false);
     setErroGlobal('');
-  }, [emailOuWhatsapp]);
+  }, [whatsapp]);
+
+  useEffect(() => {
+    setErroEmail(validarEmail(email));
+    setTentouSubmeter(false);
+    setErroGlobal('');
+  }, [email]);
 
   useEffect(() => {
     setErroSenha(validarSenha(senha));
@@ -257,35 +211,32 @@ export const Cadastro: React.FC = () => {
     setTentouSubmeter(true);
 
     const erroN = validarNome(nome);
-    const erroE = validarEmailOuWhatsapp(emailOuWhatsapp);
+    const erroW = validarWhatsapp(whatsapp);
+    const erroE = validarEmail(email);
     const erroS = validarSenha(senha);
     const erroC = validarConfirmarSenha(confirmarSenha, senha);
 
     setErroNome(erroN);
+    setErroWhatsapp(erroW);
     setErroEmail(erroE);
     setErroSenha(erroS);
     setErroConfirmarSenha(erroC);
 
-    if (erroN || erroE || erroS || erroC) {
+    if (erroN || erroW || erroE || erroS || erroC) {
       return;
     }
 
     setCarregando(true);
-    
-    // Identifica se digitou e-mail ou whatsapp
-    const apenasNum = emailOuWhatsapp.replace(/\D/g, '');
-    const isWhatsapp = !emailOuWhatsapp.includes('@') && apenasNum.length >= 11;
-    
-    const emailFinal = isWhatsapp ? '' : emailOuWhatsapp;
-    const whatsappFinal = isWhatsapp ? apenasNum : '';
+    const whatsappLimpo = whatsapp.replace(/\D/g, '');
 
     try {
-      await cadastro(nome, emailFinal, whatsappFinal, senha);
+      await cadastro(nome, email, whatsappLimpo, senha);
       setSucesso(true);
       
-      // Limpeza de cache de inputs pós sucesso
+      // Limpeza de cache
       setNome('');
-      setEmailOuWhatsapp('');
+      setWhatsapp('');
+      setEmail('');
       setSenha('');
       setConfirmarSenha('');
 
@@ -299,15 +250,14 @@ export const Cadastro: React.FC = () => {
     }
   };
 
-  const botaoDesativado = !nome.trim() || !emailOuWhatsapp.trim() || senha.length < 6 || !confirmarSenha || carregando;
+  const botaoDesativado = !nome.trim() || !whatsapp.trim() || !email.trim() || senha.length < 6 || !confirmarSenha || carregando;
 
   return (
     <div 
       className="tela-santuario-literario"
       onMouseMove={handleMouseMove}
     >
-      
-      {/* Partículas douradas de poeira de luz */}
+      {/* Partículas douradas */}
       <div 
         style={{ 
           position: 'absolute', 
@@ -342,15 +292,13 @@ export const Cadastro: React.FC = () => {
         className={`card-santuario ${carregando ? 'pulsar-loading' : ''} animar-entrada`}
         style={{
           transform: `translate3d(${mousePos.x}px, ${mousePos.y}px, 0)`,
-          transition: carregando ? 'none' : 'transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)'
+          transition: carregando ? 'none' : 'transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+          maxWidth: '460px' // Um pouco mais largo para acomodar os campos extras confortavelmente
         }}
       >
-        
-        {/* Moldura dupla em relevo */}
         <div className="card-santuario-moldura" />
 
         {sucesso ? (
-          /* Carimbo "APROVADO" de Sucesso do Bibliotecário */
           <div style={{ 
             display: 'flex', 
             flexDirection: 'column', 
@@ -376,9 +324,7 @@ export const Cadastro: React.FC = () => {
                 boxShadow: '0 8px 24px rgba(46, 125, 50, 0.1)',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '10px',
-                backgroundImage: 'linear-gradient(rgba(255,255,255,0.03) 50%, rgba(0,0,0,0.03) 50%), linear-gradient(90deg, rgba(255,255,255,0.03) 50%, rgba(0,0,0,0.03) 50%)',
-                backgroundSize: '3px 3px'
+                gap: '10px'
               }}
             >
               <CheckCircle size={26} />
@@ -398,9 +344,7 @@ export const Cadastro: React.FC = () => {
             </p>
           </div>
         ) : (
-          /* Formulário de Registro Ativo */
           <>
-            {/* Cabeçalho da Ficha */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '32px', position: 'relative', zIndex: 2 }}>
               <h1 className="titulo-santuario" style={{ fontSize: '2.5rem' }}>
                 Ficha de Leitor
@@ -410,18 +354,18 @@ export const Cadastro: React.FC = () => {
               </p>
             </div>
 
-            {/* Erro Global da API */}
+            {/* Erro Global */}
             {erroGlobal && (
-              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '24px', marginBottom: '40px', position: 'relative', zIndex: 2 }}>
+              <div style={{ display: 'flex', justifyContent: 'center', marginTop: '12px', marginBottom: '24px', position: 'relative', zIndex: 2 }}>
                 <div className="carimbo-erro animar-tremor" style={{ margin: 0 }}>
                   <AlertCircle size={18} style={{ flexShrink: 0 }} />
-                  <span>DUPLICADO: {erroGlobal}</span>
+                  <span>REGISTRO: {erroGlobal}</span>
                 </div>
               </div>
             )}
 
             {/* Formulário */}
-            <form onSubmit={handleSubmeter} style={{ display: 'flex', flexDirection: 'column', gap: '24px', position: 'relative', zIndex: 2 }} noValidate>
+            <form onSubmit={handleSubmeter} style={{ display: 'flex', flexDirection: 'column', gap: '20px', position: 'relative', zIndex: 2 }} noValidate>
               
               {/* Campo Nome Completo */}
               <div className={`campo-wrapper ${nomeFocado || nome ? 'focado preenchido' : ''}`}>
@@ -452,27 +396,51 @@ export const Cadastro: React.FC = () => {
                 )}
               </div>
 
-              {/* Campo E-mail ou WhatsApp */}
-              <div className={`campo-wrapper ${emailFocado || emailOuWhatsapp ? 'focado preenchido' : ''}`}>
-                <label htmlFor="input-cadastro-email-whatsapp" className="label-santuario-flutuante">
-                  E-mail ou WhatsApp
+              {/* Campo WhatsApp */}
+              <div className={`campo-wrapper ${whatsappFocado || whatsapp ? 'focado preenchido' : ''}`}>
+                <label htmlFor="input-cadastro-whatsapp" className="label-santuario-flutuante">
+                  WhatsApp
+                </label>
+                <div className="input-santuario" style={{
+                  border: (erroWhatsapp && tentouSubmeter) ? '1px solid var(--cor-vermelho-ferrugem)' : undefined,
+                  boxShadow: (erroWhatsapp && tentouSubmeter) ? '0 0 0 3px rgba(163, 40, 20, 0.15)' : undefined
+                }}>
+                  <Phone size={18} color={(erroWhatsapp && tentouSubmeter) ? 'var(--cor-vermelho-ferrugem)' : undefined} />
+                  <input
+                    id="input-cadastro-whatsapp"
+                    type="text"
+                    className="input-santuario-inner"
+                    value={whatsapp}
+                    onChange={(e) => handleWhatsappChange(e.target.value)}
+                    onFocus={() => setWhatsappFocado(true)}
+                    onBlur={() => setWhatsappFocado(false)}
+                    disabled={carregando}
+                    required
+                  />
+                </div>
+                {erroWhatsapp && tentouSubmeter && (
+                  <span className="carimbo-erro">
+                    INVÁLIDO: {erroWhatsapp}
+                  </span>
+                )}
+              </div>
+
+              {/* Campo E-mail */}
+              <div className={`campo-wrapper ${emailFocado || email ? 'focado preenchido' : ''}`}>
+                <label htmlFor="input-cadastro-email" className="label-santuario-flutuante">
+                  Endereço de E-mail
                 </label>
                 <div className="input-santuario" style={{
                   border: (erroEmail && tentouSubmeter) ? '1px solid var(--cor-vermelho-ferrugem)' : undefined,
                   boxShadow: (erroEmail && tentouSubmeter) ? '0 0 0 3px rgba(163, 40, 20, 0.15)' : undefined
                 }}>
-                  {emailOuWhatsapp.includes('@') || !emailOuWhatsapp.replace(/\D/g, '') ? (
-                    <Mail size={18} color={(erroEmail && tentouSubmeter) ? 'var(--cor-vermelho-ferrugem)' : undefined} />
-                  ) : (
-                    <Phone size={18} color={(erroEmail && tentouSubmeter) ? 'var(--cor-vermelho-ferrugem)' : undefined} />
-                  )}
+                  <Mail size={18} color={(erroEmail && tentouSubmeter) ? 'var(--cor-vermelho-ferrugem)' : undefined} />
                   <input
-                    id="input-cadastro-email-whatsapp"
-                    type="text"
+                    id="input-cadastro-email"
+                    type="email"
                     className="input-santuario-inner"
-                    placeholder={emailFocado ? placeholderText : ''}
-                    value={emailOuWhatsapp}
-                    onChange={(e) => handleEmailWhatsappChange(e.target.value)}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     onFocus={() => setEmailFocado(true)}
                     onBlur={() => setEmailFocado(false)}
                     disabled={carregando}
@@ -525,7 +493,7 @@ export const Cadastro: React.FC = () => {
                   </button>
                 </div>
                 
-                {/* Medidor de Força da Senha */}
+                {/* Medidor de Força */}
                 {senha && (
                   <div className="senha-forca-container" style={{ marginTop: '8px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                     <div style={{ display: 'flex', gap: '4px', height: '4px', width: '100%', borderRadius: '2px', overflow: 'hidden', backgroundColor: 'rgba(0,0,0,0.06)' }}>
@@ -600,7 +568,7 @@ export const Cadastro: React.FC = () => {
                 )}
               </div>
 
-              {/* Botão Submeter Ficha */}
+              {/* Botão Submeter */}
               <button
                 id="btn-submeter-cadastro"
                 type="submit"
@@ -624,7 +592,6 @@ export const Cadastro: React.FC = () => {
               </button>
             </form>
 
-            {/* Login Link no Rodapé */}
             <div style={{ textAlign: 'center', marginTop: '28px', fontSize: '0.85rem', color: '#5c5950', fontWeight: 600, position: 'relative', zIndex: 2 }}>
               Já possui conta?{' '}
               <Link to="/login" className="btn-cadastro-santuario" style={{ marginLeft: '4px' }}>
