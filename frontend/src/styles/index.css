@@ -63,3 +63,319 @@
   margin: 0 auto;
   padding: 0 24px;
 }
+
+/* Animação de Gradiente de Fundo Dinâmico */
+@keyframes gradiente-fundo {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.tela-autenticacao {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(-45deg, hsl(222, 47%, 8%), hsl(224, 30%, 12%), hsl(210, 50%, 8%), hsl(222, 47%, 10%));
+  background-size: 400% 400%;
+  animation: gradiente-fundo 15s ease infinite;
+  padding: 24px;
+}
+
+/* Estilo do Input Premium */
+.input-premium {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--cor-texto-principal);
+  font-size: 0.95rem;
+  font-family: var(--fonte-principal);
+}
+
+.input-premium::placeholder {
+  color: var(--cor-texto-desativado);
+}
+
+/* Animação de Entrada Cinematográfica (Slide up + Fade In) */
+@keyframes entrada-suave {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animar-entrada {
+  opacity: 0;
+  animation: entrada-suave 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Ajustes Premium do Glow Effect */
+.efeito-glow {
+  border: 1px solid var(--cor-borda);
+  transition: border-color var(--transicao-suave), box-shadow var(--transicao-suave), background-color var(--transicao-suave);
+}
+
+.efeito-glow:focus-within {
+  border-color: var(--cor-primaria);
+  box-shadow: 0 0 16px rgba(var(--cor-primaria-rgb), 0.25);
+  background-color: rgba(15, 23, 42, 0.6) !important;
+}
+
+/* Transição nos ícones dos inputs ao focar */
+.efeito-glow svg {
+  transition: transform var(--transicao-suave), color var(--transicao-suave);
+}
+
+.efeito-glow:focus-within svg {
+  transform: translateX(3px);
+  color: var(--cor-primaria) !important;
+}
+
+/* Botão Animado com Efeito Shine */
+.btn-animado {
+  position: relative;
+  overflow: hidden;
+  border: none;
+  cursor: pointer;
+  transition: background-color var(--transicao-suave), transform var(--transicao-suave), box-shadow var(--transicao-suave);
+}
+
+.btn-animado:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--cor-primaria-hover) 0%, var(--cor-primaria) 100%) !important;
+  box-shadow: 0 6px 24px rgba(var(--cor-primaria-rgb), 0.45) !important;
+}
+
+.btn-animado:active:not(:disabled) {
+  transform: scale(0.98) !important;
+}
+
+@keyframes brilho-shine {
+  0% {
+    left: -100%;
+  }
+  15%, 100% {
+    left: 100%;
+  }
+}
+
+.btn-animado::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: skewX(-25deg);
+  animation: brilho-shine 8s infinite ease-in-out;
+}
+
+/* Botão Revelar Senha */
+.btn-revelar-senha {
+  transition: color var(--transicao-rapida), transform var(--transicao-rapida);
+}
+
+.btn-revelar-senha:hover {
+  color: var(--cor-primaria) !important;
+  transform: scale(1.1);
+}
+
+.btn-revelar-senha:active {
+  transform: scale(0.9);
+}
+
+/* Animação suave para exibição de erros de validação */
+@keyframes erro-slide {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animar-erro {
+  animation: erro-slide 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Animação de Pulsação de Carregamento Premium no Card */
+@keyframes pulsar-card {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.95;
+    transform: scale(0.99);
+    border-color: rgba(var(--cor-primaria-rgb), 0.3);
+  }
+}
+
+.pulsar-loading {
+  animation: pulsar-card 1.5s ease-in-out infinite;
+  pointer-events: none; /* Bloqueia cliques adicionais */
+}
+
+/* Animação de Rotação para Icone Loader/Spinner */
+@keyframes girar {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.girar-icone {
+  animation: girar 1s linear infinite;
+  display: inline-block;
+}
+
+/* Animação de Saída Cinematográfica da Tela */
+@keyframes saida-suave {
+  from {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.96);
+    filter: blur(4px);
+  }
+}
+
+.animar-saida {
+  animation: saida-suave 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Animação de Tremor (Shake) para Banner de Erro */
+@keyframes tremor {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20%, 60% {
+    transform: translateX(-6px);
+  }
+  40%, 80% {
+    transform: translateX(6px);
+  }
+}
+
+.animar-tremor {
+  animation: tremor 0.4s ease-in-out;
+}
+
+/* --- Tema Apple Minimalista Premium --- */
+.tela-autenticacao-apple {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Fundo degradê estático e sutil que remete a papel pólen e marfim claro de alta qualidade */
+  background: radial-gradient(circle at 50% 50%, #fdfdfc 0%, #f6f3eb 100%);
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Card Apple Style Limpo */
+.card-apple-glass {
+  width: 100%;
+  max-width: 400px;
+  background: #ffffff;
+  border-radius: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.04),
+    0 1px 3px rgba(0, 0, 0, 0.02);
+  padding: 48px 40px;
+  transition: transform var(--transicao-suave), box-shadow var(--transicao-suave);
+}
+
+.card-apple-glass:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 15px 35px rgba(0, 0, 0, 0.06),
+    0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+/* Inputs minimalistas Apple style */
+.input-apple {
+  background-color: #f5f5f7;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  border-radius: 12px;
+  transition: all var(--transicao-suave);
+}
+
+.input-apple:focus-within {
+  border-color: #0071e3;
+  box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.15);
+  background-color: #ffffff !important;
+}
+
+.input-apple-inner {
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #1d1d1f;
+  font-size: 0.95rem;
+  font-family: var(--fonte-principal);
+  font-weight: 450;
+}
+
+.input-apple-inner::placeholder {
+  color: #86868b;
+}
+
+.input-apple svg {
+  transition: transform var(--transicao-suave), color var(--transicao-suave);
+}
+
+.input-apple:focus-within svg {
+  transform: scale(1.02);
+  color: #0071e3 !important;
+}
+
+/* Botão Apple style limpo (sem brilho shine móvel) */
+.btn-apple {
+  background-color: #0071e3;
+  color: #ffffff;
+  border: none;
+  border-radius: 12px;
+  font-weight: 600;
+  letter-spacing: -0.1px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all var(--transicao-suave);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-apple:hover:not(:disabled) {
+  background-color: #0077ed !important;
+}
+
+.btn-apple:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+
+
+
