@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Layout } from '../components/Layout';
 import { api } from '../services/api';
-import { BookOpen, Search, Plus, Filter, BookMarked, Library } from 'lucide-react';
+import { BookOpen, Search, Plus, Filter, BookMarked, Library, X, CheckCircle, Clock } from 'lucide-react';
 import '../styles/index.css';
 
 interface Livro {
@@ -28,6 +28,8 @@ export const Catalogo: React.FC = () => {
   const [livros, setLivros] = useState<Livro[]>([]);
   const [carregando, setCarregando] = useState(true);
   const [busca, setBusca] = useState('');
+  const [mostrarFiltros, setMostrarFiltros] = useState(false);
+  const [filtroCategoria, setFiltroCategoria] = useState('');
   
   // Estados de criação de livro (para administradores)
   const [mostrarCriar, setMostrarCriar] = useState(false);
@@ -40,6 +42,11 @@ export const Catalogo: React.FC = () => {
   const [idBiblioteca, setIdBiblioteca] = useState<number>(1);
   const [erroCriar, setErroCriar] = useState('');
   const [sucessoCriar, setSucessoCriar] = useState('');
+
+  // Fases 3 e 4: Estados do Modal e Integração
+  const [livroSelecionado, setLivroSelecionado] = useState<Livro | null>(null);
+  const [processandoRequisicao, setProcessandoRequisicao] = useState(false);
+  const [statusRequisicao, setStatusRequisicao] = useState<{ tipo: 'sucesso' | 'erro' | 'fila', mensagem: string } | null>(null);
 
   const carregarLivros = async () => {
     setCarregando(true);
@@ -94,11 +101,54 @@ export const Catalogo: React.FC = () => {
     }
   };
 
-  const livrosFiltrados = livros.filter(livro => 
-    livro.titulo.toLowerCase().includes(busca.toLowerCase()) ||
-    livro.autor.toLowerCase().includes(busca.toLowerCase()) ||
-    livro.categoria.toLowerCase().includes(busca.toLowerCase())
-  );
+  const livrosFiltrados = livros.filter(livro => {
+    const matchBusca = livro.titulo.toLowerCase().includes(busca.toLowerCase()) ||
+                       livro.autor.toLowerCase().includes(busca.toLowerCase()) ||
+                       livro.categoria.toLowerCase().includes(busca.toLowerCase());
+    
+    const matchCategoria = filtroCategoria ? livro.categoria.toLowerCase() === filtroCategoria.toLowerCase() : true;
+
+    return matchBusca && matchCategoria;
+  });
+
+  const fecharModal = () => {
+    setLivroSelecionado(null);
+    setStatusRequisicao(null);
+  };
+
+  const solicitarEmprestimo = async (livro: Livro) => {
+    setProcessandoRequisicao(true);
+    setStatusRequisicao(null);
+    try {
+      await api.post('/api/emprestimos', {
+        id_livro: String(livro.id),
+        id_biblioteca: String(livro.id_biblioteca)
+      });
+      setStatusRequisicao({ tipo: 'sucesso', mensagem: 'EMPRÉSTIMO APROVADO' });
+      carregarLivros(); // Atualiza quantidades
+    } catch (erro: any) {
+      setStatusRequisicao({ tipo: 'erro', mensagem: erro.response?.data?.erro || 'Erro ao solicitar empréstimo' });
+    } finally {
+      setProcessandoRequisicao(false);
+    }
+  };
+
+  const entrarNaFila = async (livro: Livro) => {
+    setProcessandoRequisicao(true);
+    setStatusRequisicao(null);
+    try {
+      const res = await api.post('/api/reservas', {
+        idLivro: String(livro.id)
+      });
+      setStatusRequisicao({ tipo: 'fila', mensagem: 'VOCÊ ENTROU NA FILA' });
+      // Idealmente pegar a posição na fila do res.data, mas vamos apenas confirmar sucesso
+      carregarLivros();
+    } catch (erro: any) {
+      setStatusRequisicao({ tipo: 'erro', mensagem: erro.response?.data?.mensagem || 'Erro ao entrar na fila' });
+    } finally {
+      setProcessandoRequisicao(false);
+    }
+  };
 
   return (
     <Layout>
@@ -186,39 +236,50 @@ export const Catalogo: React.FC = () => {
           </section>
         )}
 
-        {/* Busca e Filtros */}
-        <section style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <div className="efeito-glow" style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            backgroundColor: 'var(--cor-card)',
-            border: '1px solid var(--cor-borda)',
-            padding: '12px 16px',
-            borderRadius: 'var(--raio-borda-md)',
-            flex: 1
-          }}>
-            <Search size={18} color="var(--cor-texto-desativado)" />
-            <input
-              type="text"
-              placeholder="Pesquisar por título, autor ou categoria..."
-              value={busca}
-              onChange={e => setBusca(e.target.value)}
-              style={{ width: '100%', height: '100%' }}
-            />
+        {/* Busca e Filtros (Gaveta) */}
+        <section style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+            <div className="gaveta-busca" style={{ flex: 1 }}>
+              <Search size={20} color="var(--cor-ouro-envelhecido)" />
+              <input
+                type="text"
+                placeholder="Pesquisar no catálogo da biblioteca (título, autor, gênero)..."
+                value={busca}
+                onChange={e => setBusca(e.target.value)}
+                style={{ width: '100%', height: '100%', backgroundColor: 'transparent', border: 'none', color: 'var(--cor-texto)' }}
+              />
+            </div>
+            <button onClick={() => setMostrarFiltros(!mostrarFiltros)} className="card-glass btn-animado" style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 18px',
+              borderRadius: 'var(--raio-borda-md)',
+              border: `1px solid ${mostrarFiltros ? 'var(--cor-ouro-envelhecido)' : 'var(--cor-borda)'}`,
+              color: mostrarFiltros ? 'var(--cor-ouro-envelhecido)' : 'var(--cor-texto-secundario)'
+            }}>
+              <Filter size={18} />
+              <span>Filtros</span>
+            </button>
           </div>
-          <button className="card-glass btn-animado" style={{
+
+          {/* Painel Expansível de Filtros */}
+          <div className="pasta-filtros" style={{
+            maxHeight: mostrarFiltros ? '300px' : '0',
+            opacity: mostrarFiltros ? 1 : 0,
+            padding: mostrarFiltros ? '16px' : '0 16px',
+            pointerEvents: mostrarFiltros ? 'auto' : 'none',
+            borderWidth: mostrarFiltros ? '1px' : '0',
             display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '12px 18px',
-            borderRadius: 'var(--raio-borda-md)',
-            border: '1px solid var(--cor-borda)',
-            color: 'var(--cor-texto-secundario)'
+            gap: '12px',
+            flexWrap: 'wrap'
           }}>
-            <Filter size={18} />
-            <span>Filtros</span>
-          </button>
+            <button className="chip-filtro" onClick={() => setFiltroCategoria('')} style={{ backgroundColor: filtroCategoria === '' ? 'var(--cor-ouro-envelhecido)' : '' }}>Todos os Gêneros</button>
+            <button className="chip-filtro" onClick={() => setFiltroCategoria('Ficção')} style={{ backgroundColor: filtroCategoria === 'Ficção' ? 'var(--cor-ouro-envelhecido)' : '' }}>Ficção</button>
+            <button className="chip-filtro" onClick={() => setFiltroCategoria('Fantasia')} style={{ backgroundColor: filtroCategoria === 'Fantasia' ? 'var(--cor-ouro-envelhecido)' : '' }}>Fantasia</button>
+            <button className="chip-filtro" onClick={() => setFiltroCategoria('Técnico')} style={{ backgroundColor: filtroCategoria === 'Técnico' ? 'var(--cor-ouro-envelhecido)' : '' }}>Técnico</button>
+            <button className="chip-filtro" onClick={() => setFiltroCategoria('Romance')} style={{ backgroundColor: filtroCategoria === 'Romance' ? 'var(--cor-ouro-envelhecido)' : '' }}>Romance</button>
+          </div>
         </section>
 
         {/* Listagem de Livros */}
@@ -236,80 +297,60 @@ export const Catalogo: React.FC = () => {
               </p>
             </div>
           ) : (
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-              gap: '24px'
-            }}>
+            <div className="grid-prateleira">
               {livrosFiltrados.map((livro) => (
-                <div key={livro.id} className="card-glass" style={{
-                  padding: '24px',
-                  border: '1px solid var(--cor-borda)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '16px',
-                  justifyContent: 'space-between'
-                }}>
-                  <div>
-                    {/* Capa do Livro (Simulada) */}
-                    <div style={{
-                      backgroundColor: 'var(--cor-card-hover)',
-                      height: '180px',
-                      borderRadius: 'var(--raio-borda-md)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      border: '1px solid var(--cor-borda)',
-                      marginBottom: '16px'
-                    }}>
-                      <BookOpen size={48} color="var(--cor-texto-desativado)" />
+                <div key={livro.id} className="prateleira-base">
+                  <div className="perspectiva-wrapper" onClick={() => setLivroSelecionado(livro)}>
+                    <div className="livro-3d">
+                      <div className="capa-livro">
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                          <span style={{
+                            fontSize: '0.65rem',
+                            fontWeight: 600,
+                            backgroundColor: 'rgba(0,0,0,0.4)',
+                            color: 'var(--cor-ouro-envelhecido)',
+                            padding: '4px 8px',
+                            borderRadius: '4px',
+                            border: '1px solid rgba(212,175,55,0.3)'
+                          }}>
+                            {livro.categoria.toUpperCase()}
+                          </span>
+                        </div>
+
+                        <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginTop: 'auto', marginBottom: '4px', lineHeight: 1.2, color: '#f8f4e6', textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}>
+                          {livro.titulo}
+                        </h3>
+                        <p style={{ fontSize: '0.75rem', color: '#d1c7a3', fontWeight: 600, marginBottom: '24px' }}>
+                          {livro.autor}
+                        </p>
+
+                        <div style={{ alignSelf: 'flex-end', marginTop: 'auto' }}>
+                          {livro.quantidade_disponivel > 0 ? (
+                            <span className="carimbo-disponivel">Disponível</span>
+                          ) : (
+                            <span className="carimbo-reservado">Fila de Espera</span>
+                          )}
+                        </div>
+                      </div>
+                      <div className="lombada-livro">
+                        <span style={{ 
+                          color: 'var(--cor-ouro-envelhecido)', 
+                          fontSize: '0.6rem', 
+                          fontWeight: 700, 
+                          writingMode: 'vertical-rl', 
+                          transform: 'rotate(180deg)', 
+                          height: '100%', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center',
+                          padding: '16px 0',
+                          opacity: 0.7
+                        }}>
+                          {livro.titulo.length > 20 ? livro.titulo.substring(0, 20) + '...' : livro.titulo}
+                        </span>
+                      </div>
+                      <div className="paginas-livro"></div>
                     </div>
-
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
-                      <span style={{
-                        fontSize: '0.75rem',
-                        fontWeight: 600,
-                        backgroundColor: 'var(--cor-card-hover)',
-                        color: 'var(--cor-primaria)',
-                        padding: '4px 8px',
-                        borderRadius: 'var(--raio-borda-sm)'
-                      }}>
-                        {livro.categoria}
-                      </span>
-                      <span style={{
-                        fontSize: '0.75rem',
-                        fontWeight: 600,
-                        color: livro.quantidade_disponivel > 0 ? 'var(--cor-sucesso)' : 'var(--cor-erro)'
-                      }}>
-                        {livro.quantidade_disponivel > 0 ? `${livro.quantidade_disponivel} disponíveis` : 'Fila de Espera'}
-                      </span>
-                    </div>
-
-                    <h3 style={{ fontSize: '1.15rem', fontWeight: 700, marginTop: '12px', lineHeight: 1.3 }}>{livro.titulo}</h3>
-                    <p style={{ fontSize: '0.85rem', color: 'var(--cor-texto-secundario)', marginTop: '4px' }}>Por {livro.autor}</p>
-                  </div>
-
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', color: 'var(--cor-texto-secundario)' }}>
-                      <Library size={14} color="var(--cor-acento)" />
-                      <span>{livro.biblioteca?.nome || `Biblioteca (ID: ${livro.id_biblioteca})`}</span>
-                    </div>
-
-                    <button
-                      className="btn-animado"
-                      style={{
-                        backgroundColor: 'transparent',
-                        border: '1px solid var(--cor-primaria)',
-                        color: 'var(--cor-primaria)',
-                        padding: '10px',
-                        borderRadius: 'var(--raio-borda-md)',
-                        fontWeight: 600,
-                        textAlign: 'center',
-                        fontSize: '0.875rem'
-                      }}
-                    >
-                      {livro.quantidade_disponivel > 0 ? 'Solicitar Empréstimo' : 'Entrar na Fila'}
-                    </button>
                   </div>
                 </div>
               ))}
@@ -318,6 +359,64 @@ export const Catalogo: React.FC = () => {
         </section>
 
       </div>
+
+      {/* MODAL FICHA TÉCNICA (FASE 3) */}
+      {livroSelecionado && (
+        <div className="modal-fundo" onClick={fecharModal}>
+          <div className="ficha-polen" onClick={e => e.stopPropagation()}>
+            <button className="ficha-fechar" onClick={fecharModal}>
+              <X size={28} />
+            </button>
+
+            {/* Carimbo de Status de Requisição Dinâmico */}
+            {statusRequisicao && (
+              <div className={`carimbo-status-modal ${
+                statusRequisicao.tipo === 'sucesso' ? 'carimbo-disponivel' : 
+                statusRequisicao.tipo === 'erro' ? 'carimbo-emprestado' : 'carimbo-reservado'
+              }`}>
+                {statusRequisicao.mensagem}
+              </div>
+            )}
+
+            <div className="ficha-titulo">{livroSelecionado.titulo}</div>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
+              <div className="ficha-dado"><strong>Autor:</strong><br/>{livroSelecionado.autor}</div>
+              <div className="ficha-dado"><strong>Categoria:</strong><br/>{livroSelecionado.categoria}</div>
+              <div className="ficha-dado"><strong>Ano:</strong><br/>{livroSelecionado.ano_publicacao || 'Desconhecido'}</div>
+              <div className="ficha-dado"><strong>ISBN:</strong><br/>{livroSelecionado.isbn}</div>
+            </div>
+
+            <div className="ficha-dado" style={{ borderTop: '1px solid rgba(139, 115, 85, 0.3)', paddingTop: '16px' }}>
+              <strong>Status do Acervo:</strong><br/>
+              Biblioteca ID: {livroSelecionado.id_biblioteca} — {livroSelecionado.quantidade_disponivel} cópias disponíveis de {livroSelecionado.quantidade_total}.
+            </div>
+
+            <div className="ficha-acoes">
+              {livroSelecionado.quantidade_disponivel > 0 ? (
+                <button 
+                  className="btn-solicitar"
+                  onClick={() => solicitarEmprestimo(livroSelecionado)}
+                  disabled={processandoRequisicao}
+                  style={{ opacity: processandoRequisicao ? 0.7 : 1 }}
+                >
+                  {processandoRequisicao ? 'Carimbando...' : 'Solicitar Empréstimo'}
+                </button>
+              ) : (
+                <button 
+                  className="btn-fila"
+                  onClick={() => entrarNaFila(livroSelecionado)}
+                  disabled={processandoRequisicao}
+                  style={{ opacity: processandoRequisicao ? 0.7 : 1 }}
+                >
+                  {processandoRequisicao ? 'Assinando...' : 'Entrar na Fila de Espera'}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
     </Layout>
   );
 };
