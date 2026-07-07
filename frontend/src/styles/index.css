@@ -1428,6 +1428,150 @@ input:-webkit-autofill:active {
   box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
 }
 
+/* ==========================================================================
+   TELA DE EMPRÉSTIMOS (FICHAS DE BOLSO & ABAS)
+   ========================================================================== */
+
+/* --- Fase 1: Abas de Fita (Marcadores de Página) --- */
+.abas-container {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 32px;
+  border-bottom: 2px solid #8B7355;
+  padding-left: 20px;
+}
+
+.aba-fita {
+  padding: 12px 24px 20px 24px;
+  background-color: #d1bfae;
+  color: #5c4a3d;
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 1.1rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  border: 1px solid #8B7355;
+  border-bottom: none;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s ease;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 85%, 0 100%);
+  top: 10px;
+}
+
+.aba-fita:hover {
+  background-color: #c4b09e;
+  transform: translateY(-4px);
+}
+
+.aba-fita.ativa {
+  background-color: #8c2a2a; /* Fita vermelha de marcação */
+  color: #f6f3eb;
+  border-color: #5c1818;
+  top: 0px;
+  padding-bottom: 30px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+/* --- Fase 1: Ficha de Bolso de Empréstimo --- */
+.ficha-bolso {
+  background-color: var(--cor-papel-polen);
+  border: 1px solid #c2b4a3;
+  border-radius: 2px;
+  padding: 24px 32px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1), inset 0 0 15px rgba(139, 115, 85, 0.05);
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  background-image: repeating-linear-gradient(
+    transparent,
+    transparent 31px,
+    #d8d0c5 31px,
+    #d8d0c5 32px
+  );
+  transition: transform 0.3s opacity 0.5s;
+}
+
+.ficha-bolso:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+.ficha-bolso-conteudo h3 {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 1.6rem;
+  color: #2c1e16;
+  margin-bottom: 4px;
+}
+
+.ficha-bolso-conteudo p {
+  font-family: 'Courier New', Courier, monospace;
+  color: #5c4a3d;
+  font-size: 1rem;
+  margin-bottom: 8px;
+}
+
+/* --- Fase 2: Carimbos de Prazo --- */
+.carimbo-prazo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 16px;
+  min-width: 250px;
+  padding: 32px; /* Margem segura para não colidir o carimbo com os textos/botoes */
+}
+
+.data-destaque {
+  font-family: 'Times New Roman', Times, serif;
+  font-size: 1.15rem;
+  font-weight: bold;
+  color: #2c1e16;
+  background-color: rgba(255, 255, 255, 0.5);
+  padding: 4px 12px;
+  border: 1px dashed #8B7355;
+}
+
+.carimbo-prazo {
+  font-family: 'Courier New', Courier, monospace;
+  font-weight: bold;
+  font-size: 1.2rem;
+  padding: 8px 16px;
+  border: 3px solid;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transform: rotate(-6deg);
+  opacity: 0.85;
+  position: absolute;
+  right: 24px;
+  top: 24px;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.2);
+}
+
+.carimbo-prazo.no-prazo {
+  color: #059669; /* Verde-floresta */
+  border-color: #059669;
+}
+
+.carimbo-prazo.vence-logo {
+  color: #d97706; /* Amarelo-ouro */
+  border-color: #d97706;
+}
+
+.carimbo-prazo.atrasado {
+  color: #dc2626; /* Vermelho-ferrugem */
+  border-color: #dc2626;
+  transform: rotate(4deg) scale(1.1); /* Destaca mais o atraso */
+  opacity: 1;
+}
+
+.carimbo-prazo.devolvido {
+  color: #1e3a8a; /* Azul-marinho */
+  border-color: #1e3a8a;
+}
+
 /* --- Responsividade Global do Layout --- */
 .layout-container {
   display: flex;
