@@ -86,7 +86,13 @@ func main() {
 	mux.Handle("/api/livros/", proxyCatalogo)
 	mux.Handle("/api/bibliotecas/", proxyCatalogo)
 	mux.Handle("/api/emprestimos/", proxyEmprestimo)
+	mux.Handle("POST /api/emprestimos", proxyEmprestimo)
+	mux.Handle("GET /api/emprestimos", proxyEmprestimo)
+
 	mux.Handle("/api/reservas/", proxyReserva)
+	mux.Handle("POST /api/reservas", proxyReserva)
+	mux.Handle("GET /api/reservas", proxyReserva)
+
 	mux.Handle("/api/recomendacoes/", proxyRecomendacao)
 
 	// 6. Encadeamento de middlewares globais de borda

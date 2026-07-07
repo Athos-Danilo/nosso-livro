@@ -15,8 +15,8 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a concl
 - [x] **Fase 2: Livros Tridimensionais com Perspectiva e Selos de Status**
 - [x] **Fase 3: Ficha Técnica Detalhada (Modal de Papel Pólen)**
 - [x] **Fase 4: Consumo e Integração com FastAPI, Go e Node.js**
-- [ ] **Fase 5: Registro de Novas Obras (Aba de Bibliotecário/Admin)**
-- [ ] **Fase 6: Paginação com Skeletons de Livros e Debounce**
+- [x] **Fase 5: Registro de Novas Obras (Aba de Bibliotecário/Admin)**
+- [x] **Fase 6: Paginação com Skeletons de Livros e Debounce**
 
 ---
 
@@ -80,17 +80,17 @@ Integração dos fluxos literários com os respectivos microsserviços.
 ## ⚙️ Fase 5: Registro de Novas Obras (Aba de Bibliotecário/Admin)
 Formulários de catalogação exclusivos para administradores.
 
-- [ ] **M5.1: Botão "Adicionar Obra ao Acervo"**
-  - [ ] Exibir botão somente se `usuario.permissao === 'administrador'`, com ícone clássico de pena/tinteiro.
-- [ ] **M5.2: Ficha de Cadastro de Livro**
-  - [ ] Formulário em papel pólen com validação sob demanda, exibindo carimbo vermelho `"INVÁLIDO"` caso ocorram erros nos inputs.
+- [x] **M5.1: Botão "Adicionar Obra ao Acervo"**
+  - [x] Exibir botão somente se `usuario.permissao === 'administrador'`, com ícone clássico de pena/tinteiro.
+- [x] **M5.2: Ficha de Cadastro de Livro**
+  - [x] Formulário em papel pólen com validação sob demanda, exibindo carimbo vermelho `"INVÁLIDO"` caso ocorram erros nos inputs.
 
 ---
 
 ## 🚀 Fase 6: Paginação com Skeletons de Livros e Debounce
 Polimento de desempenho para acervos massivos.
 
-- [ ] **M6.1: Paginação Infinita e Skeletons de Livros**
-  - [ ] Carregamento dinâmico ao rolar a tela, exibindo skeletons simulando silhuetas de livros cinza cardboard em prateleiras escuras de madeira.
-- [ ] **M6.2: Debounce de Pesquisa de Ficha**
-  - [ ] Implementar `debounce` de 300ms no input de busca para evitar múltiplas chamadas à API enquanto o usuário digita.
+- [x] **M6.1: Paginação Infinita e Skeletons de Livros**
+  - [x] Carregamento dinâmico ao rolar a tela, exibindo skeletons simulando silhuetas de livros cinza cardboard em prateleiras escuras de madeira.
+- [x] **M6.2: Debounce de Pesquisa de Ficha**
+  - [x] Implementar `debounce` de 300ms no input de busca para evitar múltiplas chamadas à API enquanto o usuário digita.

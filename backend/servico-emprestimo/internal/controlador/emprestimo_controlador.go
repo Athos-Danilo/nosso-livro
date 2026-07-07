@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"nosso-livro/servico-emprestimo/internal/dominio"
 	"nosso-livro/servico-emprestimo/internal/servico"
@@ -43,7 +44,8 @@ func (c *ControladorEmprestimo) CriarEmprestimo(w http.ResponseWriter, r *http.R
 	}
 
 	// Validação de perfil/permissão do usuário
-	if usuario.Permissao != "MEMBRO" {
+	permissao := strings.ToUpper(usuario.Permissao)
+	if permissao != "MEMBRO" {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusForbidden)
 		fmt.Fprint(w, `{"erro": "Apenas membros têm permissão para criar empréstimos"}`)
@@ -111,7 +113,8 @@ func (c *ControladorEmprestimo) DevolverEmprestimo(w http.ResponseWriter, r *htt
 	}
 
 	// Permissão concedida tanto para MEMBRO quanto para ADMINISTRADOR
-	if usuario.Permissao != "MEMBRO" && usuario.Permissao != "ADMINISTRADOR" {
+	permissao := strings.ToUpper(usuario.Permissao)
+	if permissao != "MEMBRO" && permissao != "ADMINISTRADOR" {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusForbidden)
 		fmt.Fprint(w, `{"erro": "Apenas membros ou administradores têm permissão para devolver empréstimos"}`)

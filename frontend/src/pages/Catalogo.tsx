@@ -1,8 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Layout } from '../components/Layout';
 import { api } from '../services/api';
-import { BookOpen, Search, Plus, Filter, BookMarked, Library, X, CheckCircle, Clock } from 'lucide-react';
+import { BookOpen, Search, Filter, X, PenTool } from 'lucide-react';
 import '../styles/index.css';
 
 interface Livro {
@@ -33,82 +33,120 @@ export const Catalogo: React.FC = () => {
   
   // Estados de criação de livro (para administradores)
   const [mostrarCriar, setMostrarCriar] = useState(false);
-  const [novoTitulo, setNovoTitulo] = useState('');
-  const [novoAutor, setNovoAutor] = useState('');
-  const [novoIsbn, setNovoIsbn] = useState('');
-  const [novaCategoria, setNovaCategoria] = useState('');
-  const [novoAno, setNovoAno] = useState<number | ''>('');
-  const [novaQtd, setNovaQtd] = useState<number>(1);
-  const [idBiblioteca, setIdBiblioteca] = useState<number>(1);
+  const [novoLivro, setNovoLivro] = useState({
+    titulo: '',
+    autor: '',
+    isbn: '',
+    categoria: '',
+    ano_publicacao: '' as string | number,
+    quantidade_total: 1,
+    id_biblioteca: 1
+  });
   const [erroCriar, setErroCriar] = useState('');
-  const [sucessoCriar, setSucessoCriar] = useState('');
 
   // Fases 3 e 4: Estados do Modal e Integração
   const [livroSelecionado, setLivroSelecionado] = useState<Livro | null>(null);
   const [processandoRequisicao, setProcessandoRequisicao] = useState(false);
   const [statusRequisicao, setStatusRequisicao] = useState<{ tipo: 'sucesso' | 'erro' | 'fila', mensagem: string } | null>(null);
 
-  const carregarLivros = async () => {
-    setCarregando(true);
+  // Fases 5 e 6: Paginação, Skeletons e Cadastro
+  const [pagina, setPagina] = useState(1);
+  const [temMais, setTemMais] = useState(true);
+  const [carregandoMais, setCarregandoMais] = useState(false);
+  const [erroValidacaoCriar, setErroValidacaoCriar] = useState(false);
+  const observadorReferencia = useRef<IntersectionObserver | null>(null);
+  const ultimoLivroReferencia = useCallback((node: HTMLDivElement) => {
+    if (carregando || carregandoMais) return;
+    if (observadorReferencia.current) observadorReferencia.current.disconnect();
+    
+    observadorReferencia.current = new IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && temMais) {
+        setPagina(prev => prev + 1);
+      }
+    });
+    
+    if (node) observadorReferencia.current.observe(node);
+  }, [carregando, carregandoMais, temMais]);
+
+  // Modificado para carregar paginado e buscar pelo título
+  const carregarLivros = async (pageNum: number, tituloBusca: string) => {
+    const limite = 12; // Número de livros por página
+    const pulo = (pageNum - 1) * limite;
+    
     try {
-      const resposta = await api.get('/api/livros/');
-      setLivros(resposta.data);
+      const resposta = await api.get('/api/livros/', {
+        params: {
+          limite: limite,
+          pulo: pulo,
+          titulo: tituloBusca || undefined
+        }
+      });
+      
+      const novosLivros = resposta.data;
+      if (novosLivros.length < limite) {
+        setTemMais(false);
+      } else {
+        setTemMais(true);
+      }
+
+      if (pageNum === 1) {
+        setLivros(novosLivros);
+      } else {
+        setLivros(prev => [...prev, ...novosLivros]);
+      }
     } catch (erro) {
-      console.error('Erro ao buscar catálogo de livros:', erro);
+      console.error('Erro ao buscar livros:', erro);
     } finally {
       setCarregando(false);
+      setCarregandoMais(false);
     }
   };
 
+  // Debounce (Fase 6)
   useEffect(() => {
-    carregarLivros();
-  }, []);
+    setCarregando(true);
+    const delayDebounce = setTimeout(() => {
+      setPagina(1);
+      carregarLivros(1, busca);
+    }, 300);
+
+    return () => clearTimeout(delayDebounce);
+  }, [busca]);
+
+  // Efeito de Paginação Infinita
+  useEffect(() => {
+    if (pagina > 1) {
+      setCarregandoMais(true);
+      carregarLivros(pagina, busca);
+    }
+  }, [pagina]);
 
   const handleCriarLivro = async (e: React.FormEvent) => {
     e.preventDefault();
     setErroCriar('');
-    setSucessoCriar('');
-
-    if (!novoTitulo || !novoAutor || !novoIsbn || !novaCategoria) {
-      setErroCriar('Preencha os campos obrigatórios.');
-      return;
-    }
 
     try {
       await api.post('/api/livros/', {
-        titulo: novoTitulo,
-        autor: novoAutor,
-        isbn: novoIsbn,
-        categoria: novaCategoria,
-        ano_publicacao: novoAno !== '' ? Number(novoAno) : null,
-        quantidade_total: Number(novaQtd),
-        quantidade_disponivel: Number(novaQtd),
-        id_biblioteca: Number(idBiblioteca)
+        ...novoLivro,
+        ano_publicacao: novoLivro.ano_publicacao !== '' ? Number(novoLivro.ano_publicacao) : null,
+        quantidade_total: Number(novoLivro.quantidade_total),
+        quantidade_disponivel: Number(novoLivro.quantidade_total),
+        id_biblioteca: Number(novoLivro.id_biblioteca)
       });
-      setSucessoCriar('Livro cadastrado com sucesso!');
+      setNovoLivro({ titulo: '', autor: '', isbn: '', categoria: '', ano_publicacao: '', quantidade_total: 1, id_biblioteca: 1 });
       
-      // Limpa formulário
-      setNovoTitulo('');
-      setNovoAutor('');
-      setNovoIsbn('');
-      setNovaCategoria('');
-      setNovoAno('');
-      setNovaQtd(1);
-      
-      carregarLivros(); // Recarrega catálogo
+      setPagina(1);
+      carregarLivros(1, busca);
     } catch (erro: any) {
-      setErroCriar(erro.response?.data?.detail || 'Erro ao cadastrar livro.');
+      setErroValidacaoCriar(true);
+      setErroCriar(erro.response?.data?.detail || 'Erro ao cadastrar livro');
     }
   };
 
+  // Filtragem
   const livrosFiltrados = livros.filter(livro => {
-    const matchBusca = livro.titulo.toLowerCase().includes(busca.toLowerCase()) ||
-                       livro.autor.toLowerCase().includes(busca.toLowerCase()) ||
-                       livro.categoria.toLowerCase().includes(busca.toLowerCase());
-    
     const matchCategoria = filtroCategoria ? livro.categoria.toLowerCase() === filtroCategoria.toLowerCase() : true;
-
-    return matchBusca && matchCategoria;
+    return matchCategoria;
   });
 
   const fecharModal = () => {
@@ -125,9 +163,11 @@ export const Catalogo: React.FC = () => {
         id_biblioteca: String(livro.id_biblioteca)
       });
       setStatusRequisicao({ tipo: 'sucesso', mensagem: 'EMPRÉSTIMO APROVADO' });
-      carregarLivros(); // Atualiza quantidades
+      setPagina(1);
+      carregarLivros(1, busca);
     } catch (erro: any) {
-      setStatusRequisicao({ tipo: 'erro', mensagem: erro.response?.data?.erro || 'Erro ao solicitar empréstimo' });
+      const msgErro = erro.response?.data?.erro || erro.response?.data?.detail || erro.message || 'Erro ao solicitar empréstimo';
+      setStatusRequisicao({ tipo: 'erro', mensagem: msgErro });
     } finally {
       setProcessandoRequisicao(false);
     }
@@ -137,14 +177,15 @@ export const Catalogo: React.FC = () => {
     setProcessandoRequisicao(true);
     setStatusRequisicao(null);
     try {
-      const res = await api.post('/api/reservas', {
+      await api.post('/api/reservas', {
         idLivro: String(livro.id)
       });
       setStatusRequisicao({ tipo: 'fila', mensagem: 'VOCÊ ENTROU NA FILA' });
-      // Idealmente pegar a posição na fila do res.data, mas vamos apenas confirmar sucesso
-      carregarLivros();
+      setPagina(1);
+      carregarLivros(1, busca);
     } catch (erro: any) {
-      setStatusRequisicao({ tipo: 'erro', mensagem: erro.response?.data?.mensagem || 'Erro ao entrar na fila' });
+      const msgErro = erro.response?.data?.mensagem || erro.response?.data?.erro || erro.message || 'Erro ao entrar na fila';
+      setStatusRequisicao({ tipo: 'erro', mensagem: msgErro });
     } finally {
       setProcessandoRequisicao(false);
     }
@@ -155,85 +196,98 @@ export const Catalogo: React.FC = () => {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
         
         {/* Cabeçalho */}
-        <section style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
             <h1 style={{ fontSize: '2rem', fontWeight: 700 }}>Catálogo de Livros</h1>
-            <p style={{ color: 'var(--cor-texto-secundario)' }}>Explore e gerencie o acervo da biblioteca compartilhada</p>
+            <p style={{ color: 'var(--cor-texto-secundario)', maxWidth: '600px' }}>
+              Navegue pelo nosso acervo infinito de conhecimento. Selecione uma obra para visualizar sua ficha ou solicitar um empréstimo.
+            </p>
           </div>
-          
-          {usuario?.permissao === 'administrador' && (
-            <button
-              onClick={() => setMostrarCriar(!mostrarCriar)}
-              className="btn-animado"
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                backgroundColor: 'var(--cor-primaria)',
-                color: 'var(--cor-fundo)',
-                padding: '12px 20px',
-                borderRadius: 'var(--raio-borda-md)',
-                fontWeight: 600
-              }}
-            >
-              <Plus size={20} />
-              <span>Novo Livro</span>
-            </button>
-          )}
-        </section>
+        </header>
 
-        {/* Formulário de Criação Rápida (Admin) */}
-        {usuario?.permissao === 'administrador' && mostrarCriar && (
-          <section className="card-glass" style={{ padding: '30px', border: '1px solid var(--cor-borda)' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '20px' }}>Cadastrar Novo Livro Físico</h3>
-            
-            {erroCriar && (
-              <div style={{ padding: '12px', backgroundColor: 'rgba(239, 68, 68, 0.1)', color: 'var(--cor-erro)', borderRadius: 'var(--raio-borda-md)', border: '1px solid var(--cor-erro)', marginBottom: '16px', fontSize: '0.9rem' }}>
-                {erroCriar}
+        {/* FASE 5: Botão Administrador e Formulário de Papel Pólen */}
+        {usuario?.permissao === 'administrador' && (
+          <div style={{ marginBottom: '16px' }}>
+            {!mostrarCriar ? (
+              <button
+                onClick={() => setMostrarCriar(true)}
+                className="btn-animado"
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '8px',
+                  backgroundColor: 'var(--cor-ouro-envelhecido)',
+                  color: '#2C1E16',
+                  padding: '12px 24px',
+                  borderRadius: 'var(--raio-borda-md)',
+                  fontWeight: 700,
+                  border: '1px solid #8B7355',
+                  boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
+                  fontFamily: '"Times New Roman", Times, serif',
+                  letterSpacing: '1px'
+                }}
+              >
+                <PenTool size={20} />
+                Adicionar Obra ao Acervo
+              </button>
+            ) : (
+              <div className="ficha-cadastro-polen">
+                {erroValidacaoCriar && <div className="carimbo-invalido">INVÁLIDO</div>}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '2px solid #8B7355', paddingBottom: '8px' }}>
+                  <h3 style={{ fontSize: '1.5rem', fontFamily: '"Times New Roman", Times, serif', color: '#2C1E16', textTransform: 'uppercase' }}>Ficha de Catalogação - Nova Obra</h3>
+                  <button onClick={() => { setMostrarCriar(false); setErroValidacaoCriar(false); }} style={{ background: 'none', border: 'none', color: '#8B7355', cursor: 'pointer' }}>
+                    <X size={24} />
+                  </button>
+                </div>
+                
+                {erroCriar && <div style={{ color: 'var(--cor-erro)', marginBottom: '16px', fontWeight: 600 }}>{erroCriar}</div>}
+                
+                <form onSubmit={handleCriarLivro} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+                  <div style={{ gridColumn: '1 / -1' }}>
+                    <label style={{ color: '#5C4033', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Título da Obra</label>
+                    <input type="text" className="input-classico" value={novoLivro.titulo} onChange={e => { setNovoLivro({...novoLivro, titulo: e.target.value}); setErroValidacaoCriar(false); }} required />
+                  </div>
+                  <div>
+                    <label style={{ color: '#5C4033', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Autor</label>
+                    <input type="text" className="input-classico" value={novoLivro.autor} onChange={e => { setNovoLivro({...novoLivro, autor: e.target.value}); setErroValidacaoCriar(false); }} required />
+                  </div>
+                  <div>
+                    <label style={{ color: '#5C4033', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>ISBN</label>
+                    <input type="text" className="input-classico" value={novoLivro.isbn} onChange={e => { setNovoLivro({...novoLivro, isbn: e.target.value}); setErroValidacaoCriar(false); }} required />
+                  </div>
+                  <div>
+                    <label style={{ color: '#5C4033', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Gênero/Categoria</label>
+                    <input type="text" className="input-classico" value={novoLivro.categoria} onChange={e => { setNovoLivro({...novoLivro, categoria: e.target.value}); setErroValidacaoCriar(false); }} required />
+                  </div>
+                  <div>
+                    <label style={{ color: '#5C4033', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Ano (Ex: 1954)</label>
+                    <input type="number" className="input-classico" value={novoLivro.ano_publicacao} onChange={e => { setNovoLivro({...novoLivro, ano_publicacao: e.target.value}); setErroValidacaoCriar(false); }} required />
+                  </div>
+                  <div>
+                    <label style={{ color: '#5C4033', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Quantidade Inicial (Estoque)</label>
+                    <input type="number" className="input-classico" value={novoLivro.quantidade_total} onChange={e => { setNovoLivro({...novoLivro, quantidade_total: parseInt(e.target.value)}); setErroValidacaoCriar(false); }} min="1" required />
+                  </div>
+                  <div>
+                    <label style={{ color: '#5C4033', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>ID da Biblioteca Origem</label>
+                    <input type="number" className="input-classico" value={novoLivro.id_biblioteca} onChange={e => { setNovoLivro({...novoLivro, id_biblioteca: parseInt(e.target.value)}); setErroValidacaoCriar(false); }} min="1" required />
+                  </div>
+                  
+                  <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
+                    <button type="submit" className="btn-animado" style={{
+                      backgroundColor: '#1e3a8a',
+                      color: '#f1ebd9',
+                      padding: '12px 32px',
+                      borderRadius: '4px',
+                      fontWeight: 700,
+                      border: '1px solid #1e3a8a',
+                      fontFamily: '"Times New Roman", Times, serif',
+                      letterSpacing: '1px'
+                    }}>
+                      Carimbar Registro
+                    </button>
+                  </div>
+                </form>
               </div>
             )}
-            {sucessoCriar && (
-              <div style={{ padding: '12px', backgroundColor: 'rgba(34, 197, 94, 0.1)', color: 'var(--cor-sucesso)', borderRadius: 'var(--raio-borda-md)', border: '1px solid var(--cor-sucesso)', marginBottom: '16px', fontSize: '0.9rem' }}>
-                {sucessoCriar}
-              </div>
-            )}
-
-            <form onSubmit={handleCriarLivro} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '0.85rem', color: 'var(--cor-texto-secundario)' }}>Título *</label>
-                <input style={{ backgroundColor: 'var(--cor-fundo)', border: '1px solid var(--cor-borda)', padding: '10px 14px', borderRadius: 'var(--raio-borda-md)' }} type="text" value={novoTitulo} onChange={e => setNovoTitulo(e.target.value)} placeholder="Título do livro" required />
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '0.85rem', color: 'var(--cor-texto-secundario)' }}>Autor *</label>
-                <input style={{ backgroundColor: 'var(--cor-fundo)', border: '1px solid var(--cor-borda)', padding: '10px 14px', borderRadius: 'var(--raio-borda-md)' }} type="text" value={novoAutor} onChange={e => setNovoAutor(e.target.value)} placeholder="Autor do livro" required />
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '0.85rem', color: 'var(--cor-texto-secundario)' }}>ISBN (Apenas números) *</label>
-                <input style={{ backgroundColor: 'var(--cor-fundo)', border: '1px solid var(--cor-borda)', padding: '10px 14px', borderRadius: 'var(--raio-borda-md)' }} type="text" value={novoIsbn} onChange={e => setNovoIsbn(e.target.value)} placeholder="97885..." required />
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '0.85rem', color: 'var(--cor-texto-secundario)' }}>Categoria *</label>
-                <input style={{ backgroundColor: 'var(--cor-fundo)', border: '1px solid var(--cor-borda)', padding: '10px 14px', borderRadius: 'var(--raio-borda-md)' }} type="text" value={novaCategoria} onChange={e => setNovaCategoria(e.target.value)} placeholder="Ficção, Técnico..." required />
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '0.85rem', color: 'var(--cor-texto-secundario)' }}>Ano de Publicação</label>
-                <input style={{ backgroundColor: 'var(--cor-fundo)', border: '1px solid var(--cor-borda)', padding: '10px 14px', borderRadius: 'var(--raio-borda-md)' }} type="number" value={novoAno} onChange={e => setNovoAno(e.target.value !== '' ? Number(e.target.value) : '')} placeholder="2020" />
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '0.85rem', color: 'var(--cor-texto-secundario)' }}>Quantidade de Cópias</label>
-                <input style={{ backgroundColor: 'var(--cor-fundo)', border: '1px solid var(--cor-borda)', padding: '10px 14px', borderRadius: 'var(--raio-borda-md)' }} type="number" min="1" value={novaQtd} onChange={e => setNovaQtd(Number(e.target.value))} />
-              </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <label style={{ fontSize: '0.85rem', color: 'var(--cor-texto-secundario)' }}>Biblioteca Coleta ID</label>
-                <input style={{ backgroundColor: 'var(--cor-fundo)', border: '1px solid var(--cor-borda)', padding: '10px 14px', borderRadius: 'var(--raio-borda-md)' }} type="number" min="1" value={idBiblioteca} onChange={e => setIdBiblioteca(Number(e.target.value))} />
-              </div>
-              <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-                <button type="submit" className="btn-animado" style={{ backgroundColor: 'var(--cor-primaria)', color: 'var(--cor-fundo)', fontWeight: 600, padding: '12px', borderRadius: 'var(--raio-borda-md)', width: '100%' }}>
-                  Salvar no Acervo
-                </button>
-              </div>
-            </form>
-          </section>
+          </div>
         )}
 
         {/* Busca e Filtros (Gaveta) */}
@@ -263,7 +317,6 @@ export const Catalogo: React.FC = () => {
             </button>
           </div>
 
-          {/* Painel Expansível de Filtros */}
           <div className="pasta-filtros" style={{
             maxHeight: mostrarFiltros ? '300px' : '0',
             opacity: mostrarFiltros ? 1 : 0,
@@ -282,40 +335,47 @@ export const Catalogo: React.FC = () => {
           </div>
         </section>
 
-        {/* Listagem de Livros */}
+        {/* Listagem de Livros e Skeletons (Fase 6) */}
         <section>
-          {carregando ? (
-            <div style={{ textAlign: 'center', padding: '40px', color: 'var(--cor-texto-secundario)' }}>
-              Carregando catálogo de livros...
+          {carregando && pagina === 1 ? (
+            <div className="grid-prateleira">
+              {[...Array(8)].map((_, index) => (
+                <div key={index} className="prateleira-base">
+                  <div className="skeleton-livro"></div>
+                </div>
+              ))}
             </div>
           ) : livrosFiltrados.length === 0 ? (
-            <div className="card-glass" style={{ textAlign: 'center', padding: '60px', border: '1px solid var(--cor-borda)' }}>
-              <BookMarked size={48} color="var(--cor-texto-desativado)" style={{ margin: '0 auto 16px auto' }} />
-              <h3>Nenhum livro localizado</h3>
-              <p style={{ color: 'var(--cor-texto-secundario)', marginTop: '8px' }}>
-                Nenhum título foi cadastrado ou condiz com os termos da busca.
+            <div style={{ textAlign: 'center', padding: '64px 0', color: 'var(--cor-texto-secundario)' }}>
+              <BookOpen size={48} color="var(--cor-borda)" style={{ marginBottom: '16px', opacity: 0.5 }} />
+              <p style={{ fontSize: '1.2rem', fontFamily: '"Times New Roman", Times, serif' }}>
+                Nenhum tomo antigo encontrado neste corredor. Tente pesquisar por outro título.
               </p>
             </div>
           ) : (
-            <div className="grid-prateleira">
-              {livrosFiltrados.map((livro) => (
-                <div key={livro.id} className="prateleira-base">
-                  <div className="perspectiva-wrapper" onClick={() => setLivroSelecionado(livro)}>
-                    <div className="livro-3d">
-                      <div className="capa-livro">
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-                          <span style={{
-                            fontSize: '0.65rem',
-                            fontWeight: 600,
-                            backgroundColor: 'rgba(0,0,0,0.4)',
-                            color: 'var(--cor-ouro-envelhecido)',
-                            padding: '4px 8px',
-                            borderRadius: '4px',
-                            border: '1px solid rgba(212,175,55,0.3)'
-                          }}>
-                            {livro.categoria.toUpperCase()}
-                          </span>
-                        </div>
+            <>
+              <div className="grid-prateleira">
+                {livrosFiltrados.map((livro, index) => {
+                  const ref = (index === livrosFiltrados.length - 1) ? ultimoLivroReferencia : null;
+                  
+                  return (
+                    <div key={livro.id} className="prateleira-base" ref={ref}>
+                      <div className="perspectiva-wrapper" onClick={() => setLivroSelecionado(livro)}>
+                        <div className="livro-3d">
+                          <div className="capa-livro">
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+                              <span style={{
+                                fontSize: '0.65rem',
+                                fontWeight: 600,
+                                backgroundColor: 'rgba(0,0,0,0.4)',
+                                color: 'var(--cor-ouro-envelhecido)',
+                                padding: '4px 8px',
+                                borderRadius: '4px',
+                                border: '1px solid rgba(212,175,55,0.3)'
+                              }}>
+                                {livro.categoria.toUpperCase()}
+                              </span>
+                            </div>
 
                         <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginTop: 'auto', marginBottom: '4px', lineHeight: 1.2, color: '#f8f4e6', textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}>
                           {livro.titulo}
@@ -353,8 +413,21 @@ export const Catalogo: React.FC = () => {
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
+              );
+                })}
+              </div>
+              
+              {/* Skeletons adicionais ao final da lista de carregamento paginado */}
+              {carregandoMais && (
+                <div className="grid-prateleira" style={{ marginTop: '24px' }}>
+                  {[...Array(4)].map((_, index) => (
+                    <div key={`more-${index}`} className="prateleira-base">
+                      <div className="skeleton-livro"></div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </section>
 
@@ -393,7 +466,11 @@ export const Catalogo: React.FC = () => {
             </div>
 
             <div className="ficha-acoes">
-              {livroSelecionado.quantidade_disponivel > 0 ? (
+              {usuario?.permissao === 'administrador' ? (
+                <div style={{ textAlign: 'center', color: '#5C4033', fontStyle: 'italic', padding: '8px', fontSize: '0.9rem' }}>
+                  Como <strong>Administrador</strong>, seu perfil destina-se a gerenciar o acervo. <br/>Faça login como <strong>Membro</strong> para solicitar empréstimos ou entrar na fila.
+                </div>
+              ) : livroSelecionado.quantidade_disponivel > 0 ? (
                 <button 
                   className="btn-solicitar"
                   onClick={() => solicitarEmprestimo(livroSelecionado)}
