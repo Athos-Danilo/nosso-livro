@@ -849,5 +849,60 @@ input:-webkit-autofill:active {
 }
 
 
+/* --- Fase 2: Animações Cinematográficas Painel --- */
 
+/* M2.1: Entrada Escalonada (Staggered Delay) */
+@keyframes entrada-plaqueta {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.plaqueta-animada {
+  opacity: 0;
+  animation: entrada-plaqueta 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.plaqueta-animada:nth-child(1) { animation-delay: 0ms; }
+.plaqueta-animada:nth-child(2) { animation-delay: 100ms; }
+.plaqueta-animada:nth-child(3) { animation-delay: 200ms; }
+.plaqueta-animada:nth-child(4) { animation-delay: 300ms; }
+
+/* M2.2: Hover Metálico Tridimensional */
+.plaqueta-metalica {
+  transition: transform var(--transicao-suave), box-shadow var(--transicao-suave), background-color var(--transicao-suave), border-color var(--transicao-suave);
+}
+
+.plaqueta-metalica:hover {
+  transform: translateY(-5px) !important;
+  background-color: var(--cor-card-hover) !important;
+  box-shadow: 
+    0 10px 20px rgba(0, 0, 0, 0.4), 
+    0 0 15px rgba(212, 175, 55, 0.3), 
+    inset 0 0 10px rgba(0,0,0,0.5) !important;
+  border-color: rgba(212, 175, 55, 0.8) !important;
+}
+
+/* M2.3: Micro-animações de Ícones Vintage */
+@keyframes pendulo-icone {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(10deg);
+  }
+  75% {
+    transform: rotate(-10deg);
+  }
+}
+
+.plaqueta-metalica:hover .icone-pendulo {
+  animation: pendulo-icone 1.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.5));
+}
 

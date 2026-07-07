@@ -11,9 +11,9 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a concl
 
 ## 🗺️ Mapa de Progresso da Tela
 
-- [ ] **Fase 1: Escrivaninha de Estudos e Banner de Registro (Estrutura)**
-- [ ] **Fase 2: Animações Cinematográficas e Efeito Hover Metálico**
-- [ ] **Fase 3: Contadores Dinâmicos de Página Mecânicos (APIs)**
+- [x] **Fase 1: Escrivaninha de Estudos e Banner de Registro (Estrutura)**
+- [x] **Fase 2: Animações Cinematográficas e Efeito Hover Metálico**
+- [x] **Fase 3: Contadores Dinâmicos de Página Mecânicos (APIs)**
 - [ ] **Fase 4: Livro de Avisos e Prateleira de Indicações (Listagens)**
 - [ ] **Fase 5: Skeletons de Papel e Responsividade Premium**
 
@@ -22,39 +22,39 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a concl
 ## 🎨 Fase 1: Escrivaninha de Estudos e Banner de Registro (Estrutura)
 Desenvolvimento do layout estrutural do dashboard clássico de biblioteca institucional.
 
-- [ ] **M1.1: Banner Ficha de Leitor (Boas-vindas)**
-  - [ ] Implementar o banner superior de boas-vindas com o estilo de folha de papel pólen texturizada (`--cor-papel-polen-glass`) e molduras clássicas duplas gravadas.
-  - [ ] Exibir o nome do leitor com efeito de escrita sutil em fonte vintage.
-  - [ ] Widget de data no formato de carimbo de calendário clássico no canto superior direito.
-- [ ] **M1.2: Plaquetas Metálicas de Estatísticas (Grid)**
-  - [ ] Dispor cards responsivos em CSS Grid (`grid-template-columns: repeat(auto-fit, minmax(220px, 1fr))`).
-  - [ ] Estilizar os cards como plaquetas de bronze/ouro envelhecido com cantos chanfrados e linhas de borda douradas sutis.
-- [ ] **M1.3: Subpainéis do Leitor**
-  - [ ] Criar divisores inferiores em duas colunas: "Prateleira de Recomendações" e "Livro de Avisos" (Notificações).
+- [x] **M1.1: Banner Ficha de Leitor (Boas-vindas)**
+  - [x] Implementar o banner superior de boas-vindas com o estilo de folha de papel pólen texturizada (`--cor-papel-polen-glass`) e molduras clássicas duplas gravadas.
+  - [x] Exibir o nome do leitor com efeito de escrita sutil em fonte vintage.
+  - [x] Widget de data no formato de carimbo de calendário clássico no canto superior direito.
+- [x] **M1.2: Plaquetas Metálicas de Estatísticas (Grid)**
+  - [x] Dispor cards responsivos em CSS Grid (`grid-template-columns: repeat(auto-fit, minmax(220px, 1fr))`).
+  - [x] Estilizar os cards como plaquetas de bronze/ouro envelhecido com cantos chanfrados e linhas de borda douradas sutis.
+- [x] **M1.3: Subpainéis do Leitor**
+  - [x] Criar divisores inferiores em duas colunas: "Prateleira de Recomendações" e "Livro de Avisos" (Notificações).
 
 ---
 
 ## 🎬 Fase 2: Animações Cinematográficas e Efeito Hover Metálico
 Adicionar efeitos de toque vintage e transições escalonadas na entrada dos dados.
 
-- [ ] **M2.1: Entrada Escalonada (Staggered Delay)**
-  - [ ] Adicionar animação de surgimento das plaquetas uma a uma a partir da base (Card 1: 0ms, Card 2: 100ms, Card 3: 200ms, Card 4: 300ms).
-- [ ] **M2.2: Hover Metálico Tridimensional**
-  - [ ] Ao passar o cursor, a plaqueta deve se elevar em 5px e ganhar um brilho sutil de ouro na borda (`box-shadow`), com fundo mudando suavemente para `--cor-card-hover`.
-- [ ] **M2.3: Micro-animações de Ícones Vintage**
-  - [ ] Ao focar ou passar o cursor sobre as plaquetas, os ícones (`BookOpen`, `Bell`, etc.) devem executar movimentos suaves (rotação ou leve balanço de pêndulo).
+- [x] **M2.1: Entrada Escalonada (Staggered Delay)**
+  - [x] Adicionar animação de surgimento das plaquetas uma a uma a partir da base (Card 1: 0ms, Card 2: 100ms, Card 3: 200ms, Card 4: 300ms).
+- [x] **M2.2: Hover Metálico Tridimensional**
+  - [x] Ao passar o cursor, a plaqueta deve se elevar em 5px e ganhar um brilho sutil de ouro na borda (`box-shadow`), com fundo mudando suavemente para `--cor-card-hover`.
+- [x] **M2.3: Micro-animações de Ícones Vintage**
+  - [x] Ao focar ou passar o cursor sobre as plaquetas, os ícones (`BookOpen`, `Bell`, etc.) devem executar movimentos suaves (rotação ou leve balanço de pêndulo).
 
 ---
 
 ## 🔗 Fase 3: Contadores Dinâmicos de Página Mecânicos (APIs)
 Alimentação real dos dados e efeito de contagem mecânica simulada.
 
-- [ ] **M3.1: Requisições assíncronas aos Serviços**
-  - [ ] Consumir dados do Catálogo (Python), Reservas (Node), Empréstimos (Go) e Notificações paralelos.
-- [ ] **M3.2: Efeito de Contador Mecânico**
-  - [ ] Implementar animação que simula um contador mecânico de páginas (ou carimbo numerado rotativo) subindo rapidamente de 0 ao número final.
-- [ ] **M3.3: Cache e Atualização Rápida**
-  - [ ] Adicionar lógica de revalidação de dados em segundo plano a cada 60 segundos.
+- [x] **M3.1: Requisições assíncronas aos Serviços**
+  - [x] Consumir dados do Catálogo (Python), Reservas (Node), Empréstimos (Go) e Notificações paralelos.
+- [x] **M3.2: Efeito de Contador Mecânico**
+  - [x] Implementar animação que simula um contador mecânico de páginas (ou carimbo numerado rotativo) subindo rapidamente de 0 ao número final.
+- [x] **M3.3: Cache e Atualização Rápida**
+  - [x] Adicionar lógica de revalidação de dados em segundo plano a cada 60 segundos.
 
 ---
 
