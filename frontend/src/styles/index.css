@@ -906,3 +906,279 @@ input:-webkit-autofill:active {
   filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.5));
 }
 
+/* --- Fase 4: Livro de Avisos e Prateleira (Listagens) --- */
+
+/* M4.1: Selos de Carimbo de Notificação */
+.selo-carimbo {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: 'Boogaloo', 'Cinzel', monospace;
+  font-weight: 700;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 2px solid;
+  transform: rotate(-4deg);
+  opacity: 0.85;
+}
+
+.selo-carimbo.devolucao {
+  color: var(--cor-sucesso);
+  border-color: var(--cor-sucesso);
+  background: rgba(46, 125, 50, 0.1);
+}
+
+.selo-carimbo.reserva {
+  color: var(--cor-ouro-envelhecido);
+  border-color: var(--cor-ouro-envelhecido);
+  background: rgba(212, 175, 55, 0.1);
+}
+
+.selo-carimbo.retirada {
+  color: var(--cor-azul-nobre);
+  border-color: var(--cor-azul-nobre);
+  background: rgba(16, 42, 67, 0.1);
+}
+
+/* M4.2: Efeito 3D para Capa de Livro em Perspectiva */
+.livro-3d-wrapper {
+  perspective: 1000px;
+  width: 50px;
+  height: 75px;
+}
+
+.livro-3d {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform var(--transicao-suave);
+  transform: rotateY(-20deg) rotateX(5deg);
+  box-shadow: 
+    -2px 5px 10px rgba(0,0,0,0.5),
+    inset 2px 0 5px rgba(255,255,255,0.2);
+  border-radius: 2px;
+  border-left: 3px solid var(--cor-papel-polen); /* Lombada (páginas) */
+}
+
+.livro-3d:hover {
+  transform: rotateY(-5deg) rotateX(0deg) translateY(-2px);
+  box-shadow: 
+    -5px 10px 15px rgba(0,0,0,0.6),
+    inset 2px 0 5px rgba(255,255,255,0.3);
+}
+
+.livro-3d-capa {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  background-size: cover;
+  background-position: center;
+  border-radius: 2px;
+}
+
+/* --- Fase 5: Skeletons e Responsividade Premium --- */
+
+/* M5.1: Skeletons de Papel Pólen */
+@keyframes pulso-polen {
+  0% {
+    background-color: rgba(246, 243, 235, 0.05);
+    box-shadow: 0 0 0 rgba(212, 175, 55, 0);
+  }
+  50% {
+    background-color: rgba(246, 243, 235, 0.15);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
+  }
+  100% {
+    background-color: rgba(246, 243, 235, 0.05);
+    box-shadow: 0 0 0 rgba(212, 175, 55, 0);
+  }
+}
+
+.skeleton-polen {
+  animation: pulso-polen 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  border-radius: 4px;
+  width: 100%;
+  height: 100%;
+}
+
+.skeleton-text {
+  height: 32px;
+  width: 60%;
+  margin-top: 4px;
+}
+
+/* M5.3: Carimbo Indisponível (Falhas de Rede) */
+.carimbo-indisponivel {
+  font-family: 'Boogaloo', 'Cinzel', monospace;
+  font-weight: 700;
+  font-size: 1.2rem;
+  color: var(--cor-vermelho-ferrugem);
+  text-transform: uppercase;
+  border: 3px double var(--cor-vermelho-ferrugem);
+  padding: 4px 8px;
+  border-radius: 4px;
+  transform: rotate(-10deg);
+  display: inline-block;
+  opacity: 0.8;
+  margin-top: 4px;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.03) 50%, rgba(0,0,0,0.03) 50%),
+    linear-gradient(90deg, rgba(255,255,255,0.03) 50%, rgba(0,0,0,0.03) 50%);
+  background-size: 2px 2px;
+}
+
+/* M5.2: Responsividade Física (Mobile & Tablet) */
+@media (max-width: 768px) {
+  /* Banner em celulares deve empilhar a ficha e o carimbo de data */
+  .banner-ficha {
+    flex-direction: column;
+    align-items: center !important;
+    text-align: center;
+    gap: 24px;
+    padding: 24px !important;
+  }
+  
+  .banner-ficha h1 {
+    font-size: 2rem !important;
+  }
+}
+
+/* --- Responsividade Global do Layout --- */
+.layout-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--cor-fundo);
+}
+
+.layout-sidebar {
+  width: 260px;
+  padding: 24px;
+  margin: 16px;
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--raio-borda-lg);
+  border: 1px solid var(--cor-borda);
+  height: calc(100vh - 32px);
+  position: sticky;
+  top: 16px;
+}
+
+.layout-logo {
+  margin-bottom: 40px !important;
+}
+
+.layout-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1; /* Empurra o footer para baixo no desktop */
+}
+
+.layout-main {
+  flex: 1;
+  padding: 32px 32px 32px 16px;
+  overflow-y: auto;
+  max-height: 100vh;
+}
+
+@media (max-width: 768px) {
+  .layout-container {
+    flex-direction: column;
+  }
+
+  .layout-sidebar {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas: 
+      "logo footer"
+      "nav nav";
+    width: 100%;
+    height: auto;
+    position: static;
+    margin: 0;
+    padding: 16px 0 0 0; /* Padding lateral será nos itens, não no contêiner para a barra não cortar */
+    border-radius: 0;
+    border: none;
+    background: transparent !important;
+    box-shadow: none !important;
+    gap: 16px;
+  }
+
+  .layout-logo {
+    grid-area: logo;
+    margin-bottom: 0 !important;
+    padding-left: 16px !important;
+  }
+
+  .layout-footer {
+    grid-area: footer;
+    display: flex;
+    align-items: center;
+    padding-right: 16px;
+  }
+  
+  .layout-footer > div:first-child {
+    border-top: none !important;
+    padding: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Esconde o texto do usuário e mostra só a foto + botão sair */
+  .layout-footer > div:first-child > div:last-child {
+    display: none;
+  }
+
+  .layout-footer button {
+    padding: 8px !important;
+    width: auto !important;
+  }
+  
+  .layout-footer button span {
+    display: none; /* Só o ícone de logout */
+  }
+
+  .layout-nav {
+    grid-area: nav;
+    position: static;
+    width: 100%;
+    flex-direction: row;
+    justify-content: flex-start;
+    overflow-x: auto;
+    background: transparent;
+    padding: 0 16px 16px 16px;
+    gap: 12px;
+    /* Esconde barra de rolagem mas permite o scroll */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .layout-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .layout-nav a {
+    padding: 12px 16px !important;
+    border-radius: var(--raio-borda-md) !important; 
+    flex-shrink: 0;
+    background-color: var(--cor-card);
+    border: 1px solid var(--cor-borda);
+  }
+
+  .layout-nav a span {
+    display: none;
+  }
+
+  .layout-main {
+    padding: 16px !important;
+    max-height: none;
+    overflow-y: visible;
+  }
+}
+
+
+

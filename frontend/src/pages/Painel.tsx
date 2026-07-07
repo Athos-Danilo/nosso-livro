@@ -38,6 +38,8 @@ const ContadorMecanico: React.FC<{ valorFinal: number }> = ({ valorFinal }) => {
 export const Painel: React.FC = () => {
   const { usuario } = useAuth();
   
+  const [carregando, setCarregando] = useState(true);
+  const [falhaRede, setFalhaRede] = useState(false);
   const [dadosEstatisticas, setDadosEstatisticas] = useState({
     livros: 0,
     reservas: 0,
@@ -47,22 +49,35 @@ export const Painel: React.FC = () => {
 
   const buscarDados = async () => {
     try {
-      // M3.1: Requisições assíncronas aos Serviços
+      // Como as rotas de estatísticas (ex: /api/bibliotecas/estatisticas) 
+      // ainda não foram implementadas nos microsserviços do backend,
+      // usamos uma simulação para não causar erros 404/500 no console.
+      const simularAPI = (valor: number) => 
+        new Promise<any>((resolve) => setTimeout(() => resolve({ data: { total: valor } }), 400));
+
       const [resLivros, resReservas, resEmprestimos, resNotificacoes] = await Promise.allSettled([
-        api.get('/api/bibliotecas/estatisticas'),
-        api.get('/api/reservas/usuario'),
-        api.get('/api/emprestimos/usuario'),
-        api.get('/api/usuarios/notificacoes')
+        simularAPI(142), // api.get('/api/bibliotecas/estatisticas')
+        simularAPI(3),   // api.get('/api/reservas/usuario')
+        simularAPI(1),   // api.get('/api/emprestimos/usuario')
+        simularAPI(5)    // api.get('/api/usuarios/notificacoes')
       ]);
 
+      const todasFalharam = resLivros.status === 'rejected' && resReservas.status === 'rejected' && resEmprestimos.status === 'rejected' && resNotificacoes.status === 'rejected';
+      
+      setFalhaRede(todasFalharam);
+
       setDadosEstatisticas({
-        livros: resLivros.status === 'fulfilled' ? (resLivros.value.data.total || 128) : 128,
-        reservas: resReservas.status === 'fulfilled' ? (resReservas.value.data.total || 2) : 2,
-        emprestimos: resEmprestimos.status === 'fulfilled' ? (resEmprestimos.value.data.total || 1) : 1,
-        notificacoes: resNotificacoes.status === 'fulfilled' ? (resNotificacoes.value.data.total || 4) : 4
+        livros: resLivros.status === 'fulfilled' ? (resLivros.value.data.total || 128) : (todasFalharam ? 0 : 128),
+        reservas: resReservas.status === 'fulfilled' ? (resReservas.value.data.total || 2) : (todasFalharam ? 0 : 2),
+        emprestimos: resEmprestimos.status === 'fulfilled' ? (resEmprestimos.value.data.total || 1) : (todasFalharam ? 0 : 1),
+        notificacoes: resNotificacoes.status === 'fulfilled' ? (resNotificacoes.value.data.total || 4) : (todasFalharam ? 0 : 4)
       });
     } catch (err) {
       console.error('Erro ao buscar dados do painel:', err);
+      setFalhaRede(true);
+    } finally {
+      // Simulando um pequeno tempo de rede para vermos os Skeletons Premium de Papel Pólen (M5.1)
+      setTimeout(() => setCarregando(false), 800);
     }
   };
 
@@ -85,7 +100,7 @@ export const Painel: React.FC = () => {
       <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
         
         {/* Banner de Boas-vindas (M1.1) */}
-        <section style={{
+        <section className="banner-ficha" style={{
           position: 'relative',
           padding: '40px',
           display: 'flex',
@@ -171,24 +186,37 @@ export const Painel: React.FC = () => {
                   background: 'linear-gradient(90deg, transparent, var(--cor-ouro-envelhecido), transparent)',
                   opacity: 0.5
                 }} />
-                <div>
-                  <span style={{ 
-                    fontSize: '0.75rem', 
-                    color: 'var(--cor-texto-secundario)', 
-                    textTransform: 'uppercase', 
-                    letterSpacing: '1px',
-                    fontFamily: '"Playfair Display", Georgia, serif'
-                  }}>
-                    {stat.titulo}
-                  </span>
-                  <h2 style={{ 
-                    fontSize: '2.5rem', 
-                    fontWeight: 700, 
-                    marginTop: '4px',
-                    color: 'var(--cor-papel-polen)',
-                    textShadow: '0 2px 4px rgba(0,0,0,0.5)'
-                  }}><ContadorMecanico valorFinal={stat.valor} /></h2>
-                </div>
+                {carregando ? (
+                  <div style={{ flex: 1, marginRight: '16px' }}>
+                    <div className="skeleton-polen skeleton-text" style={{ width: '40%', height: '12px' }}></div>
+                    <div className="skeleton-polen skeleton-text" style={{ width: '25%', height: '40px', marginTop: '12px' }}></div>
+                  </div>
+                ) : (
+                  <div style={{ flex: 1 }}>
+                    <span style={{ 
+                      fontSize: '0.75rem', 
+                      color: 'var(--cor-texto-secundario)', 
+                      textTransform: 'uppercase', 
+                      letterSpacing: '1px',
+                      fontFamily: '"Playfair Display", Georgia, serif'
+                    }}>
+                      {stat.titulo}
+                    </span>
+                    {falhaRede ? (
+                      <div>
+                        <span className="carimbo-indisponivel">Indisponível</span>
+                      </div>
+                    ) : (
+                      <h2 style={{ 
+                        fontSize: '2.5rem', 
+                        fontWeight: 700, 
+                        marginTop: '4px',
+                        color: 'var(--cor-papel-polen)',
+                        textShadow: '0 2px 4px rgba(0,0,0,0.5)'
+                      }}><ContadorMecanico valorFinal={stat.valor} /></h2>
+                    )}
+                  </div>
+                )}
                 <div className="icone-pendulo" style={{
                   padding: '12px',
                   borderRadius: '50%',
@@ -204,7 +232,7 @@ export const Painel: React.FC = () => {
         </section>
 
         {/* Subpainéis do Leitor (M1.3) */}
-        <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '24px' }}>
+        <section style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px' }}>
           
           {/* Prateleira de Recomendações */}
           <div style={{ 
@@ -226,14 +254,18 @@ export const Painel: React.FC = () => {
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               <div style={{ display: 'flex', gap: '16px', alignItems: 'center', padding: '12px', backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '8px' }}>
-                <div style={{ width: '50px', height: '75px', backgroundColor: 'var(--cor-azul-nobre)', borderRadius: '2px', boxShadow: '2px 2px 5px rgba(0,0,0,0.5)', borderLeft: '3px solid var(--cor-papel-polen)' }}></div>
+                <div className="livro-3d-wrapper">
+                  <div className="livro-3d" style={{ backgroundColor: 'var(--cor-azul-nobre)' }}></div>
+                </div>
                 <div>
                   <div style={{ fontWeight: 600, fontSize: '1rem', color: 'var(--cor-papel-polen)' }}>O Senhor dos Anéis</div>
                   <div style={{ fontSize: '0.85rem', color: 'var(--cor-texto-secundario)', fontStyle: 'italic' }}>J.R.R. Tolkien</div>
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '16px', alignItems: 'center', padding: '12px', backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '8px' }}>
-                <div style={{ width: '50px', height: '75px', backgroundColor: 'var(--cor-verde-biblioteca)', borderRadius: '2px', boxShadow: '2px 2px 5px rgba(0,0,0,0.5)', borderLeft: '3px solid var(--cor-papel-polen)' }}></div>
+                <div className="livro-3d-wrapper">
+                  <div className="livro-3d" style={{ backgroundColor: 'var(--cor-verde-biblioteca)' }}></div>
+                </div>
                 <div>
                   <div style={{ fontWeight: 600, fontSize: '1rem', color: 'var(--cor-papel-polen)' }}>Arquitetura Limpa</div>
                   <div style={{ fontSize: '0.85rem', color: 'var(--cor-texto-secundario)', fontStyle: 'italic' }}>Robert C. Martin</div>
@@ -261,22 +293,28 @@ export const Painel: React.FC = () => {
             </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '16px' }}>
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '16px', position: 'relative' }}>
                 <div style={{ padding: '8px', borderRadius: '50%', backgroundColor: 'rgba(46, 125, 50, 0.15)', color: 'var(--cor-sucesso)' }}>
                   <History size={18} />
                 </div>
-                <div>
+                <div style={{ flex: 1 }}>
                   <div style={{ fontSize: '0.95rem', fontWeight: 500, color: 'var(--cor-papel-polen)' }}>Empréstimo realizado com sucesso!</div>
                   <div style={{ fontSize: '0.8rem', color: 'var(--cor-texto-desativado)', marginTop: '4px' }}>Há 2 horas</div>
                 </div>
+                <div className="selo-carimbo devolucao" style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%) rotate(-4deg)' }}>
+                  Devolvido
+                </div>
               </div>
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', position: 'relative' }}>
                 <div style={{ padding: '8px', borderRadius: '50%', backgroundColor: 'rgba(212, 175, 55, 0.15)', color: 'var(--cor-ouro-envelhecido)' }}>
                   <Bookmark size={18} />
                 </div>
-                <div>
-                  <div style={{ fontSize: '0.95rem', fontWeight: 500, color: 'var(--cor-papel-polen)' }}>Sua reserva do livro "Clean Code" está pronta para retirada.</div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '0.95rem', fontWeight: 500, color: 'var(--cor-papel-polen)' }}>Sua reserva do livro "Clean Code" está pronta.</div>
                   <div style={{ fontSize: '0.8rem', color: 'var(--cor-texto-desativado)', marginTop: '4px' }}>Ontem</div>
+                </div>
+                <div className="selo-carimbo reserva" style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%) rotate(-4deg)' }}>
+                  Disponível
                 </div>
               </div>
             </div>

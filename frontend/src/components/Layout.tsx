@@ -33,24 +33,11 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   ];
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: 'var(--cor-fundo)' }}>
+    <div className="layout-container">
       {/* Menu Lateral (Sidebar) */}
-      <aside className="card-glass" style={{
-        width: '260px',
-        padding: '24px',
-        margin: '16px',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        borderRadius: 'var(--raio-borda-lg)',
-        border: '1px solid var(--cor-borda)',
-        height: 'calc(100vh - 32px)',
-        position: 'sticky',
-        top: '16px'
-      }}>
-        <div>
+      <aside className="card-glass layout-sidebar">
           {/* Logo do App */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '40px', paddingLeft: '8px' }}>
+          <div className="layout-logo" style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '40px', paddingLeft: '8px' }}>
             <div style={{
               backgroundColor: 'var(--cor-primaria)',
               padding: '8px',
@@ -65,7 +52,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
           </div>
 
           {/* Links do Menu */}
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <nav className="layout-nav">
             {itensMenu.map((item) => {
               const Ativo = location.pathname === item.caminho;
               const Icone = item.icone;
@@ -93,10 +80,9 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
               );
             })}
           </nav>
-        </div>
 
         {/* Informações do Usuário no Rodapé */}
-        <div>
+        <div className="layout-footer">
           {usuario && (
             <div style={{
               display: 'flex',
@@ -145,7 +131,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       </aside>
 
       {/* Conteúdo Principal */}
-      <main style={{ flex: 1, padding: '32px 32px 32px 16px', overflowY: 'auto', maxHeight: '100vh' }}>
+      <main className="layout-main">
         {children}
       </main>
     </div>

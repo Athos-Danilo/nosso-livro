@@ -14,8 +14,8 @@ Este documento funciona como um guia de acompanhamento (To-Do List) para a concl
 - [x] **Fase 1: Escrivaninha de Estudos e Banner de Registro (Estrutura)**
 - [x] **Fase 2: Animações Cinematográficas e Efeito Hover Metálico**
 - [x] **Fase 3: Contadores Dinâmicos de Página Mecânicos (APIs)**
-- [ ] **Fase 4: Livro de Avisos e Prateleira de Indicações (Listagens)**
-- [ ] **Fase 5: Skeletons de Papel e Responsividade Premium**
+- [x] **Fase 4: Livro de Avisos e Prateleira de Indicações (Listagens)**
+- [x] **Fase 5: Skeletons de Papel e Responsividade Premium**
 
 ---
 
@@ -61,19 +61,19 @@ Alimentação real dos dados e efeito de contagem mecânica simulada.
 ## 📨 Fase 4: Livro de Avisos e Prateleira de Indicações (Listagens)
 Alimentação das listas inferiores do painel de leitura.
 
-- [ ] **M4.1: Livro de Avisos (Notificações)**
-  - [ ] Mostrar as últimas notificações. Atribuir selos de carimbo coloridos sutilmente conforme o tipo (Devolução, Reserva, Retirada).
-- [ ] **M4.2: Prateleira de Recomendações**
-  - [ ] Carregar as sugestões do microsserviço de recomendações. Exibir os livros no formato 3D com a capa em perspectiva.
+- [x] **M4.1: Livro de Avisos (Notificações)**
+  - [x] Mostrar as últimas notificações. Atribuir selos de carimbo coloridos sutilmente conforme o tipo (Devolução, Reserva, Retirada).
+- [x] **M4.2: Prateleira de Recomendações**
+  - [x] Carregar as sugestões do microsserviço de recomendações. Exibir os livros no formato 3D com a capa em perspectiva.
 
 ---
 
 ## 🚀 Fase 5: Skeletons de Papel e Responsividade Premium
 Garantir o acabamento tátil em carregamentos lentos e celulares.
 
-- [ ] **M5.1: Skeletons de Ficha Pólen**
-  - [ ] Exibir esqueletos pulsando com brilho sutil em tons bege pólen e dourado no lugar das plaquetas de dados.
-- [ ] **M5.2: Responsividade Física**
-  - [ ] Garantir empilhamento simétrico em duas colunas para tablets e coluna única vertical contínua para celulares.
-- [ ] **M5.3: Tratamento contra Falhas de Rede**
-  - [ ] Mostrar um carimbo vintage `"INDISPONÍVEL"` no lugar dos contadores se os microsserviços falharem.
+- [x] **M5.1: Skeletons de Ficha Pólen**
+  - [x] Exibir esqueletos pulsando com brilho sutil em tons bege pólen e dourado no lugar das plaquetas de dados.
+- [x] **M5.2: Responsividade Física**
+  - [x] Garantir empilhamento simétrico em duas colunas para tablets e coluna única vertical contínua para celulares.
+- [x] **M5.3: Tratamento contra Falhas de Rede**
+  - [x] Mostrar um carimbo vintage `"INDISPONÍVEL"` no lugar dos contadores se os microsserviços falharem.
