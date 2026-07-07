@@ -384,11 +384,25 @@ export const Catalogo: React.FC = () => {
                           {livro.autor}
                         </p>
 
-                        <div style={{ alignSelf: 'flex-end', marginTop: 'auto' }}>
+                        <div style={{ alignSelf: 'flex-end', marginTop: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
                           {livro.quantidade_disponivel > 0 ? (
                             <span className="carimbo-disponivel">Disponível</span>
                           ) : (
-                            <span className="carimbo-reservado">Fila de Espera</span>
+                            <>
+                              <span className="carimbo-reservado">Fila de Espera</span>
+                              {usuario?.permissao === 'membro' && (
+                                <button 
+                                  className="btn-fila-mini"
+                                  onClick={(e) => { 
+                                    e.stopPropagation(); 
+                                    entrarNaFila(livro); 
+                                  }}
+                                  disabled={processandoRequisicao}
+                                >
+                                  {processandoRequisicao ? '...' : 'Reservar'}
+                                </button>
+                              )}
+                            </>
                           )}
                         </div>
                       </div>

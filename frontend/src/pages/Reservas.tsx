@@ -1,140 +1,217 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
 import { Layout } from '../components/Layout';
-import { Bookmark, Clock, CheckCircle, ArrowRight } from 'lucide-react';
+import { api } from '../services/api';
+import { Bookmark, Hourglass, XCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import '../styles/index.css';
 
+interface ReservaAPI {
+  id: string;
+  idLivro: string;
+  estado: string; // PENDENTE, ATRIBUIDO, CONCLUIDO, CANCELADO
+  posicao: number;
+  prazoRetirada?: string | null;
+  criadoEm: string;
+}
+
+interface LivroDetalhes {
+  titulo: string;
+  autor: string;
+  capa_url?: string;
+}
+
+interface ReservaAgregada extends ReservaAPI {
+  livro?: LivroDetalhes;
+}
+
 export const Reservas: React.FC = () => {
-  // Dados simulados elegantes de reservas
-  const reservas = [
-    {
-      id: '1',
-      livro: 'Clean Code',
-      autor: 'Robert C. Martin',
-      dataReserva: '01/07/2026',
-      status: 'FILA',
-      posicaoFila: 2,
-      totalFila: 5,
-    },
-    {
-      id: '2',
-      livro: 'Arquitetura Limpa',
-      autor: 'Robert C. Martin',
-      dataReserva: '29/06/2026',
-      status: 'DISPONIVEL',
-      prazoRetirada: '05/07/2026',
-      biblioteca: 'Biblioteca Central (Bloco A)'
+  const { usuario } = useAuth();
+  
+  const [reservas, setReservas] = useState<ReservaAgregada[]>([]);
+  const [carregando, setCarregando] = useState(true);
+  const [removendoIds, setRemovendoIds] = useState<Set<string>>(new Set());
+
+  const carregarReservas = async () => {
+    if (!usuario?.id) return;
+    
+    setCarregando(true);
+    try {
+      // Busca a lista de reservas do usuário
+      const respostaReservas = await api.get('/api/reservas/me');
+      
+      // O backend retorna um array "dados" contendo as reservas
+      const listaReservas: ReservaAPI[] = respostaReservas.data?.dados || [];
+      
+      // Busca detalhes dos livros do catálogo em paralelo
+      const promessasLivros = listaReservas.map(async (res) => {
+        try {
+          const resLivro = await api.get(`/api/livros/${res.idLivro}`);
+          return { ...res, livro: resLivro.data };
+        } catch (e) {
+          return { ...res, livro: { titulo: 'Obra Desconhecida', autor: 'Autor Desconhecido' } };
+        }
+      });
+      
+      const agregados = await Promise.all(promessasLivros);
+      
+      // Exibir apenas PENDENTES e ATRIBUIDOS na fila principal
+      const reservasAtivas = agregados.filter(
+        r => r.estado === 'PENDENTE' || r.estado === 'ATRIBUIDO'
+      );
+      
+      setReservas(reservasAtivas);
+    } catch (erro) {
+      console.error('Erro ao carregar reservas:', erro);
+    } finally {
+      setCarregando(false);
     }
-  ];
+  };
+
+  useEffect(() => {
+    carregarReservas();
+  }, [usuario]);
+
+  const cancelarReserva = async (id: string) => {
+    // Inicia a animação de encolhimento adicionando à lista de remocao
+    setRemovendoIds(prev => new Set(prev).add(id));
+    
+    try {
+      await api.delete(`/api/reservas/${id}`);
+      
+      // Aguarda o término da animação CSS antes de remover do estado
+      setTimeout(() => {
+        setReservas(prev => prev.filter(r => r.id !== id));
+      }, 400); // 400ms é a transição do .removendo
+      
+    } catch (erro) {
+      console.error('Erro ao cancelar reserva:', erro);
+      setRemovendoIds(prev => {
+        const nova = new Set(prev);
+        nova.delete(id);
+        return nova;
+      });
+    }
+  };
+
+  const formatarPrazo = (dataIso?: string | null) => {
+    if (!dataIso) return '';
+    const data = new Date(dataIso);
+    return data.toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+  };
 
   return (
     <Layout>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
         
-        {/* Cabeçalho */}
-        <div>
-          <h1 style={{ fontSize: '2rem', fontWeight: 700 }}>Minhas Reservas</h1>
-          <p style={{ color: 'var(--cor-texto-secundario)' }}>Monitore sua posição na fila de espera e livros liberados</p>
+        {/* Cabeçalho Clássico */}
+        <div style={{ borderBottom: '2px solid #8B7355', paddingBottom: '16px', marginBottom: '8px' }}>
+          <h1 style={{ fontFamily: '"Times New Roman", Times, serif', fontSize: '2.5rem', fontWeight: 'bold', color: '#2c1e16' }}>Fila de Espera</h1>
+          <p style={{ color: '#5c4a3d', fontSize: '1.1rem', marginTop: '8px', fontStyle: 'italic' }}>
+            Aguardando pacientemente a devolução das seguintes obras:
+          </p>
         </div>
 
-        {/* Listagem */}
-        <section style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {reservas.map((reserva) => (
-            <div key={reserva.id} className="card-glass" style={{
-              padding: '24px',
-              border: '1px solid var(--cor-borda)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              flexWrap: 'wrap',
-              gap: '20px'
-            }}>
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-                <div style={{
-                  padding: '12px',
-                  borderRadius: 'var(--raio-borda-md)',
-                  backgroundColor: reserva.status === 'DISPONIVEL' ? 'rgba(34, 197, 94, 0.1)' : 'rgba(235, 94, 40, 0.1)',
-                  color: reserva.status === 'DISPONIVEL' ? 'var(--cor-sucesso)' : 'var(--cor-acento)'
-                }}>
-                  <Bookmark size={24} />
-                </div>
-                <div>
-                  <h3 style={{ fontSize: '1.2rem', fontWeight: 700 }}>{reserva.livro}</h3>
-                  <p style={{ fontSize: '0.85rem', color: 'var(--cor-texto-secundario)', marginTop: '2px' }}>Por {reserva.autor}</p>
-                  <p style={{ fontSize: '0.8rem', color: 'var(--cor-texto-desativado)', marginTop: '4px' }}>Reservado em {reserva.dataReserva}</p>
-                </div>
-              </div>
+        {/* FASE 5: Skeletons e Estado Vazio */}
+        {carregando ? (
+          <div className="lista-reservas">
+            <div className="skeleton-livro" style={{ height: '180px', borderRadius: '4px' }}></div>
+            <div className="skeleton-livro" style={{ height: '180px', borderRadius: '4px', animationDelay: '0.2s' }}></div>
+          </div>
+        ) : reservas.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '64px', backgroundColor: 'var(--cor-papel-polen)', border: '1px dashed #c2b4a3', borderRadius: '4px' }}>
+            <Bookmark size={64} color="#8B7355" style={{ margin: '0 auto', marginBottom: '24px', opacity: 0.5 }} />
+            <h2 style={{ fontFamily: '"Times New Roman", Times, serif', color: '#2c1e16', fontSize: '1.8rem', marginBottom: '16px', textTransform: 'uppercase' }}>
+              Nenhum livro em espera registrado na sua ficha.
+            </h2>
+            <p style={{ color: '#5c4a3d', marginBottom: '32px', fontFamily: '"Courier New", Courier, monospace' }}>
+              "A leitura é uma viagem cujo bilhete você já comprou."
+            </p>
+            <Link to="/catalogo" className="btn-santuario" style={{ display: 'inline-flex', padding: '12px 32px' }}>
+              Explorar Prateleiras do Acervo
+            </Link>
+          </div>
+        ) : (
+          <div className="lista-reservas">
+            {reservas.map((reserva) => {
+              const estaRemovendo = removendoIds.has(reserva.id);
+              const estaAtribuido = reserva.estado === 'ATRIBUIDO';
+              
+              // Simulação visual de carregamento da barra: exibe barra 100% cheia se for Posição 1 ou Atribuído, 
+              // Do contrário, baseia-se num cálculo fictício (posições altas preenchem menos)
+              const progresso = estaAtribuido ? 100 : Math.max(10, 100 - (reserva.posicao * 15));
 
-              {/* Informações de Status */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexWrap: 'wrap' }}>
-                {reserva.status === 'FILA' ? (
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--cor-acento)', fontSize: '0.875rem', fontWeight: 600 }}>
-                      <Clock size={16} />
-                      <span>Na Fila de Espera</span>
-                    </div>
-                    {/* Barra de Progresso da Fila */}
-                    {(() => {
-                      const totalFila = reserva.totalFila ?? 1;
-                      const posicaoFila = reserva.posicaoFila ?? 1;
-                      const porcentagem = ((totalFila - posicaoFila + 1) / totalFila) * 100;
-                      return (
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <div style={{ width: '120px', height: '6px', backgroundColor: 'var(--cor-card-hover)', borderRadius: '3px', overflow: 'hidden' }}>
-                            <div style={{
-                              width: `${porcentagem}%`,
-                              height: '100%',
-                              backgroundColor: 'var(--cor-acento)',
-                              borderRadius: '3px'
-                            }}></div>
-                          </div>
-                          <span style={{ fontSize: '0.8rem', fontWeight: 500 }}>
-                            {posicaoFila}º de {totalFila}
+              return (
+                <div 
+                  key={reserva.id} 
+                  className={`ficha-reserva ${estaRemovendo ? 'removendo' : ''} ${estaAtribuido ? 'atribuido' : ''}`}
+                >
+                  {/* Capa 3D sutil */}
+                  <div className="reserva-imagem-container">
+                    {reserva.livro?.capa_url ? (
+                      <img src={reserva.livro.capa_url} alt={reserva.livro.titulo} />
+                    ) : (
+                      <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d8d0c5', fontStyle: 'italic', fontSize: '0.8rem', padding: '8px', textAlign: 'center' }}>
+                        Sem Capa
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="reserva-conteudo">
+                    <h3 className="reserva-titulo">{reserva.livro?.titulo || 'Livro Desconhecido'}</h3>
+                    <p className="reserva-autor">Por {reserva.livro?.autor || 'Desconhecido'}</p>
+                    
+                    {/* FASE 2: Indicador à Pena */}
+                    <div style={{ marginTop: '24px', maxWidth: '300px' }}>
+                      <div className="indicador-pena">
+                        <Hourglass size={18} color="#8B7355" />
+                        {estaAtribuido ? (
+                          <span>Livro retornado à Biblioteca!</span>
+                        ) : (
+                          <span>
+                            {reserva.posicao}º na fila de espera
                           </span>
+                        )}
+                      </div>
+                      
+                      {!estaAtribuido && (
+                        <div className="barra-espera-container">
+                          <div className="barra-espera-preenchimento" style={{ width: `${progresso}%` }}></div>
                         </div>
-                      );
-                    })()}
-                  </div>
-                ) : (
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--cor-sucesso)', fontSize: '0.875rem', fontWeight: 600 }}>
-                      <CheckCircle size={16} />
-                      <span>Disponível para Coleta!</span>
+                      )}
                     </div>
-                    <span style={{ fontSize: '0.8rem', color: 'var(--cor-texto-secundario)' }}>
-                      Retirar até: <strong style={{ color: 'var(--cor-texto-principal)' }}>{reserva.prazoRetirada}</strong>
-                    </span>
-                    <span style={{ fontSize: '0.75rem', color: 'var(--cor-texto-desativado)' }}>
-                      Local: {reserva.biblioteca}
-                    </span>
                   </div>
-                )}
 
-                <button className="btn-animado" style={{
-                  backgroundColor: reserva.status === 'DISPONIVEL' ? 'var(--cor-sucesso)' : 'transparent',
-                  border: reserva.status === 'DISPONIVEL' ? 'none' : '1px solid var(--cor-erro)',
-                  color: reserva.status === 'DISPONIVEL' ? 'var(--cor-fundo)' : 'var(--cor-erro)',
-                  padding: '10px 18px',
-                  borderRadius: 'var(--raio-borda-md)',
-                  fontWeight: 600,
-                  fontSize: '0.875rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px'
-                }}>
-                  {reserva.status === 'DISPONIVEL' ? (
-                    <>
-                      <span>Ver Código Coleta</span>
-                      <ArrowRight size={16} />
-                    </>
-                  ) : (
-                    <span>Cancelar Reserva</span>
-                  )}
-                </button>
-              </div>
-
-            </div>
-          ))}
-        </section>
+                  {/* FASE 4: Ações e Carimbos */}
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '24px', minWidth: '220px' }}>
+                    {estaAtribuido ? (
+                      <>
+                        <div className="carimbo-liberado">
+                          LIBERADO PARA RETIRADA
+                        </div>
+                        {reserva.prazoRetirada && (
+                          <div className="cronometro-guarda">
+                            <Hourglass size={16} />
+                            Retirar até {formatarPrazo(reserva.prazoRetirada)}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <button 
+                        className="btn-cancelar-reserva"
+                        onClick={() => cancelarReserva(reserva.id)}
+                        disabled={estaRemovendo}
+                      >
+                        <XCircle size={18} style={{ display: 'inline', verticalAlign: 'text-bottom', marginRight: '6px' }} />
+                        Cancelar Reserva
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
       </div>
     </Layout>

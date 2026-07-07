@@ -14,7 +14,7 @@ const roteador = Router();
 
 /** Valida o corpo da requisição de criação de reserva */
 const esquemaCriarReserva = z.object({
-  idLivro: z.string().uuid({ message: 'O campo "idLivro" deve ser um UUID válido.' }),
+  idLivro: z.string().min(1, { message: 'O campo "idLivro" é obrigatório e não pode ser vazio.' }),
 });
 
 /** Valida o parâmetro de rota `:id` */
@@ -24,7 +24,7 @@ const esquemaParamId = z.object({
 
 /** Valida o parâmetro de rota `:idLivro` */
 const esquemaParamIdLivro = z.object({
-  idLivro: z.string().uuid({ message: 'O parâmetro "idLivro" deve ser um UUID válido.' }),
+  idLivro: z.string().min(1, { message: 'O parâmetro "idLivro" é obrigatório.' }),
 });
 
 // ─── POST /api/reservas ───────────────────────────────────────────────────────
