@@ -45,7 +45,7 @@ export const Home: React.FC = () => {
         
         <div className="hero-imagem-container flutuacao">
           <img 
-            src="/assets/hero-bg.png" 
+            src="/assets/livrosss.webp" 
             alt="Biblioteca Digital Iluminada" 
             className="hero-imagem"
           />
