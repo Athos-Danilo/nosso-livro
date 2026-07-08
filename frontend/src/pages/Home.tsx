@@ -41,20 +41,6 @@ export const Home: React.FC = () => {
           <p className="hero-subtitulo">
             Conecte leitores e livros em uma plataforma unificada. Gerencie empréstimos, crie filas de espera justas e descubra novas leituras com o nosso ecossistema institucional.
           </p>
-          <div className="hero-ctas">
-            {!autenticado ? (
-              <Link to="/cadastro" className="btn-primario btn-lg btn-animado">
-                Começar Agora
-              </Link>
-            ) : (
-              <Link to="/catalogo" className="btn-primario btn-lg btn-animado">
-                Explorar Catálogo
-              </Link>
-            )}
-            <a href="#funcionalidades" className="btn-secundario btn-lg btn-animado">
-              Conhecer Mais
-            </a>
-          </div>
         </div>
         
         <div className="hero-imagem-container flutuacao">
