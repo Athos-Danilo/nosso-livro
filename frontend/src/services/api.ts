@@ -2,7 +2,8 @@ import axios from 'axios';
 
 // Instância do Axios apontando para o Gateway de API na porta 3000
 export const api = axios.create({
-  baseURL: 'http://localhost:3000',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
+  timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
   },
