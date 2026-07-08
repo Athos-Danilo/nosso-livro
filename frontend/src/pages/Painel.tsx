@@ -65,7 +65,7 @@ export const Painel: React.FC = () => {
       setDadosEstatisticas({
         livros: resLivros.status === 'fulfilled' ? (resLivros.value.data.total || 0) : 0,
         reservas: resReservas.status === 'fulfilled' ? (resReservas.value.data.total || resReservas.value.data.dados?.length || 0) : 0,
-        emprestimos: resEmprestimos.status === 'fulfilled' ? (resEmprestimos.value.data.length || 0) : 0,
+        emprestimos: resEmprestimos.status === 'fulfilled' ? (resEmprestimos.value.data?.length || 0) : 0,
         notificacoes: resNotificacoes.status === 'fulfilled' ? (resNotificacoes.value.data.total || 0) : 0
       });
     } catch (err) {

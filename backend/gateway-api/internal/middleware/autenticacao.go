@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"strings"
@@ -106,6 +107,17 @@ func MiddlewareAutenticacao(cfg *configuracao.Configuracao) func(http.Handler) h
 				// Permissao
 				if permissao, ok := claims["permissao"]; ok {
 					r.Header.Set("X-Usuario-Permissao", fmt.Sprintf("%v", permissao))
+				}
+
+				dadosUsuario := map[string]interface{}{
+					"id":        claims["sub"],
+					"email":     claims["email"],
+					"nome":      claims["nome"],
+					"whatsapp":  claims["whatsapp"],
+					"permissao": claims["permissao"],
+				}
+				if jsonBytes, err := json.Marshal(dadosUsuario); err == nil {
+					r.Header.Set("X-Usuario-Dados", string(jsonBytes))
 				}
 			} else {
 				erroNaoAutorizado(w, "Falha ao extrair dados do token.")

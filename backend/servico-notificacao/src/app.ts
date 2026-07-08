@@ -63,6 +63,6 @@ app.get('/pronto', async (_req: Request, res: Response) => {
 });
 
 // ─── Rotas da API ────────────────────────────────────────────────────────────
-app.use('/', rotasNotificacoes);
+app.use('/api/notificacoes', rotasNotificacoes);
 
 export default app;
