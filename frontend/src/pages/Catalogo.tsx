@@ -30,7 +30,7 @@ export const Catalogo: React.FC = () => {
   const [busca, setBusca] = useState('');
   const [mostrarFiltros, setMostrarFiltros] = useState(false);
   const [filtroCategoria, setFiltroCategoria] = useState('');
-  
+
   // Estados de criação de livro (para administradores)
   const [mostrarCriar, setMostrarCriar] = useState(false);
   const [novoLivro, setNovoLivro] = useState({
@@ -58,13 +58,13 @@ export const Catalogo: React.FC = () => {
   const ultimoLivroReferencia = useCallback((node: HTMLDivElement) => {
     if (carregando || carregandoMais) return;
     if (observadorReferencia.current) observadorReferencia.current.disconnect();
-    
+
     observadorReferencia.current = new IntersectionObserver(entries => {
       if (entries[0].isIntersecting && temMais) {
         setPagina(prev => prev + 1);
       }
     });
-    
+
     if (node) observadorReferencia.current.observe(node);
   }, [carregando, carregandoMais, temMais]);
 
@@ -72,7 +72,7 @@ export const Catalogo: React.FC = () => {
   const carregarLivros = async (pageNum: number, tituloBusca: string) => {
     const limite = 12; // Número de livros por página
     const pulo = (pageNum - 1) * limite;
-    
+
     try {
       const resposta = await api.get('/api/livros/', {
         params: {
@@ -81,7 +81,7 @@ export const Catalogo: React.FC = () => {
           titulo: tituloBusca || undefined
         }
       });
-      
+
       const novosLivros = resposta.data;
       if (novosLivros.length < limite) {
         setTemMais(false);
@@ -134,7 +134,7 @@ export const Catalogo: React.FC = () => {
         id_biblioteca: Number(novoLivro.id_biblioteca)
       });
       setNovoLivro({ titulo: '', autor: '', isbn: '', categoria: '', ano_publicacao: '', quantidade_total: 1, id_biblioteca: 1 });
-      
+
       setPagina(1);
       carregarLivros(1, busca);
     } catch (erro: any) {
@@ -163,7 +163,7 @@ export const Catalogo: React.FC = () => {
         id_biblioteca: String(livro.id_biblioteca)
       });
       setStatusRequisicao({ tipo: 'sucesso', mensagem: 'EMPRÉSTIMO APROVADO' });
-      
+
       // Atualiza o estado do livro no modal para exibir a nova quantidade instantaneamente
       setLivroSelecionado(prev => prev ? {
         ...prev,
@@ -201,7 +201,7 @@ export const Catalogo: React.FC = () => {
   return (
     <Layout>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-        
+
         {/* Cabeçalho */}
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
@@ -244,39 +244,39 @@ export const Catalogo: React.FC = () => {
                     <X size={24} />
                   </button>
                 </div>
-                
+
                 {erroCriar && <div style={{ color: 'var(--cor-erro)', marginBottom: '16px', fontWeight: 600 }}>{erroCriar}</div>}
-                
+
                 <form onSubmit={handleCriarLivro} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
                   <div style={{ gridColumn: '1 / -1' }}>
                     <label style={{ color: 'var(--cor-texto-secundario)', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Título da Obra</label>
-                    <input type="text" className="input-classico" value={novoLivro.titulo} onChange={e => { setNovoLivro({...novoLivro, titulo: e.target.value}); setErroValidacaoCriar(false); }} required />
+                    <input type="text" className="input-classico" value={novoLivro.titulo} onChange={e => { setNovoLivro({ ...novoLivro, titulo: e.target.value }); setErroValidacaoCriar(false); }} required />
                   </div>
                   <div>
                     <label style={{ color: 'var(--cor-texto-secundario)', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Autor</label>
-                    <input type="text" className="input-classico" value={novoLivro.autor} onChange={e => { setNovoLivro({...novoLivro, autor: e.target.value}); setErroValidacaoCriar(false); }} required />
+                    <input type="text" className="input-classico" value={novoLivro.autor} onChange={e => { setNovoLivro({ ...novoLivro, autor: e.target.value }); setErroValidacaoCriar(false); }} required />
                   </div>
                   <div>
                     <label style={{ color: 'var(--cor-texto-secundario)', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>ISBN</label>
-                    <input type="text" className="input-classico" value={novoLivro.isbn} onChange={e => { setNovoLivro({...novoLivro, isbn: e.target.value}); setErroValidacaoCriar(false); }} required />
+                    <input type="text" className="input-classico" value={novoLivro.isbn} onChange={e => { setNovoLivro({ ...novoLivro, isbn: e.target.value }); setErroValidacaoCriar(false); }} required />
                   </div>
                   <div>
                     <label style={{ color: 'var(--cor-texto-secundario)', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Gênero/Categoria</label>
-                    <input type="text" className="input-classico" value={novoLivro.categoria} onChange={e => { setNovoLivro({...novoLivro, categoria: e.target.value}); setErroValidacaoCriar(false); }} required />
+                    <input type="text" className="input-classico" value={novoLivro.categoria} onChange={e => { setNovoLivro({ ...novoLivro, categoria: e.target.value }); setErroValidacaoCriar(false); }} required />
                   </div>
                   <div>
                     <label style={{ color: 'var(--cor-texto-secundario)', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Ano (Ex: 1954)</label>
-                    <input type="number" className="input-classico" value={novoLivro.ano_publicacao} onChange={e => { setNovoLivro({...novoLivro, ano_publicacao: e.target.value}); setErroValidacaoCriar(false); }} required />
+                    <input type="number" className="input-classico" value={novoLivro.ano_publicacao} onChange={e => { setNovoLivro({ ...novoLivro, ano_publicacao: e.target.value }); setErroValidacaoCriar(false); }} required />
                   </div>
                   <div>
                     <label style={{ color: 'var(--cor-texto-secundario)', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Quantidade Inicial (Estoque)</label>
-                    <input type="number" className="input-classico" value={novoLivro.quantidade_total} onChange={e => { setNovoLivro({...novoLivro, quantidade_total: parseInt(e.target.value)}); setErroValidacaoCriar(false); }} min="1" required />
+                    <input type="number" className="input-classico" value={novoLivro.quantidade_total} onChange={e => { setNovoLivro({ ...novoLivro, quantidade_total: parseInt(e.target.value) }); setErroValidacaoCriar(false); }} min="1" required />
                   </div>
                   <div>
                     <label style={{ color: 'var(--cor-texto-secundario)', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>ID da Biblioteca Origem</label>
-                    <input type="number" className="input-classico" value={novoLivro.id_biblioteca} onChange={e => { setNovoLivro({...novoLivro, id_biblioteca: parseInt(e.target.value)}); setErroValidacaoCriar(false); }} min="1" required />
+                    <input type="number" className="input-classico" value={novoLivro.id_biblioteca} onChange={e => { setNovoLivro({ ...novoLivro, id_biblioteca: parseInt(e.target.value) }); setErroValidacaoCriar(false); }} min="1" required />
                   </div>
-                  
+
                   <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
                     <button type="submit" className="btn-animado" style={{
                       backgroundColor: 'var(--cor-primaria)',
@@ -364,80 +364,92 @@ export const Catalogo: React.FC = () => {
               <div className="grid-prateleira">
                 {livrosFiltrados.map((livro, index) => {
                   const ref = (index === livrosFiltrados.length - 1) ? ultimoLivroReferencia : null;
-                  
+
                   return (
                     <div key={livro.id} className="prateleira-base" ref={ref}>
                       <div className="perspectiva-wrapper" onClick={() => setLivroSelecionado(livro)}>
                         <div className="livro-3d">
-                          <div className="capa-livro">
+                          <div className="capa-livro" style={livro.capa_url ? {
+                            backgroundImage: `url(${livro.capa_url})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center',
+                            boxShadow: 'inset 0 0 20px rgba(0,0,0,0.8)'
+                          } : {}}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
                               <span style={{
                                 fontSize: '0.65rem',
                                 fontWeight: 600,
-                                backgroundColor: 'rgba(0,0,0,0.4)',
+                                backgroundColor: 'rgba(0,0,0,0.6)',
                                 color: 'var(--cor-ouro-envelhecido)',
                                 padding: '4px 8px',
                                 borderRadius: '4px',
-                                border: '1px solid rgba(212,175,55,0.3)'
+                                border: '1px solid rgba(212,175,55,0.3)',
+                                backdropFilter: 'blur(2px)'
                               }}>
                                 {livro.categoria.toUpperCase()}
                               </span>
                             </div>
 
-                        <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginTop: 'auto', marginBottom: '4px', lineHeight: 1.2, color: '#f8f4e6', textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}>
-                          {livro.titulo}
-                        </h3>
-                        <p style={{ fontSize: '0.75rem', color: '#d1c7a3', fontWeight: 600, marginBottom: '24px' }}>
-                          {livro.autor}
-                        </p>
+                            {!livro.capa_url ? (
+                              <>
+                                <h3 style={{ fontSize: '1.1rem', fontWeight: 800, marginTop: 'auto', marginBottom: '4px', lineHeight: 1.2, color: '#f8f4e6', textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}>
+                                  {livro.titulo}
+                                </h3>
+                                <p style={{ fontSize: '0.75rem', color: '#d1c7a3', fontWeight: 600, marginBottom: '24px' }}>
+                                  {livro.autor}
+                                </p>
+                              </>
+                            ) : (
+                              <div style={{ flex: 1 }}></div>
+                            )}
 
-                        <div style={{ alignSelf: 'flex-end', marginTop: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
-                          {livro.quantidade_disponivel > 0 ? (
-                            <span className="carimbo-disponivel">Disponível</span>
-                          ) : (
-                            <>
-                              <span className="carimbo-reservado">Fila de Espera</span>
-                              {usuario?.permissao === 'membro' && (
-                                <button 
-                                  className="btn-fila-mini"
-                                  onClick={(e) => { 
-                                    e.stopPropagation(); 
-                                    entrarNaFila(livro); 
-                                  }}
-                                  disabled={processandoRequisicao}
-                                >
-                                  {processandoRequisicao ? '...' : 'Reservar'}
-                                </button>
+                            <div style={{ alignSelf: 'flex-end', marginTop: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+                              {livro.quantidade_disponivel > 0 ? (
+                                <span className="carimbo-disponivel">Disponível</span>
+                              ) : (
+                                <>
+                                  <span className="carimbo-reservado">Fila de Espera</span>
+                                  {usuario?.permissao === 'membro' && (
+                                    <button
+                                      className="btn-fila-mini"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        entrarNaFila(livro);
+                                      }}
+                                      disabled={processandoRequisicao}
+                                    >
+                                      {processandoRequisicao ? '...' : 'Reservar'}
+                                    </button>
+                                  )}
+                                </>
                               )}
-                            </>
-                          )}
+                            </div>
+                          </div>
+                          <div className="lombada-livro">
+                            <span style={{
+                              color: 'var(--cor-ouro-envelhecido)',
+                              fontSize: '0.6rem',
+                              fontWeight: 700,
+                              writingMode: 'vertical-rl',
+                              transform: 'rotate(180deg)',
+                              height: '100%',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              padding: '16px 0',
+                              opacity: 0.7
+                            }}>
+                              {livro.titulo.length > 20 ? livro.titulo.substring(0, 20) + '...' : livro.titulo}
+                            </span>
+                          </div>
+                          <div className="paginas-livro"></div>
                         </div>
                       </div>
-                      <div className="lombada-livro">
-                        <span style={{ 
-                          color: 'var(--cor-ouro-envelhecido)', 
-                          fontSize: '0.6rem', 
-                          fontWeight: 700, 
-                          writingMode: 'vertical-rl', 
-                          transform: 'rotate(180deg)', 
-                          height: '100%', 
-                          display: 'flex', 
-                          alignItems: 'center', 
-                          justifyContent: 'center',
-                          padding: '16px 0',
-                          opacity: 0.7
-                        }}>
-                          {livro.titulo.length > 20 ? livro.titulo.substring(0, 20) + '...' : livro.titulo}
-                        </span>
-                      </div>
-                      <div className="paginas-livro"></div>
                     </div>
-                  </div>
-                </div>
-              );
+                  );
                 })}
               </div>
-              
+
               {/* Skeletons adicionais ao final da lista de carregamento paginado */}
               {carregandoMais && (
                 <div className="grid-prateleira" style={{ marginTop: '24px' }}>
@@ -464,35 +476,49 @@ export const Catalogo: React.FC = () => {
 
             {/* Carimbo de Status de Requisição Dinâmico */}
             {statusRequisicao && (
-              <div className={`carimbo-status-modal ${
-                statusRequisicao.tipo === 'sucesso' ? 'carimbo-disponivel' : 
-                statusRequisicao.tipo === 'erro' ? 'carimbo-emprestado' : 'carimbo-reservado'
-              }`}>
+              <div className={`carimbo-status-modal ${statusRequisicao.tipo === 'sucesso' ? 'carimbo-disponivel' :
+                  statusRequisicao.tipo === 'erro' ? 'carimbo-emprestado' : 'carimbo-reservado'
+                }`}>
                 {statusRequisicao.mensagem}
               </div>
             )}
 
             <div className="ficha-titulo">{livroSelecionado.titulo}</div>
-            
+
+            {livroSelecionado.capa_url && (
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '24px' }}>
+                <img
+                  src={livroSelecionado.capa_url}
+                  alt={`Capa do livro ${livroSelecionado.titulo}`}
+                  style={{
+                    maxWidth: '150px',
+                    borderRadius: '4px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                    border: '1px solid rgba(139, 115, 85, 0.4)'
+                  }}
+                />
+              </div>
+            )}
+
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
-              <div className="ficha-dado"><strong>Autor:</strong><br/>{livroSelecionado.autor}</div>
-              <div className="ficha-dado"><strong>Categoria:</strong><br/>{livroSelecionado.categoria}</div>
-              <div className="ficha-dado"><strong>Ano:</strong><br/>{livroSelecionado.ano_publicacao || 'Desconhecido'}</div>
-              <div className="ficha-dado"><strong>ISBN:</strong><br/>{livroSelecionado.isbn}</div>
+              <div className="ficha-dado"><strong>Autor:</strong><br />{livroSelecionado.autor}</div>
+              <div className="ficha-dado"><strong>Categoria:</strong><br />{livroSelecionado.categoria}</div>
+              <div className="ficha-dado"><strong>Ano:</strong><br />{livroSelecionado.ano_publicacao || 'Desconhecido'}</div>
+              <div className="ficha-dado"><strong>ISBN:</strong><br />{livroSelecionado.isbn}</div>
             </div>
 
             <div className="ficha-dado" style={{ borderTop: '1px solid rgba(139, 115, 85, 0.3)', paddingTop: '16px' }}>
-              <strong>Status do Acervo:</strong><br/>
+              <strong>Status do Acervo:</strong><br />
               Biblioteca ID: {livroSelecionado.id_biblioteca} — {livroSelecionado.quantidade_disponivel} cópias disponíveis de {livroSelecionado.quantidade_total}.
             </div>
 
             <div className="ficha-acoes">
               {usuario?.permissao === 'administrador' ? (
                 <div style={{ textAlign: 'center', color: 'var(--cor-texto-secundario)', fontStyle: 'italic', padding: '8px', fontSize: '0.9rem', backgroundColor: 'rgba(0,0,0,0.02)', borderRadius: '4px' }}>
-                  Como <strong>Administrador</strong>, seu perfil destina-se a gerenciar o acervo. <br/>Faça login como <strong>Membro</strong> para solicitar empréstimos ou entrar na fila.
+                  Como <strong>Administrador</strong>, seu perfil destina-se a gerenciar o acervo. <br />Faça login como <strong>Membro</strong> para solicitar empréstimos ou entrar na fila.
                 </div>
               ) : livroSelecionado.quantidade_disponivel > 0 ? (
-                <button 
+                <button
                   className="btn-solicitar"
                   onClick={() => solicitarEmprestimo(livroSelecionado)}
                   disabled={processandoRequisicao}
@@ -501,7 +527,7 @@ export const Catalogo: React.FC = () => {
                   {processandoRequisicao ? 'Carimbando...' : 'Solicitar Empréstimo'}
                 </button>
               ) : (
-                <button 
+                <button
                   className="btn-fila"
                   onClick={() => entrarNaFila(livroSelecionado)}
                   disabled={processandoRequisicao}

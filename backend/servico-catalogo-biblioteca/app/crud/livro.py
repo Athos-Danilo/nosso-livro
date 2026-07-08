@@ -49,7 +49,7 @@ async def listar_livros(
     pulo: int = 0
 ) -> list[Livro]:
     """Lista todos os livros ativos com suporte a filtros dinâmicos e paginação."""
-    instrucao = select(Livro).options(joinedload(Livro.biblioteca)).where(Livro.ativo == True)
+    instrucao = select(Livro).options(joinedload(Livro.biblioteca)).where(Livro.ativo == True).order_by(Livro.id.desc())
     
     if titulo:
         instrucao = instrucao.where(Livro.titulo.ilike(f"%{titulo}%"))

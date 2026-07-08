@@ -9,64 +9,55 @@ async def popular_banco():
     async with sessao_local() as db:
         # Verifica se o banco já contém dados de bibliotecas
         resultado_bibliotecas = await db.execute(select(Biblioteca))
-        total_bibliotecas = len(resultado_bibliotecas.scalars().all())
+        bibliotecas_existentes = resultado_bibliotecas.scalars().all()
         
-        if total_bibliotecas > 0:
-            print("O banco de dados já possui registros de bibliotecas. Abortando semeadura.")
-            return
+        if len(bibliotecas_existentes) > 0:
+            print("Bibliotecas já existem. Usando as existentes...")
+            biblioteca_central = bibliotecas_existentes[0]
+            if len(bibliotecas_existentes) > 1:
+                biblioteca_norte = bibliotecas_existentes[1]
+            else:
+                biblioteca_norte = biblioteca_central
+        else:
+            print("Criando bibliotecas de exemplo...")
+            biblioteca_central = Biblioteca(nome="Biblioteca Central", localizacao="Prédio Principal")
+            biblioteca_norte = Biblioteca(nome="Biblioteca Setor Norte", localizacao="Bloco Acadêmico")
+            db.add_all([biblioteca_central, biblioteca_norte])
+            await db.commit()
+            await db.refresh(biblioteca_central)
+            await db.refresh(biblioteca_norte)
+            print("Bibliotecas criadas.")
 
-        print("Iniciando semeadura de dados no banco de dados...")
+        import json
+        import os
+        caminho_json = os.path.join(os.path.dirname(__file__), 'livros_seed.json')
         
-        # 1. Criação das bibliotecas fictícias
-        biblioteca_central = Biblioteca(
-            nome="Biblioteca Central",
-            localizacao="Prédio Principal, Campus I"
-        )
-        biblioteca_norte = Biblioteca(
-            nome="Biblioteca Setor Norte",
-            localizacao="Bloco Acadêmico 4, Campus II"
-        )
+        if not os.path.exists(caminho_json):
+            print("Arquivo livros_seed.json não encontrado. Abortando semeadura de livros.")
+            return
+            
+        with open(caminho_json, 'r', encoding='utf-8') as f:
+            dados_livros = json.load(f)
+            
+        print(f"Lendo {len(dados_livros)} livros do arquivo JSON...")
         
-        db.add_all([biblioteca_central, biblioteca_norte])
-        
-        # Salvando as bibliotecas no banco para gerar seus IDs
-        await db.commit()
-        await db.refresh(biblioteca_central)
-        await db.refresh(biblioteca_norte)
-        
-        # 2. Criação dos livros de exemplo com ISBNs válidos (10 ou 13 dígitos numéricos)
-        livro_1 = Livro(
-            titulo="Introdução ao Python e SQLAlchemy",
-            autor="Cauã Herculano",
-            isbn="9788535288210",  # 13 dígitos
-            categoria="Tecnologia",
-            ano_publicacao=2026,
-            quantidade_total=5,
-            quantidade_disponivel=5,
-            id_biblioteca=biblioteca_central.id
-        )
-        livro_2 = Livro(
-            titulo="Construindo APIs Robustas com FastAPI",
-            autor="Athos Inácio",
-            isbn="9788535288227",  # 13 dígitos
-            categoria="Tecnologia",
-            ano_publicacao=2025,
-            quantidade_total=3,
-            quantidade_disponivel=3,
-            id_biblioteca=biblioteca_central.id
-        )
-        livro_3 = Livro(
-            titulo="Arquitetura Avançada de Microsserviços",
-            autor="Marcus Vinícius",
-            isbn="8535288235",  # 10 dígitos
-            categoria="Engenharia de Software",
-            ano_publicacao=2024,
-            quantidade_total=4,
-            quantidade_disponivel=4,
-            id_biblioteca=biblioteca_norte.id
-        )
-        
-        db.add_all([livro_1, livro_2, livro_3])
+        livros_para_inserir = []
+        for dado in dados_livros:
+            id_bib = biblioteca_central.id if dado['id_biblioteca'] == 1 else biblioteca_norte.id
+            livro = Livro(
+                titulo=dado['titulo'][:150], # Limitando tamanho para segurança
+                autor=dado['autor'][:100],
+                isbn=dado['isbn'][:20],
+                categoria=dado['categoria'][:50],
+                ano_publicacao=dado['ano_publicacao'],
+                capa_url=dado.get('capa_url'),
+                quantidade_total=dado['quantidade_total'],
+                quantidade_disponivel=dado['quantidade_total'],
+                id_biblioteca=id_bib
+            )
+            livros_para_inserir.append(livro)
+            
+        db.add_all(livros_para_inserir)
         await db.commit()
         print("Semeadura de dados concluída com sucesso!")
 
