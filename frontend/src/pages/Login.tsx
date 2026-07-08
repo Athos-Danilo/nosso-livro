@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { BookOpen, Mail, Lock, AlertCircle, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Mail, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import '../styles/index.css';
 
 export const Login: React.FC = () => {
@@ -14,8 +14,6 @@ export const Login: React.FC = () => {
   const [erroGlobal, setErroGlobal] = useState('');
   
   // Estados para controlar interações
-  const [emailTocado, setEmailTocado] = useState(false);
-  const [senhaTocado, setSenhaTocado] = useState(false);
   const [tentouSubmeter, setTentouSubmeter] = useState(false);
   
   const [carregando, setCarregando] = useState(false);
@@ -294,7 +292,6 @@ export const Login: React.FC = () => {
                 onFocus={() => setEmailFocado(true)}
                 onBlur={() => {
                   setEmailFocado(false);
-                  setEmailTocado(true);
                 }}
                 disabled={carregando}
                 aria-invalid={!!exibirErroEmail}
@@ -335,7 +332,6 @@ export const Login: React.FC = () => {
                 onFocus={() => setSenhaFocado(true)}
                 onBlur={() => {
                   setSenhaFocado(false);
-                  setSenhaTocado(true);
                 }}
                 disabled={carregando}
                 aria-invalid={!!exibirErroSenha}
