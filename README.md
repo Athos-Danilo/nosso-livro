@@ -140,34 +140,38 @@ Certifique-se de possuir instalado em sua máquina:
 * [Go](https://go.dev/) (Versão 1.20+)
 * [Python](https://www.python.org/) (Versão 3.10+)
 
-### Passo 1: Inicializando a Infraestrutura (Docker Compose)
-Na raiz do monorepo, execute o comando para subir os bancos de dados PostgreSQL locais de cada microsserviço e a instância local do RabbitMQ:
+### Passo 1: Inicializando o Backend Completo (Docker Compose)
+A nossa infraestrutura docker-compose já está configurada para subir **todos** os microsserviços do backend (APIs), RabbitMQ e os Bancos de Dados locais.
+Na raiz do monorepo, execute:
 
 ```bash
-docker compose up -d
+docker-compose up -d --build
 ```
+*Observação: A primeira execução pode demorar alguns minutos pois o Docker fará o build das imagens em Go, Python e Node.js. O serviço de Catálogo executará automaticamente a criação das tabelas e a injeção inicial de livros de exemplo no banco de dados.*
 
 ### Passo 2: Configurando o Frontend
+O frontend do React não roda no Docker, ele precisa ser iniciado localmente para desenvolvimento:
 1. Acesse o diretório do cliente web:
    ```bash
    cd frontend
    ```
-2. Instale as dependências de desenvolvimento:
+2. Crie o seu arquivo de variáveis de ambiente com base no exemplo:
+   ```bash
+   cp .env.example .env
+   ```
+3. Instale as dependências e inicie:
    ```bash
    npm install
-   ```
-3. Inicialize o servidor local do Vite:
-   ```bash
    npm run dev
    ```
-O frontend estará acessível em `http://localhost:5173`.
+O frontend estará acessível em `http://localhost:5173` e já estará conectado ao Gateway API (que roda no Docker na porta 3000).
 
-### Passo 3: Executando os Serviços do Backend
-Para cada microsserviço dentro de `./backend/`, configure o arquivo de variáveis de ambiente `.env` apontando para os bancos criados e as conexões do RabbitMQ, depois inicie cada um conforme as instruções de suas linguagens:
-
-* **Serviços em Go:** `go run cmd/api/principal.go` (ou `main.go`)
+### Passo 3: Executando Microsserviços Manualmente (Apenas se for alterar o código)
+Caso você queira alterar o código de um microsserviço específico, basta parar aquele contêiner específico no Docker (`docker stop nome_do_container`) e rodá-lo localmente na sua máquina:
+* **Serviços em Go:** `go run cmd/api/principal.go`
 * **Serviços em Node.js:** `npm run dev`
-* **Serviços em Python:** `uvicorn main:app --reload --port <porta>`
+* **Serviços em Python:** `uvicorn app.principal:app --reload --port <porta>`
+* *Lembre-se de configurar o `.env` dentro da pasta do serviço apontando para o banco local (`localhost:5432`) ao invés do host do docker (`db:5432`).*
 
 ---
 

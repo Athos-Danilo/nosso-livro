@@ -36,6 +36,13 @@ async def popular_banco():
             print("Arquivo livros_seed.json não encontrado. Abortando semeadura de livros.")
             return
             
+        # Verifica se já existem livros
+        resultado_livros = await db.execute(select(Livro))
+        livros_existentes = resultado_livros.scalars().all()
+        if len(livros_existentes) > 0:
+            print("Livros já existem no banco. Pulando semeadura para evitar duplicatas.")
+            return
+
         with open(caminho_json, 'r', encoding='utf-8') as f:
             dados_livros = json.load(f)
             

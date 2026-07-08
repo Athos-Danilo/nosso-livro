@@ -88,6 +88,7 @@ services:
     environment:
       - URL_BANCO_DADOS=postgresql+asyncpg://postgres:8156@db:5432/banco_catalogo
       - CHAVE_SECRETA_JWT=chave_secreta_padrao_desenvolvimento_nosso_livro
+    command: sh -c "alembic upgrade head && python -m app.sementes && uvicorn app.principal:app --host 0.0.0.0 --port 8000"
     depends_on:
       - db
     networks:
