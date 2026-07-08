@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ProvedorAuth, useAuth } from './context/AuthContext';
 
 // Importação das páginas
+import { Home } from './pages/Home';
 import { Login } from './pages/Login';
 import { Cadastro } from './pages/Cadastro';
 import { Painel } from './pages/Painel';
@@ -49,7 +50,7 @@ const RotaPublica: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   }
 
   if (autenticado) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/painel" replace />;
   }
 
   return <>{children}</>;
@@ -61,6 +62,7 @@ function App() {
       <ProvedorAuth>
         <Routes>
           {/* Rotas Públicas */}
+          <Route path="/" element={<Home />} />
           <Route path="/login" element={
             <RotaPublica>
               <Login />
@@ -73,7 +75,7 @@ function App() {
           } />
 
           {/* Rotas Privadas */}
-          <Route path="/" element={
+          <Route path="/painel" element={
             <RotaPrivada>
               <Painel />
             </RotaPrivada>
