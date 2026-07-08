@@ -164,8 +164,8 @@
   0% {
     left: -100%;
   }
-  15%, 100% {
-    left: 100%;
+  100% {
+    left: 150%;
   }
 }
 
@@ -178,7 +178,7 @@
   height: 100%;
   background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
   transform: skewX(-25deg);
-  animation: brilho-shine 8s infinite ease-in-out;
+  animation: brilho-shine 1.5s ease-in-out forwards;
 }
 
 /* Botão Revelar Senha */
