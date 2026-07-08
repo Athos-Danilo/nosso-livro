@@ -46,12 +46,19 @@ const decodificarTokenJWT = (token: string) => {
   }
 };
 
+const formatarNomeCurto = (nomeCompleto: string) => {
+  if (!nomeCompleto) return 'Usuário';
+  const partes = nomeCompleto.trim().split(/\s+/);
+  if (partes.length <= 1) return nomeCompleto;
+  return `${partes[0]} ${partes[partes.length - 1]}`;
+};
+
 export const ProvedorAuth: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [carregando, setCarregando] = useState(true);
 
   useEffect(() => {
-    const carregarSessao = () => {
+    const carregarSessao = async () => {
       const token = localStorage.getItem('nosso-livro:token');
       
       if (token) {
@@ -59,13 +66,24 @@ export const ProvedorAuth: React.FC<{ children: ReactNode }> = ({ children }) =>
         
         // Verifica se o token não expirou (claims.exp está em segundos Unix)
         if (claims && claims.exp * 1000 > Date.now()) {
-          setUsuario({
+          const dadosUsuario: Usuario = {
             id: claims.sub,
-            nome: claims.nome || 'Usuário', // Caso venha na claims
+            nome: formatarNomeCurto(claims.nome), // Caso venha na claims
             email: claims.email || '',
             whatsapp: claims.whatsapp || '',
             permissao: claims.permissao || 'membro',
-          });
+          };
+
+          try {
+            const respostaPerfil = await api.get('/api/usuarios/me', {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            dadosUsuario.nome = formatarNomeCurto(respostaPerfil.data.nome);
+          } catch (erroPerfil) {
+            console.warn('Não foi possível obter dados detalhados de perfil no reload.');
+          }
+
+          setUsuario(dadosUsuario);
         } else {
           // Token expirado
           localStorage.removeItem('nosso-livro:token');
@@ -89,7 +107,7 @@ export const ProvedorAuth: React.FC<{ children: ReactNode }> = ({ children }) =>
         // Se a API não devolveu o nome no token, podemos buscar no perfil (/me) na sequência
         const dadosUsuario: Usuario = {
           id: claims.sub,
-          nome: claims.nome || 'Usuário',
+          nome: formatarNomeCurto(claims.nome),
           email: claims.email || '',
           whatsapp: claims.whatsapp || '',
           permissao: claims.permissao || 'membro',
@@ -100,7 +118,7 @@ export const ProvedorAuth: React.FC<{ children: ReactNode }> = ({ children }) =>
           const respostaPerfil = await api.get('/api/usuarios/me', {
             headers: { Authorization: `Bearer ${token}` }
           });
-          dadosUsuario.nome = respostaPerfil.data.nome;
+          dadosUsuario.nome = formatarNomeCurto(respostaPerfil.data.nome);
         } catch (erroPerfil) {
           console.warn('Não foi possível obter dados detalhados de perfil no login, usando claims padrão.');
         }
