@@ -82,3 +82,12 @@ async def atualizar_estoque_livro(db: AsyncSession, id_livro: int, delta_quantid
     await db.commit()
     await db.refresh(livro)
     return livro
+
+async def contar_livros_disponiveis(db: AsyncSession) -> int:
+    """Retorna a soma de quantidade_disponivel de todos os livros ativos."""
+    from sqlalchemy import func
+    resultado = await db.execute(
+        select(func.sum(Livro.quantidade_disponivel)).where(Livro.ativo == True)
+    )
+    total = resultado.scalar()
+    return total or 0

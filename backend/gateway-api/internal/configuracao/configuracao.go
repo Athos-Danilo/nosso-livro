@@ -18,6 +18,7 @@ type Configuracao struct {
 	UrlServicoEmprestimo   string
 	UrlServicoReserva      string
 	UrlServicoRecomendacao string
+	UrlServicoNotificacao  string
 }
 
 // Carregar le as configuracoes a partir do ambiente ou de um arquivo .env opcional.
@@ -72,6 +73,11 @@ func Carregar() *Configuracao {
 		urlRecomendacao = "http://localhost:8001"
 	}
 
+	urlNotificacao := os.Getenv("URL_SERVICO_NOTIFICACAO")
+	if urlNotificacao == "" {
+		urlNotificacao = "http://localhost:3002"
+	}
+
 	return &Configuracao{
 		Porta:                  porta,
 		Ambiente:               ambiente,
@@ -82,5 +88,6 @@ func Carregar() *Configuracao {
 		UrlServicoEmprestimo:   urlEmprestimo,
 		UrlServicoReserva:      urlReserva,
 		UrlServicoRecomendacao: urlRecomendacao,
+		UrlServicoNotificacao:  urlNotificacao,
 	}
 }

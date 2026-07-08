@@ -48,18 +48,14 @@ export const Painel: React.FC = () => {
   });
 
   const buscarDados = async () => {
+    if (!usuario?.id) return;
+    
     try {
-      // Como as rotas de estatísticas (ex: /api/bibliotecas/estatisticas) 
-      // ainda não foram implementadas nos microsserviços do backend,
-      // usamos uma simulação para não causar erros 404/500 no console.
-      const simularAPI = (valor: number) => 
-        new Promise<any>((resolve) => setTimeout(() => resolve({ data: { total: valor } }), 400));
-
       const [resLivros, resReservas, resEmprestimos, resNotificacoes] = await Promise.allSettled([
-        simularAPI(142), // api.get('/api/bibliotecas/estatisticas')
-        simularAPI(3),   // api.get('/api/reservas/usuario')
-        simularAPI(1),   // api.get('/api/emprestimos/usuario')
-        simularAPI(5)    // api.get('/api/usuarios/notificacoes')
+        api.get('/api/bibliotecas/estatisticas'),
+        api.get('/api/reservas/me'),
+        api.get('/api/emprestimos', { params: { usuario_id: usuario.id } }),
+        api.get('/api/notificacoes')
       ]);
 
       const todasFalharam = resLivros.status === 'rejected' && resReservas.status === 'rejected' && resEmprestimos.status === 'rejected' && resNotificacoes.status === 'rejected';
@@ -67,10 +63,10 @@ export const Painel: React.FC = () => {
       setFalhaRede(todasFalharam);
 
       setDadosEstatisticas({
-        livros: resLivros.status === 'fulfilled' ? (resLivros.value.data.total || 128) : (todasFalharam ? 0 : 128),
-        reservas: resReservas.status === 'fulfilled' ? (resReservas.value.data.total || 2) : (todasFalharam ? 0 : 2),
-        emprestimos: resEmprestimos.status === 'fulfilled' ? (resEmprestimos.value.data.total || 1) : (todasFalharam ? 0 : 1),
-        notificacoes: resNotificacoes.status === 'fulfilled' ? (resNotificacoes.value.data.total || 4) : (todasFalharam ? 0 : 4)
+        livros: resLivros.status === 'fulfilled' ? (resLivros.value.data.total || 0) : 0,
+        reservas: resReservas.status === 'fulfilled' ? (resReservas.value.data.total || resReservas.value.data.dados?.length || 0) : 0,
+        emprestimos: resEmprestimos.status === 'fulfilled' ? (resEmprestimos.value.data.length || 0) : 0,
+        notificacoes: resNotificacoes.status === 'fulfilled' ? (resNotificacoes.value.data.total || 0) : 0
       });
     } catch (err) {
       console.error('Erro ao buscar dados do painel:', err);
@@ -106,6 +102,8 @@ export const Painel: React.FC = () => {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '24px',
           backgroundColor: 'var(--cor-papel-polen)',
           color: 'var(--cor-papel-texto)',
           border: '4px double var(--cor-ouro-envelhecido)',
@@ -150,7 +148,8 @@ export const Painel: React.FC = () => {
             height: '120px',
             color: 'var(--cor-vermelho-ferrugem)',
             transform: 'rotate(15deg)',
-            opacity: 0.8
+            opacity: 0.8,
+            flexShrink: 0
           }}>
             <Calendar size={24} />
             <span style={{ fontSize: '0.875rem', fontWeight: 700, textAlign: 'center', textTransform: 'uppercase' }}>
@@ -198,7 +197,8 @@ export const Painel: React.FC = () => {
                       color: 'var(--cor-texto-secundario)', 
                       textTransform: 'uppercase', 
                       letterSpacing: '1px',
-                      fontFamily: '"Playfair Display", Georgia, serif'
+                      fontFamily: 'var(--fonte-principal)',
+                      fontWeight: 600
                     }}>
                       {stat.titulo}
                     </span>
@@ -253,7 +253,7 @@ export const Painel: React.FC = () => {
             </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'center', padding: '12px', backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '8px' }}>
+              <div className="item-lista-hover" style={{ display: 'flex', gap: '16px', alignItems: 'center', padding: '12px', backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '8px', transition: 'all 0.2s ease', cursor: 'pointer' }}>
                 <div className="livro-3d-wrapper">
                   <div className="livro-3d" style={{ backgroundColor: 'var(--cor-azul-nobre)' }}></div>
                 </div>
@@ -262,7 +262,7 @@ export const Painel: React.FC = () => {
                   <div style={{ fontSize: '0.85rem', color: 'var(--cor-texto-secundario)', fontStyle: 'italic' }}>J.R.R. Tolkien</div>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'center', padding: '12px', backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '8px' }}>
+              <div className="item-lista-hover" style={{ display: 'flex', gap: '16px', alignItems: 'center', padding: '12px', backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '8px', transition: 'all 0.2s ease', cursor: 'pointer' }}>
                 <div className="livro-3d-wrapper">
                   <div className="livro-3d" style={{ backgroundColor: 'var(--cor-verde-biblioteca)' }}></div>
                 </div>
@@ -293,7 +293,7 @@ export const Painel: React.FC = () => {
             </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '16px', position: 'relative' }}>
+              <div className="item-lista-hover" style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '16px', position: 'relative', transition: 'all 0.2s ease', cursor: 'pointer', padding: '8px', borderRadius: '8px' }}>
                 <div style={{ padding: '8px', borderRadius: '50%', backgroundColor: 'rgba(46, 125, 50, 0.15)', color: 'var(--cor-sucesso)' }}>
                   <History size={18} />
                 </div>
@@ -305,7 +305,7 @@ export const Painel: React.FC = () => {
                   Devolvido
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', position: 'relative' }}>
+              <div className="item-lista-hover" style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', position: 'relative', transition: 'all 0.2s ease', cursor: 'pointer', padding: '8px', borderRadius: '8px' }}>
                 <div style={{ padding: '8px', borderRadius: '50%', backgroundColor: 'rgba(212, 175, 55, 0.15)', color: 'var(--cor-ouro-envelhecido)' }}>
                   <Bookmark size={18} />
                 </div>

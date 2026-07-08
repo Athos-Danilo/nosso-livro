@@ -47,3 +47,4 @@ pip-delete-this-directory.txt
 .gemini/
 antigravity-ide/
 .system_generated/
+.impeccable/

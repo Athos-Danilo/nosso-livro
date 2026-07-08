@@ -906,6 +906,12 @@ input:-webkit-autofill:active {
   filter: drop-shadow(0 0 4px rgba(212, 175, 55, 0.5));
 }
 
+.item-lista-hover:hover {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  transform: translateY(-2px);
+  box-shadow: var(--sombra-sm);
+}
+
 /* --- Fase 4: Livro de Avisos e Prateleira (Listagens) --- */
 
 /* M4.1: Selos de Carimbo de Notificação */

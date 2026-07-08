@@ -50,6 +50,11 @@ func main() {
 		slog.Error("Falha ao criar proxy para o servico de recomendacao", slog.String("erro", err.Error()))
 		os.Exit(1)
 	}
+	proxyNotificacao, err := proxy.NovoProxyReverso(cfg.UrlServicoNotificacao)
+	if err != nil {
+		slog.Error("Falha ao criar proxy para o servico de notificacao", slog.String("erro", err.Error()))
+		os.Exit(1)
+	}
 
 	// 4. Configura o Roteador HTTP (ServeMux nativo do Go 1.22+)
 	mux := http.NewServeMux()
@@ -94,6 +99,9 @@ func main() {
 	mux.Handle("GET /api/reservas", proxyReserva)
 
 	mux.Handle("/api/recomendacoes/", proxyRecomendacao)
+	
+	mux.Handle("/api/notificacoes/", proxyNotificacao)
+	mux.Handle("GET /api/notificacoes", proxyNotificacao)
 
 	// 6. Encadeamento de middlewares globais de borda
 	// Ordem de execucao: Logs -> Seguranca (Filtro 2MB/Headers) -> CORS (Origens/Preflight) -> Autenticacao (JWT) -> Roteador (mux)

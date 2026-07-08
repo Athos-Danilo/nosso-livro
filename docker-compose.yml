@@ -47,12 +47,14 @@ services:
       - URL_SERVICO_EMPRESTIMO=http://servico-emprestimo:8081
       - URL_SERVICO_RESERVA=http://servico-reserva-fila:3001
       - URL_SERVICO_RECOMENDACAO=http://servico-recomendacao:8001
+      - URL_SERVICO_NOTIFICACAO=http://servico-notificacao:3002
     depends_on:
       - servico-autenticacao-usuario
       - servico-catalogo-biblioteca
       - servico-emprestimo
       - servico-reserva-fila
       - servico-recomendacao
+      - servico-notificacao
     networks:
       - rede-nosso-livro
 

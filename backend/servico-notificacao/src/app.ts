@@ -8,6 +8,7 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 import prisma from './banco/prisma';
+import rotasNotificacoes from './rotas/notificacoes';
 
 const app = express();
 
@@ -60,5 +61,8 @@ app.get('/pronto', async (_req: Request, res: Response) => {
     });
   }
 });
+
+// ─── Rotas da API ────────────────────────────────────────────────────────────
+app.use('/', rotasNotificacoes);
 
 export default app;

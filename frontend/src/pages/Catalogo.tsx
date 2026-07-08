@@ -163,6 +163,13 @@ export const Catalogo: React.FC = () => {
         id_biblioteca: String(livro.id_biblioteca)
       });
       setStatusRequisicao({ tipo: 'sucesso', mensagem: 'EMPRÉSTIMO APROVADO' });
+      
+      // Atualiza o estado do livro no modal para exibir a nova quantidade instantaneamente
+      setLivroSelecionado(prev => prev ? {
+        ...prev,
+        quantidade_disponivel: Math.max(0, prev.quantidade_disponivel - 1)
+      } : null);
+
       setPagina(1);
       carregarLivros(1, busca);
     } catch (erro: any) {
@@ -215,13 +222,13 @@ export const Catalogo: React.FC = () => {
                 style={{
                   display: 'flex', alignItems: 'center', gap: '8px',
                   backgroundColor: 'var(--cor-ouro-envelhecido)',
-                  color: '#2C1E16',
+                  color: 'var(--cor-papel-texto)',
                   padding: '12px 24px',
                   borderRadius: 'var(--raio-borda-md)',
                   fontWeight: 700,
-                  border: '1px solid #8B7355',
+                  border: '1px solid var(--cor-ouro-envelhecido)',
                   boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
-                  fontFamily: '"Times New Roman", Times, serif',
+                  fontFamily: 'var(--fonte-principal)',
                   letterSpacing: '1px'
                 }}
               >
@@ -231,9 +238,9 @@ export const Catalogo: React.FC = () => {
             ) : (
               <div className="ficha-cadastro-polen">
                 {erroValidacaoCriar && <div className="carimbo-invalido">INVÁLIDO</div>}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '2px solid #8B7355', paddingBottom: '8px' }}>
-                  <h3 style={{ fontSize: '1.5rem', fontFamily: '"Times New Roman", Times, serif', color: '#2C1E16', textTransform: 'uppercase' }}>Ficha de Catalogação - Nova Obra</h3>
-                  <button onClick={() => { setMostrarCriar(false); setErroValidacaoCriar(false); }} style={{ background: 'none', border: 'none', color: '#8B7355', cursor: 'pointer' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', borderBottom: '2px solid var(--cor-ouro-envelhecido)', paddingBottom: '8px' }}>
+                  <h3 style={{ fontSize: '1.5rem', fontFamily: 'var(--fonte-principal)', color: 'var(--cor-papel-texto)', textTransform: 'uppercase', fontWeight: 700 }}>Ficha de Catalogação - Nova Obra</h3>
+                  <button onClick={() => { setMostrarCriar(false); setErroValidacaoCriar(false); }} style={{ background: 'none', border: 'none', color: 'var(--cor-ouro-envelhecido)', cursor: 'pointer' }}>
                     <X size={24} />
                   </button>
                 </div>
@@ -242,43 +249,43 @@ export const Catalogo: React.FC = () => {
                 
                 <form onSubmit={handleCriarLivro} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
                   <div style={{ gridColumn: '1 / -1' }}>
-                    <label style={{ color: '#5C4033', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Título da Obra</label>
+                    <label style={{ color: 'var(--cor-texto-secundario)', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Título da Obra</label>
                     <input type="text" className="input-classico" value={novoLivro.titulo} onChange={e => { setNovoLivro({...novoLivro, titulo: e.target.value}); setErroValidacaoCriar(false); }} required />
                   </div>
                   <div>
-                    <label style={{ color: '#5C4033', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Autor</label>
+                    <label style={{ color: 'var(--cor-texto-secundario)', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Autor</label>
                     <input type="text" className="input-classico" value={novoLivro.autor} onChange={e => { setNovoLivro({...novoLivro, autor: e.target.value}); setErroValidacaoCriar(false); }} required />
                   </div>
                   <div>
-                    <label style={{ color: '#5C4033', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>ISBN</label>
+                    <label style={{ color: 'var(--cor-texto-secundario)', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>ISBN</label>
                     <input type="text" className="input-classico" value={novoLivro.isbn} onChange={e => { setNovoLivro({...novoLivro, isbn: e.target.value}); setErroValidacaoCriar(false); }} required />
                   </div>
                   <div>
-                    <label style={{ color: '#5C4033', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Gênero/Categoria</label>
+                    <label style={{ color: 'var(--cor-texto-secundario)', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Gênero/Categoria</label>
                     <input type="text" className="input-classico" value={novoLivro.categoria} onChange={e => { setNovoLivro({...novoLivro, categoria: e.target.value}); setErroValidacaoCriar(false); }} required />
                   </div>
                   <div>
-                    <label style={{ color: '#5C4033', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Ano (Ex: 1954)</label>
+                    <label style={{ color: 'var(--cor-texto-secundario)', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Ano (Ex: 1954)</label>
                     <input type="number" className="input-classico" value={novoLivro.ano_publicacao} onChange={e => { setNovoLivro({...novoLivro, ano_publicacao: e.target.value}); setErroValidacaoCriar(false); }} required />
                   </div>
                   <div>
-                    <label style={{ color: '#5C4033', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Quantidade Inicial (Estoque)</label>
+                    <label style={{ color: 'var(--cor-texto-secundario)', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>Quantidade Inicial (Estoque)</label>
                     <input type="number" className="input-classico" value={novoLivro.quantidade_total} onChange={e => { setNovoLivro({...novoLivro, quantidade_total: parseInt(e.target.value)}); setErroValidacaoCriar(false); }} min="1" required />
                   </div>
                   <div>
-                    <label style={{ color: '#5C4033', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>ID da Biblioteca Origem</label>
+                    <label style={{ color: 'var(--cor-texto-secundario)', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase' }}>ID da Biblioteca Origem</label>
                     <input type="number" className="input-classico" value={novoLivro.id_biblioteca} onChange={e => { setNovoLivro({...novoLivro, id_biblioteca: parseInt(e.target.value)}); setErroValidacaoCriar(false); }} min="1" required />
                   </div>
                   
                   <div style={{ gridColumn: '1 / -1', display: 'flex', justifyContent: 'flex-end', marginTop: '16px' }}>
                     <button type="submit" className="btn-animado" style={{
-                      backgroundColor: '#1e3a8a',
-                      color: '#f1ebd9',
+                      backgroundColor: 'var(--cor-primaria)',
+                      color: '#ffffff',
                       padding: '12px 32px',
                       borderRadius: '4px',
                       fontWeight: 700,
-                      border: '1px solid #1e3a8a',
-                      fontFamily: '"Times New Roman", Times, serif',
+                      border: '1px solid var(--cor-primaria)',
+                      fontFamily: 'var(--fonte-principal)',
                       letterSpacing: '1px'
                     }}>
                       Carimbar Registro
@@ -348,7 +355,7 @@ export const Catalogo: React.FC = () => {
           ) : livrosFiltrados.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '64px 0', color: 'var(--cor-texto-secundario)' }}>
               <BookOpen size={48} color="var(--cor-borda)" style={{ marginBottom: '16px', opacity: 0.5 }} />
-              <p style={{ fontSize: '1.2rem', fontFamily: '"Times New Roman", Times, serif' }}>
+              <p style={{ fontSize: '1.1rem', fontFamily: 'var(--fonte-principal)', fontWeight: 500 }}>
                 Nenhum tomo antigo encontrado neste corredor. Tente pesquisar por outro título.
               </p>
             </div>
@@ -481,7 +488,7 @@ export const Catalogo: React.FC = () => {
 
             <div className="ficha-acoes">
               {usuario?.permissao === 'administrador' ? (
-                <div style={{ textAlign: 'center', color: '#5C4033', fontStyle: 'italic', padding: '8px', fontSize: '0.9rem' }}>
+                <div style={{ textAlign: 'center', color: 'var(--cor-texto-secundario)', fontStyle: 'italic', padding: '8px', fontSize: '0.9rem', backgroundColor: 'rgba(0,0,0,0.02)', borderRadius: '4px' }}>
                   Como <strong>Administrador</strong>, seu perfil destina-se a gerenciar o acervo. <br/>Faça login como <strong>Membro</strong> para solicitar empréstimos ou entrar na fila.
                 </div>
               ) : livroSelecionado.quantidade_disponivel > 0 ? (
