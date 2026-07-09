@@ -11,21 +11,7 @@ O **Nosso Livro** é uma plataforma acadêmica e comunitária em arquitetura de 
 
 O sistema integra múltiplas bibliotecas físicas, automatiza filas de reservas justas, rastreia empréstimos e fornece recomendações personalizadas baseadas nas preferências de leitura dos usuários.
 
----
 
-## 📌 Sumário
-
-1. [🎯 Visão Geral do Projeto](#-visão-geral-do-projeto)
-2. [🏗️ Arquitetura e Fluxo de Integração](#%EF%B8%8F-arquitetura-e-fluxo-de-integração)
-3. [📁 Organização do Repositório (Monorepo)](#-organização-do-repositório-monorepo)
-4. [⚙️ Ecossistema de Microsserviços](#%EF%B8%8F-ecossistema-de-microsserviços)
-5. [✉️ Catálogo de Eventos (RabbitMQ)](#%EF%B8%8F-catálogo-de-eventos-rabbitmq)
-6. [🛠️ Como Executar o Ambiente Local](#%EF%B8%8F-como-executar-o-ambiente-local)
-7. [🗄️ Migrações de Bancos de Dados](#%EF%B8%8F-migrações-de-bancos-de-dados)
-8. [📝 Diretrizes de Desenvolvimento (Idioma e Código)](#-diretrizes-de-desenvolvimento-idioma-e-código)
-9. [👥 Equipe de Desenvolvimento](#-equipe-de-desenvolvimento)
-
----
 
 ## 🎯 Visão Geral do Projeto
 
