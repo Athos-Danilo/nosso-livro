@@ -10,7 +10,7 @@ class HistoricoLeitura(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     id_usuario = Column(UUID(as_uuid=True), nullable=False, index=True)
-    id_livro = Column(UUID(as_uuid=True), nullable=False)
+    id_livro = Column(String(255), nullable=False)
     categoria = Column(String(100), nullable=False)
     data_inicio = Column(DateTime, nullable=False, default=datetime.utcnow)
     data_fim = Column(DateTime, nullable=True)

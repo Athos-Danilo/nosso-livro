@@ -1,4 +1,5 @@
 import logging
+import random
 from uuid import UUID
 from typing import List
 from sqlalchemy.future import select
@@ -6,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modelos.historico import HistoricoLeitura
 from app.modelos.popularidade import PopularidadeLivro
+from app.esquemas.recomendacao import RespostaRecomendacaoItem
 
 # Configuração do registrador de logs em português (PT-BR)
 registrador = logging.getLogger("recomendador")
@@ -15,9 +17,9 @@ class ServicoRecomendacao:
 
     async def gerar_recomendacoes_personalizadas(
         self, id_usuario: UUID, sessao: AsyncSession, limite: int = 10
-    ) -> List[UUID]:
+    ) -> List[RespostaRecomendacaoItem]:
         """
-        Gera uma lista de identificadores (UUIDs) de livros recomendados para o usuário.
+        Gera uma lista de livros recomendados para o usuário.
         
         A lógica de recomendação segue os seguintes passos:
         1. Busca as categorias que o usuário mais consumiu na tabela de histórico de leitura.
@@ -36,6 +38,8 @@ class ServicoRecomendacao:
         # Mapeia todos os IDs dos livros já consumidos para exclusão posterior
         ids_excluir = {registro.id_livro for registro in historicos}
         
+        recomendacoes = []
+        
         # Caso de Fallback: Usuário sem histórico (usuário novo)
         if not historicos:
             registrador.info(f"Usuário {id_usuario} sem histórico de leitura. Aplicando estratégia de fallback global.")
@@ -45,7 +49,15 @@ class ServicoRecomendacao:
                 .limit(limite)
             )
             resultado_fallback = await sessao.execute(stmt_fallback)
-            return list(resultado_fallback.scalars().all())
+            ids_fallback = list(resultado_fallback.scalars().all())
+            
+            for id_livro in ids_fallback:
+                recomendacoes.append(RespostaRecomendacaoItem(
+                    id_livro=id_livro,
+                    porcentagem_compatibilidade=random.randint(70, 85),
+                    motivo="Alta popularidade entre os leitores da comunidade."
+                ))
+            return recomendacoes
             
         # Passo 2: Mapear e contar as categorias preferidas do usuário
         contagem_categorias = {}
@@ -64,7 +76,7 @@ class ServicoRecomendacao:
         
         # Passo 3: Buscar livros mais populares que pertencem a essas categorias preferidas
         if categorias_preferidas:
-            stmt_populares = select(PopularidadeLivro.id_livro).where(
+            stmt_populares = select(PopularidadeLivro).where(
                 PopularidadeLivro.categoria.in_(categorias_preferidas)
             )
             if ids_excluir:
@@ -72,21 +84,36 @@ class ServicoRecomendacao:
             
             stmt_populares = stmt_populares.order_by(PopularidadeLivro.total_emprestimos.desc()).limit(limite)
             resultado_populares = await sessao.execute(stmt_populares)
-            recomendacoes_ids = list(resultado_populares.scalars().all())
+            livros_populares = list(resultado_populares.scalars().all())
+            
+            for livro in livros_populares:
+                recomendacoes_ids.append(livro.id_livro)
+                recomendacoes.append(RespostaRecomendacaoItem(
+                    id_livro=livro.id_livro,
+                    porcentagem_compatibilidade=random.randint(90, 99),
+                    motivo=f"Baseado no seu alto interesse pela categoria {livro.categoria}."
+                ))
             
         # Passo 4: Se o total de recomendações for inferior ao limite desejado,
         # preenchemos os itens restantes com os livros mais populares globais (excluindo os já consumidos e já recomendados)
-        if len(recomendacoes_ids) < limite:
-            itens_restantes = limite - len(recomendacoes_ids)
+        if len(recomendacoes) < limite:
+            itens_restantes = limite - len(recomendacoes)
             excluir_adicional = ids_excluir.union(set(recomendacoes_ids))
             
-            stmt_global = select(PopularidadeLivro.id_livro)
+            stmt_global = select(PopularidadeLivro)
             if excluir_adicional:
                 stmt_global = stmt_global.where(PopularidadeLivro.id_livro.not_in(excluir_adicional))
                 
             stmt_global = stmt_global.order_by(PopularidadeLivro.total_emprestimos.desc()).limit(itens_restantes)
             resultado_global = await sessao.execute(stmt_global)
-            recomendacoes_ids.extend(list(resultado_global.scalars().all()))
+            livros_globais = list(resultado_global.scalars().all())
             
-        registrador.info(f"Recomendações geradas com sucesso para {id_usuario}: {recomendacoes_ids}")
-        return recomendacoes_ids
+            for livro in livros_globais:
+                recomendacoes.append(RespostaRecomendacaoItem(
+                    id_livro=livro.id_livro,
+                    porcentagem_compatibilidade=random.randint(70, 85),
+                    motivo="Alta popularidade entre os leitores da comunidade."
+                ))
+            
+        registrador.info(f"Recomendações geradas com sucesso para {id_usuario}: {[r.id_livro for r in recomendacoes]}")
+        return recomendacoes

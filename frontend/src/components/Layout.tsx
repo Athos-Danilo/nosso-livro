@@ -24,7 +24,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   };
 
   const itensMenu = [
-    { nome: 'Painel', caminho: '/', icone: LayoutDashboard, permissao: 'todos' },
+    { nome: 'Painel', caminho: '/painel', icone: LayoutDashboard, permissao: 'todos' },
     { nome: 'Catálogo', caminho: '/catalogo', icone: BookOpen, permissao: 'todos' },
     { nome: 'Reservas', caminho: '/reservas', icone: Bookmark, permissao: 'todos' },
     { nome: 'Empréstimos', caminho: '/emprestimos', icone: History, permissao: 'todos' },

@@ -33,7 +33,7 @@ async def processar_mensagem(mensagem: aio_pika.IncomingMessage) -> None:
             async with sessao_local() as db:
                 if chave_roteamento == "emprestimo.criado":
                     id_usuario = uuid.UUID(dados.get("id_usuario"))
-                    id_livro = uuid.UUID(dados.get("id_livro"))
+                    id_livro = str(dados.get("id_livro"))
                     categoria = dados.get("categoria")
                     titulo = dados.get("titulo", "Título Desconhecido")
                     
@@ -69,7 +69,7 @@ async def processar_mensagem(mensagem: aio_pika.IncomingMessage) -> None:
                     
                 elif chave_roteamento == "emprestimo.devolvido":
                     id_usuario = uuid.UUID(dados.get("id_usuario"))
-                    id_livro = uuid.UUID(dados.get("id_livro"))
+                    id_livro = str(dados.get("id_livro"))
                     
                     # Localiza o registro de leitura correspondente que esteja no estado LENDO
                     query_historico = await db.execute(

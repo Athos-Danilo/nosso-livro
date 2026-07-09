@@ -24,7 +24,7 @@ def upgrade() -> None:
     op.create_table('historicos_leitura',
     sa.Column('id', sa.UUID(), nullable=False),
     sa.Column('id_usuario', sa.UUID(), nullable=False),
-    sa.Column('id_livro', sa.UUID(), nullable=False),
+    sa.Column('id_livro', sa.String(length=255), nullable=False),
     sa.Column('categoria', sa.String(length=100), nullable=False),
     sa.Column('data_inicio', sa.DateTime(), nullable=False),
     sa.Column('data_fim', sa.DateTime(), nullable=True),
@@ -33,7 +33,7 @@ def upgrade() -> None:
     )
     op.create_index(op.f('ix_historicos_leitura_id_usuario'), 'historicos_leitura', ['id_usuario'], unique=False)
     op.create_table('popularidades_livros',
-    sa.Column('id_livro', sa.UUID(), nullable=False),
+    sa.Column('id_livro', sa.String(length=255), nullable=False),
     sa.Column('titulo', sa.String(length=255), nullable=False),
     sa.Column('categoria', sa.String(length=100), nullable=False),
     sa.Column('total_emprestimos', sa.Integer(), nullable=False),

@@ -46,16 +46,19 @@ export const Painel: React.FC = () => {
     emprestimos: 0,
     notificacoes: 0
   });
+  const [recomendacoes, setRecomendacoes] = useState<any[]>([]);
+  const [avisos, setAvisos] = useState<any[]>([]);
 
   const buscarDados = async () => {
     if (!usuario?.id) return;
     
     try {
-      const [resLivros, resReservas, resEmprestimos, resNotificacoes] = await Promise.allSettled([
+      const [resLivros, resReservas, resEmprestimos, resNotificacoes, resRecomendacoes] = await Promise.allSettled([
         api.get('/api/bibliotecas/estatisticas'),
         api.get('/api/reservas/me'),
         api.get('/api/emprestimos', { params: { usuario_id: usuario.id } }),
-        api.get('/api/notificacoes')
+        api.get('/api/notificacoes'),
+        api.get(`/api/recomendacoes/usuario/${usuario.id}`)
       ]);
 
       const todasFalharam = resLivros.status === 'rejected' && resReservas.status === 'rejected' && resEmprestimos.status === 'rejected' && resNotificacoes.status === 'rejected';
@@ -68,6 +71,37 @@ export const Painel: React.FC = () => {
         emprestimos: resEmprestimos.status === 'fulfilled' ? (resEmprestimos.value.data?.length || 0) : 0,
         notificacoes: resNotificacoes.status === 'fulfilled' ? (resNotificacoes.value.data.total || 0) : 0
       });
+
+      if (resRecomendacoes.status === 'fulfilled' && resRecomendacoes.value.data) {
+        const top2 = resRecomendacoes.value.data.slice(0, 2);
+        const recDetalhes = await Promise.all(
+          top2.map(async (rec: any) => {
+             try {
+               const resLivro = await api.get(`/api/livros/${rec.id_livro}`);
+               return { ...rec, detalhesLivro: resLivro.data };
+             } catch (e) {
+               return { ...rec, detalhesLivro: { titulo: 'Desconhecido', autor: 'Desconhecido' }};
+             }
+          })
+        );
+        setRecomendacoes(recDetalhes);
+      }
+
+      if (resEmprestimos.status === 'fulfilled' && resEmprestimos.value.data) {
+        const ativos = resEmprestimos.value.data.filter((e: any) => e.estado === 'ATIVO' || e.estado === 'ATRASADO');
+        const topAtivos = ativos.slice(0, 3);
+        const ativosDetalhes = await Promise.all(
+          topAtivos.map(async (emp: any) => {
+             try {
+               const resLivro = await api.get(`/api/livros/${emp.id_livro}`);
+               return { ...emp, livro: resLivro.data };
+             } catch (e) {
+               return { ...emp, livro: { titulo: `Livro #${emp.id_livro}` }};
+             }
+          })
+        );
+        setAvisos(ativosDetalhes);
+      }
     } catch (err) {
       console.error('Erro ao buscar dados do painel:', err);
       setFalhaRede(true);
@@ -253,24 +287,44 @@ export const Painel: React.FC = () => {
             </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div className="item-lista-hover" style={{ display: 'flex', gap: '16px', alignItems: 'center', padding: '12px', backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '8px', transition: 'all 0.2s ease', cursor: 'pointer' }}>
-                <div className="livro-3d-wrapper">
-                  <div className="livro-3d" style={{ backgroundColor: 'var(--cor-azul-nobre)' }}></div>
+              {recomendacoes.length > 0 ? recomendacoes.map((rec, idx) => (
+                <div key={rec.id_livro || idx} className="item-lista-hover" style={{ display: 'flex', gap: '16px', alignItems: 'center', padding: '12px', backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '8px', transition: 'all 0.2s ease', cursor: 'pointer' }}>
+                  {rec.detalhesLivro?.capa_url ? (
+                    <img 
+                      src={rec.detalhesLivro.capa_url} 
+                      alt={rec.detalhesLivro.titulo} 
+                      style={{
+                        width: '45px',
+                        height: '65px',
+                        objectFit: 'cover',
+                        borderRadius: '4px',
+                        border: '1px solid var(--cor-borda)',
+                        flexShrink: 0
+                      }}
+                    />
+                  ) : (
+                    <div style={{
+                      width: '45px',
+                      height: '65px',
+                      backgroundColor: 'var(--cor-card-hover)',
+                      borderRadius: '4px',
+                      border: '1px solid var(--cor-borda)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      flexShrink: 0
+                    }}>
+                      <BookOpen size={20} color="var(--cor-texto-desativado)" />
+                    </div>
+                  )}
+                  <div>
+                    <div style={{ fontWeight: 600, fontSize: '1rem', color: 'var(--cor-papel-polen)', lineHeight: 1.2, marginBottom: '4px' }}>{rec.detalhesLivro?.titulo}</div>
+                    <div style={{ fontSize: '0.85rem', color: 'var(--cor-texto-secundario)', fontStyle: 'italic' }}>{rec.detalhesLivro?.autor}</div>
+                  </div>
                 </div>
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: '1rem', color: 'var(--cor-papel-polen)' }}>O Senhor dos Anéis</div>
-                  <div style={{ fontSize: '0.85rem', color: 'var(--cor-texto-secundario)', fontStyle: 'italic' }}>J.R.R. Tolkien</div>
-                </div>
-              </div>
-              <div className="item-lista-hover" style={{ display: 'flex', gap: '16px', alignItems: 'center', padding: '12px', backgroundColor: 'rgba(255,255,255,0.03)', borderRadius: '8px', transition: 'all 0.2s ease', cursor: 'pointer' }}>
-                <div className="livro-3d-wrapper">
-                  <div className="livro-3d" style={{ backgroundColor: 'var(--cor-verde-biblioteca)' }}></div>
-                </div>
-                <div>
-                  <div style={{ fontWeight: 600, fontSize: '1rem', color: 'var(--cor-papel-polen)' }}>Arquitetura Limpa</div>
-                  <div style={{ fontSize: '0.85rem', color: 'var(--cor-texto-secundario)', fontStyle: 'italic' }}>Robert C. Martin</div>
-                </div>
-              </div>
+              )) : (
+                <div style={{ padding: '12px', color: 'var(--cor-texto-secundario)', fontStyle: 'italic' }}>Nenhuma recomendação disponível no momento.</div>
+              )}
             </div>
           </div>
 
@@ -293,30 +347,32 @@ export const Painel: React.FC = () => {
             </div>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div className="item-lista-hover" style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '16px', position: 'relative', transition: 'all 0.2s ease', cursor: 'pointer', padding: '8px', borderRadius: '8px' }}>
-                <div style={{ padding: '8px', borderRadius: '50%', backgroundColor: 'rgba(46, 125, 50, 0.15)', color: 'var(--cor-sucesso)' }}>
-                  <History size={18} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '0.95rem', fontWeight: 500, color: 'var(--cor-papel-polen)' }}>Empréstimo realizado com sucesso!</div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--cor-texto-desativado)', marginTop: '4px' }}>Há 2 horas</div>
-                </div>
-                <div className="selo-carimbo devolucao" style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%) rotate(-4deg)' }}>
-                  Devolvido
-                </div>
-              </div>
-              <div className="item-lista-hover" style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', position: 'relative', transition: 'all 0.2s ease', cursor: 'pointer', padding: '8px', borderRadius: '8px' }}>
-                <div style={{ padding: '8px', borderRadius: '50%', backgroundColor: 'rgba(212, 175, 55, 0.15)', color: 'var(--cor-ouro-envelhecido)' }}>
-                  <Bookmark size={18} />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ fontSize: '0.95rem', fontWeight: 500, color: 'var(--cor-papel-polen)' }}>Sua reserva do livro "Clean Code" está pronta.</div>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--cor-texto-desativado)', marginTop: '4px' }}>Ontem</div>
-                </div>
-                <div className="selo-carimbo reserva" style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%) rotate(-4deg)' }}>
-                  Disponível
-                </div>
-              </div>
+              {avisos.length > 0 ? avisos.map((aviso, idx) => {
+                const atrasado = aviso.estado === 'ATRASADO';
+                const corIcone = atrasado ? 'var(--cor-alerta)' : 'var(--cor-sucesso)';
+                const bgIcone = atrasado ? 'rgba(220, 38, 38, 0.15)' : 'rgba(46, 125, 50, 0.15)';
+                const textoSelo = atrasado ? 'Atrasado' : 'Ativo';
+                const classeSelo = atrasado ? 'atrasado' : 'no-prazo';
+                
+                return (
+                  <div key={aviso.id || idx} className="item-lista-hover" style={{ display: 'flex', gap: '16px', alignItems: 'flex-start', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '16px', position: 'relative', transition: 'all 0.2s ease', cursor: 'pointer', padding: '8px', borderRadius: '8px' }}>
+                    <div style={{ padding: '8px', borderRadius: '50%', backgroundColor: bgIcone, color: corIcone }}>
+                      <History size={18} />
+                    </div>
+                    <div style={{ flex: 1, paddingRight: '100px' }}>
+                      <div style={{ fontSize: '0.95rem', fontWeight: 500, color: 'var(--cor-papel-polen)', lineHeight: 1.2 }}>Emprestou: {aviso.livro?.titulo}</div>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--cor-texto-desativado)', marginTop: '6px' }}>
+                        Devolução: {new Date(aviso.data_devolucao_prevista).toLocaleDateString('pt-BR')}
+                      </div>
+                    </div>
+                    <div className={`selo-carimbo ${classeSelo}`} style={{ position: 'absolute', right: '10px', top: '50%', transform: 'translateY(-50%) rotate(-4deg)', fontSize: '0.7rem' }}>
+                      {textoSelo}
+                    </div>
+                  </div>
+                );
+              }) : (
+                <div style={{ padding: '12px', color: 'var(--cor-texto-secundario)', fontStyle: 'italic' }}>Nenhum aviso ou empréstimo pendente.</div>
+              )}
             </div>
           </div>
 

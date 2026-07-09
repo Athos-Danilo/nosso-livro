@@ -11,7 +11,7 @@ from app.modelos.historico import HistoricoLeitura
 from app.modelos.popularidade import PopularidadeLivro
 from app.servicos.recomendador import ServicoRecomendacao
 from app.esquemas import RespostaPopularidadeLivro, RespostaHistoricoLeitura
-
+from app.esquemas.recomendacao import RespostaRecomendacaoItem
 # Configuração do registrador de logs
 registrador = logging.getLogger("recomendacoes_api")
 
@@ -23,7 +23,7 @@ servico_recomendador = ServicoRecomendacao()
 
 @roteador.get(
     "/usuario/{id_usuario}",
-    response_model=List[UUID],
+    response_model=List[RespostaRecomendacaoItem],
     status_code=status.HTTP_200_OK,
     summary="Obter recomendações personalizadas para um usuário específico."
 )
@@ -31,7 +31,7 @@ async def obter_recomendacoes_usuario(
     id_usuario: UUID,
     usuario_sessao: dict = Depends(obter_usuario_atual),
     db: AsyncSession = Depends(obter_banco)
-) -> List[UUID]:
+) -> List[RespostaRecomendacaoItem]:
     """
     Retorna uma lista de IDs de livros recomendados de forma personalizada para o usuário.
     Requer autenticação JWT do usuário.
